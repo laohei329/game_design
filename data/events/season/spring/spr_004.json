@@ -1,0 +1,78 @@
+{
+  "configVersion": 25,
+  "id": "spr_004",
+  "status": "ready",
+  "bucket": "season",
+  "season": "spring",
+  "minYear": null,
+  "weightEventId": "evt_mood",
+  "weight": 0.9,
+  "yieldScale": 1.0,
+  "tags": [
+    "mood"
+  ],
+  "title": {
+    "zh": "返青的栅栏",
+    "en": "Green Wire",
+    "de": "Grüner Zaun",
+    "ru": "Зелёный забор",
+    "es": "Alambrada verde"
+  },
+  "body": {
+    "zh": "野草从铁丝网里钻出来，像是不久前才有人路过。铁丝上新挂了一块撕破的布条。",
+    "en": "Weeds punch through a chain-link fence as if someone walked the line yesterday. The moment passes without a second signal.",
+    "de": "Unkraut bricht durch den Maschendraht, als wäre gestern noch jemand die Strecke gegangen.",
+    "ru": "Сорняки пробиваются сквозь сетку, будто вчера здесь кто-то ходил.",
+    "es": "Hierbas rompen la valla metálica como si alguien pasó ayer."
+  },
+  "logLine": {
+    "zh": "【返青的栅栏】野草从铁丝网里钻出来，像是不久前才有人路过。铁丝上新挂了一块撕破的布条。",
+    "en": "[Green Wire] Weeds punch through a chain-link fence as if someone walked the line yesterday. The moment passes without a second signal.",
+    "de": "«Grüner Zaun» Unkraut bricht durch den Maschendraht, als wäre gestern noch jemand die Strecke gegangen.",
+    "ru": "«Зелёный забор» Сорняки пробиваются сквозь сетку, будто вчера здесь кто-то ходил.",
+    "es": "«Alambrada verde» Hierbas rompen la valla metálica como si alguien pasó ayer."
+  },
+  "options": [
+    {
+      "id": "talk",
+      "label": {
+        "zh": "让几个人聊聊",
+        "en": "Let them talk",
+        "de": "Reden lassen",
+        "ru": "Дать поговорить",
+        "es": "Dejar que hablen"
+      },
+      "immediate": {
+        "op": "mood_delta",
+        "targetType": "party",
+        "args": {
+          "delta": 3
+        }
+      },
+      "delayDays": 2,
+      "op": "weight_mod",
+      "targetType": "segment",
+      "args": {
+        "eventTag": "raid",
+        "delta": 0.08
+      }
+    },
+    {
+      "id": "silence",
+      "label": {
+        "zh": "继续沉默",
+        "en": "Stay silent",
+        "de": "Schweigen",
+        "ru": "Молчать",
+        "es": "Guardar silencio"
+      },
+      "delayDays": 1,
+      "op": "mood_delta",
+      "targetType": "party",
+      "args": {
+        "delta": -4
+      },
+      "capture": "snapshot"
+    }
+  ]
+}

@@ -1,0 +1,219 @@
+{
+  "configVersion": 25,
+  "authority": "modules/06-region-events.md §2.1 · modules/09-data-platform.md",
+  "status": "ready_cards",
+  "targetTotal": 120,
+  "buckets": {
+    "general": {
+      "quota": 60,
+      "description": "全年可抽 · 与季节无关",
+      "filePattern": "events/general/{eventId}.json",
+      "eventIds": [
+        "gen_001",
+        "gen_002",
+        "gen_003",
+        "gen_004",
+        "gen_005",
+        "gen_006",
+        "gen_007",
+        "gen_008",
+        "gen_009",
+        "gen_010",
+        "gen_011",
+        "gen_012",
+        "gen_013",
+        "gen_014",
+        "gen_015",
+        "gen_016",
+        "gen_017",
+        "gen_018",
+        "gen_019",
+        "gen_020",
+        "gen_021",
+        "gen_022",
+        "gen_023",
+        "gen_024",
+        "gen_025",
+        "gen_026",
+        "gen_027",
+        "gen_028",
+        "gen_029",
+        "gen_030",
+        "gen_031",
+        "gen_032",
+        "gen_033",
+        "gen_034",
+        "gen_035",
+        "gen_036",
+        "gen_037",
+        "gen_038",
+        "gen_039",
+        "gen_040",
+        "gen_041",
+        "gen_042",
+        "gen_043",
+        "gen_044",
+        "gen_045",
+        "gen_046",
+        "gen_047",
+        "gen_048",
+        "gen_049",
+        "gen_050",
+        "gen_051",
+        "gen_052",
+        "gen_053",
+        "gen_054",
+        "gen_055",
+        "gen_056",
+        "gen_057",
+        "gen_058",
+        "gen_059",
+        "gen_060"
+      ]
+    },
+    "season": {
+      "quota": 40,
+      "description": "季节池 · 各季 10",
+      "filePattern": "events/season/{season}/{eventId}.json",
+      "bySeason": {
+        "spring": {
+          "quota": 10,
+          "eventIds": [
+            "spr_001",
+            "spr_002",
+            "spr_003",
+            "spr_004",
+            "spr_005",
+            "spr_006",
+            "spr_007",
+            "spr_008",
+            "spr_009",
+            "spr_010"
+          ]
+        },
+        "summer": {
+          "quota": 10,
+          "eventIds": [
+            "sum_001",
+            "sum_002",
+            "sum_003",
+            "sum_004",
+            "sum_005",
+            "sum_006",
+            "sum_007",
+            "sum_008",
+            "sum_009",
+            "sum_010"
+          ]
+        },
+        "autumn": {
+          "quota": 10,
+          "eventIds": [
+            "aut_001",
+            "aut_002",
+            "aut_003",
+            "aut_004",
+            "aut_005",
+            "aut_006",
+            "aut_007",
+            "aut_008",
+            "aut_009",
+            "aut_010"
+          ]
+        },
+        "winter": {
+          "quota": 10,
+          "eventIds": [
+            "win_001",
+            "win_002",
+            "win_003",
+            "win_004",
+            "win_005",
+            "win_006",
+            "win_007",
+            "win_008",
+            "win_009",
+            "win_010"
+          ]
+        }
+      }
+    },
+    "year": {
+      "quota": 20,
+      "description": "年份门槛 · 年≥2/≥3",
+      "filePattern": "events/year/{eventId}.json",
+      "eventIds": [
+        "yr_001",
+        "yr_002",
+        "yr_003",
+        "yr_004",
+        "yr_005",
+        "yr_006",
+        "yr_007",
+        "yr_008",
+        "yr_009",
+        "yr_010",
+        "yr_011",
+        "yr_012",
+        "yr_013",
+        "yr_014",
+        "yr_015",
+        "yr_016",
+        "yr_017",
+        "yr_018",
+        "yr_019",
+        "yr_020"
+      ]
+    }
+  },
+  "tags": {
+    "recruit": {
+      "targetCount": 24,
+      "description": "收留类 · 可跨桶",
+      "eventIds": [
+        "aut_002",
+        "aut_005",
+        "gen_001",
+        "gen_007",
+        "gen_013",
+        "gen_019",
+        "gen_025",
+        "gen_031",
+        "gen_037",
+        "gen_043",
+        "gen_049",
+        "gen_055",
+        "spr_002",
+        "spr_005",
+        "sum_002",
+        "sum_005",
+        "win_002",
+        "win_005",
+        "yr_001",
+        "yr_004",
+        "yr_007",
+        "yr_010",
+        "yr_013",
+        "yr_016"
+      ]
+    }
+  },
+  "cardSchema": {
+    "required": [
+      "id",
+      "weightEventId",
+      "weight",
+      "yieldScale",
+      "options"
+    ],
+    "options": {
+      "min": 2,
+      "max": 4,
+      "forbidPureReward": true,
+      "delayConsequenceRequired": true
+    },
+    "opsAuthority": "modules/09-data-platform.md §3"
+  },
+  "notes": "ready=阶段二可接；五语文案用 sync_event_locale.py + localization/events_*.csv；机制改 options 须手改单卡",
+  "drawRules": "data/event_draw_rules.json"
+}

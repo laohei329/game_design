@@ -1,0 +1,79 @@
+{
+  "configVersion": 25,
+  "id": "win_005",
+  "status": "ready",
+  "bucket": "season",
+  "season": "winter",
+  "minYear": null,
+  "weightEventId": "evt_recruit",
+  "weight": 1.0,
+  "yieldScale": 1.0,
+  "tags": [
+    "raid",
+    "recruit"
+  ],
+  "title": {
+    "zh": "冻结的车门",
+    "en": "Frozen Door",
+    "de": "Gefrorene Tür",
+    "ru": "Замёрзшая дверь",
+    "es": "Puerta helada"
+  },
+  "body": {
+    "zh": "一节抛锚客车门下结着冰凌，里面黑漆漆的。窗玻璃内侧有手指划痕。",
+    "en": "Ice fangs hang from a stranded coach door; the cabin inside is pitch black. No one answers when you call out.",
+    "de": "Eiszapfen hängen an einer liegen gebliebenen Wagentür; drinnen ist Finsternis.",
+    "ru": "Сосульки на двери брошенного вагона; внутри тьма.",
+    "es": "Carámbanos cuelgan de un vagón varado; adentro no hay luz."
+  },
+  "logLine": {
+    "zh": "【冻结的车门】一节抛锚客车门下结着冰凌，里面黑漆漆的。窗玻璃内侧有手指划痕。",
+    "en": "[Frozen Door] Ice fangs hang from a stranded coach door; the cabin inside is pitch black. No one answers when you call out.",
+    "de": "«Gefrorene Tür» Eiszapfen hängen an einer liegen gebliebenen Wagentür; drinnen ist Finsternis.",
+    "ru": "«Замёрзшая дверь» Сосульки на двери брошенного вагона; внутри тьма.",
+    "es": "«Puerta helada» Carámbanos cuelgan de un vagón varado; adentro no hay luz."
+  },
+  "options": [
+    {
+      "id": "shelter",
+      "label": {
+        "zh": "腾一张床",
+        "en": "Make room",
+        "de": "Platz schaffen",
+        "ru": "Освободить койку",
+        "es": "Hacer hueco"
+      },
+      "immediate": {
+        "op": "recruit_roll",
+        "targetType": "global",
+        "args": {
+          "p": 0.72
+        }
+      },
+      "delayDays": 3,
+      "op": "flag_set",
+      "targetType": "global",
+      "args": {
+        "key": "evt_win_005_late",
+        "value": true
+      }
+    },
+    {
+      "id": "pass",
+      "label": {
+        "zh": "鸣笛离开",
+        "en": "Move on",
+        "de": "Weiterfahren",
+        "ru": "Трогаться",
+        "es": "Seguir"
+      },
+      "delayDays": 2,
+      "op": "weight_mod",
+      "targetType": "segment",
+      "args": {
+        "eventTag": "raid",
+        "delta": 0.05
+      }
+    }
+  ]
+}

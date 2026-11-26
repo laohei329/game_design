@@ -1,0 +1,78 @@
+{
+  "configVersion": 25,
+  "id": "gen_006",
+  "status": "ready",
+  "bucket": "general",
+  "season": null,
+  "minYear": null,
+  "weightEventId": "evt_mood",
+  "weight": 1.15,
+  "yieldScale": 1.0,
+  "tags": [
+    "mood"
+  ],
+  "title": {
+    "zh": "求援涂鸦",
+    "en": "Chalk Plea",
+    "de": "Hilferuf in Kreide",
+    "ru": "Мелом о помощи",
+    "es": "Súplica con tiza"
+  },
+  "body": {
+    "zh": "车厢壁上有人用粉笔画了箭头——指向棚户区。涂鸦被雨洗过一遍，边缘仍湿润。",
+    "en": "Fresh chalk arrows on a boxcar point toward a shanty belt along the yard. Tracks ahead look freshly disturbed.",
+    "de": "Frische Kreidepfeile auf einem Güterwagen zeigen auf Baracken am Gleis.",
+    "ru": "Свежие меловые стрелки на вагоне указывают на трущобы у депо.",
+    "es": "Flechas de tiza en un vagón señalan chabolas del patio."
+  },
+  "logLine": {
+    "zh": "【求援涂鸦】车厢壁上有人用粉笔画了箭头——指向棚户区。涂鸦被雨洗过一遍，边缘仍湿润。",
+    "en": "[Chalk Plea] Fresh chalk arrows on a boxcar point toward a shanty belt along the yard. Tracks ahead look freshly disturbed.",
+    "de": "«Hilferuf in Kreide» Frische Kreidepfeile auf einem Güterwagen zeigen auf Baracken am Gleis.",
+    "ru": "«Мелом о помощи» Свежие меловые стрелки на вагоне указывают на трущобы у депо.",
+    "es": "«Súplica con tiza» Flechas de tiza en un vagón señalan chabolas del patio."
+  },
+  "options": [
+    {
+      "id": "talk",
+      "label": {
+        "zh": "让几个人聊聊",
+        "en": "Let them talk",
+        "de": "Reden lassen",
+        "ru": "Дать поговорить",
+        "es": "Dejar que hablen"
+      },
+      "immediate": {
+        "op": "mood_delta",
+        "targetType": "party",
+        "args": {
+          "delta": 3
+        }
+      },
+      "delayDays": 2,
+      "op": "weight_mod",
+      "targetType": "segment",
+      "args": {
+        "eventTag": "raid",
+        "delta": 0.08
+      }
+    },
+    {
+      "id": "silence",
+      "label": {
+        "zh": "继续沉默",
+        "en": "Stay silent",
+        "de": "Schweigen",
+        "ru": "Молчать",
+        "es": "Guardar silencio"
+      },
+      "delayDays": 1,
+      "op": "mood_delta",
+      "targetType": "party",
+      "args": {
+        "delta": -4
+      },
+      "capture": "snapshot"
+    }
+  ]
+}

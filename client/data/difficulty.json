@@ -1,0 +1,25 @@
+{
+  "configVersion": 25,
+  "authority": "AUDIT D7 · launch scope",
+  "defaultId": "normal",
+  "launchTiers": [
+    "normal"
+  ],
+  "tiers": {
+    "normal": {
+      "id": "normal",
+      "label": {
+        "zh": "标准",
+        "en": "Normal"
+      },
+      "launchDefault": true,
+      "multipliers": {
+        "nodeYield": 1.0,
+        "threatPressure": 1.0,
+        "repairCost": 1.0,
+        "diseaseSpread": 1.0
+      },
+      "notes": "首发唯一可玩档位；easy/hard 与 UI 切换延后至 EA 后评估"
+    }
+  }
+}

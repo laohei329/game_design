@@ -1,0 +1,79 @@
+{
+  "configVersion": 25,
+  "id": "aut_002",
+  "status": "ready",
+  "bucket": "season",
+  "season": "autumn",
+  "minYear": null,
+  "weightEventId": "evt_recruit",
+  "weight": 1.15,
+  "yieldScale": 1.0,
+  "tags": [
+    "supply",
+    "recruit"
+  ],
+  "title": {
+    "zh": "仓房烟囱",
+    "en": "Silo Smoke",
+    "de": "Silo-Rauch",
+    "ru": "Дым склада",
+    "es": "Humo del silo"
+  },
+  "body": {
+    "zh": "大粮仓方向有烟——也许还有未搬空的货架。仓门半开，滑轮卡住。",
+    "en": "Smoke rises from a grain hall—shelves inside might still hold stock. No one answers when you call out.",
+    "de": "Rauch steigt aus einer Kornschwinge — vielleicht steht noch etwas auf den Regalen.",
+    "ru": "Дым из зернохранилища — на полках может остаться запас.",
+    "es": "Humo del granero; quizá queden provisiones en los estantes."
+  },
+  "logLine": {
+    "zh": "【仓房烟囱】大粮仓方向有烟——也许还有未搬空的货架。仓门半开，滑轮卡住。",
+    "en": "[Silo Smoke] Smoke rises from a grain hall—shelves inside might still hold stock. No one answers when you call out.",
+    "de": "«Silo-Rauch» Rauch steigt aus einer Kornschwinge — vielleicht steht noch etwas auf den Regalen.",
+    "ru": "«Дым склада» Дым из зернохранилища — на полках может остаться запас.",
+    "es": "«Humo del silo» Humo del granero; quizá queden provisiones en los estantes."
+  },
+  "options": [
+    {
+      "id": "shelter",
+      "label": {
+        "zh": "腾一张床",
+        "en": "Make room",
+        "de": "Platz schaffen",
+        "ru": "Освободить койку",
+        "es": "Hacer hueco"
+      },
+      "immediate": {
+        "op": "recruit_roll",
+        "targetType": "global",
+        "args": {
+          "p": 0.72
+        }
+      },
+      "delayDays": 3,
+      "op": "flag_set",
+      "targetType": "global",
+      "args": {
+        "key": "evt_aut_002_late",
+        "value": true
+      }
+    },
+    {
+      "id": "pass",
+      "label": {
+        "zh": "鸣笛离开",
+        "en": "Move on",
+        "de": "Weiterfahren",
+        "ru": "Трогаться",
+        "es": "Seguir"
+      },
+      "delayDays": 2,
+      "op": "weight_mod",
+      "targetType": "segment",
+      "args": {
+        "eventTag": "raid",
+        "delta": 0.05
+      }
+    }
+  ]
+}

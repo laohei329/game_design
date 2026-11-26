@@ -1,0 +1,88 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/presentation/hud_top.gd" id="1_hud"]
+
+[node name="HudTop" type="MarginContainer"]
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 148.0
+grow_horizontal = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 8
+script = ExtResource("1_hud")
+
+[node name="VBox" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="RowCalendar" type="HBoxContainer" parent="VBox"]
+layout_mode = 2
+
+[node name="Calendar" type="Label" parent="VBox/RowCalendar"]
+layout_mode = 2
+text = "日历 …"
+
+[node name="RowResources" type="HBoxContainer" parent="VBox"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Food" type="Label" parent="VBox/RowResources"]
+layout_mode = 2
+text = "粮 —"
+
+[node name="Water" type="Label" parent="VBox/RowResources"]
+layout_mode = 2
+text = "水 —"
+
+[node name="Fuel" type="Label" parent="VBox/RowResources"]
+layout_mode = 2
+text = "油 —"
+
+[node name="Parts" type="Label" parent="VBox/RowResources"]
+layout_mode = 2
+text = "件 —"
+
+[node name="RowDrive" type="HBoxContainer" parent="VBox"]
+layout_mode = 2
+
+[node name="DriveStatus" type="Label" parent="VBox/RowDrive"]
+layout_mode = 2
+text = "驾驶 …"
+
+[node name="RowActions" type="HBoxContainer" parent="VBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="DriveForward" type="Button" parent="VBox/RowActions"]
+layout_mode = 2
+text = "前进"
+
+[node name="DriveReverse" type="Button" parent="VBox/RowActions"]
+layout_mode = 2
+text = "返程"
+
+[node name="EndDay" type="Button" parent="VBox/RowActions"]
+layout_mode = 2
+text = "结束一天"
+
+[node name="Heating" type="CheckBox" parent="VBox/RowActions"]
+layout_mode = 2
+text = "种植供暖"
+
+[node name="DriveStop" type="Button" parent="VBox/RowActions"]
+layout_mode = 2
+text = "停靠"
+
+[node name="EnterStation" type="Button" parent="VBox/RowActions"]
+layout_mode = 2
+text = "进站"
+
+[node name="OpenSearch" type="Button" parent="VBox/RowActions"]
+layout_mode = 2
+text = "搜索"
+
+[node name="OpenAbandon" type="Button" parent="VBox/RowActions"]
+layout_mode = 2
+text = "遗弃"

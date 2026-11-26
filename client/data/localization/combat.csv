@@ -1,0 +1,28 @@
+key,en,zh,de,ru,es
+ability.sense,Sense,感知,Sinn,Чутьё,Sentido
+ability.barrier,Barrier,屏障,Barriere,Барьер,Barrera
+ability.heal,Heal,治愈,Heilen,Лечение,Curar
+ability.telekinesis,Telekinesis,控物,Telekinese,Телекинез,Telequinesis
+ability.shockwave,Shockwave,冲击波,Schockwelle,Ударная волна,Onda
+ability.armor_break,Armor Break,裂甲,Rüstungsbruch,Бронебой,Romper armadura
+ability.berserk,Berserk,狂怒,Raserei,Берсерк,Furia
+ability.carapace,Carapace,甲壳,Panzer,Панцирь,Caparazón
+ability.rally,Rally,鼓舞,Moral,Подъём,Morale
+ability.silence,Silence,静默,Stille,Тишина,Silencio
+ability.blink_aid,Blink Aid,急援,Soforthilfe,Срочная помощь,Ayuda rápida
+combat.obj.clear_track,Clear the track,清轨,Gleis räumen,Расчистить путь,Despejar vía
+combat.obj.protect_rear,Hold the rear car,守住尾车,Hinterwagen halten,Держать хвост,Proteger cola
+combat.obj.hold_door,Seal the side door,封住侧门,Seitentür sichern,Задраить дверь,Sellar puerta
+combat.obj.salvage_coupling,Salvage a coupling,拆下车钩,Kupplung bergen,Снять сцепку,Rescatar acoplamiento
+combat.obj.evac_families,Evacuate families,接应家属,Familien evakuieren,Эвакуировать семьи,Evacuar familias
+combat.obj.snipe_leader,Drop the leader,击毙领队,Anführer ausschalten,Снять лидера,Eliminar líder
+combat.obj.fuel_convoy,Secure fuel drums,守住油桶,Treibstoff sichern,Захватить бочки,Asegurar combustible
+combat.obj.med_cache,Hold the med cache,护住药箱,Medizinlager halten,Охранять медикаменты,Proteger botiquín
+combat.obj.silence_alarm,Silence the alarm,掐断警报,Alarm ausschalten,Глушить тревогу,Calar alarma
+combat.obj.breach_armor_car,Breach the armor car,攻破铁甲车,Panzerwagen stürmen,Взять броневик,Asaltar vagón blindado
+combat.obj.defuse_trap,Defuse traps,排除陷阱,Fallen entschärfen,Обезвредить ловушки,Desactivar trampas
+combat.obj.cover_purifier,Cover the purifier,掩护净水员,Reiniger decken,Прикрыть очистителя,Cubrir depurador
+combat.obj.night_raid,Night raid hold,顶住夜袭,Nachtangriff abwehren,Удержать ночной налёт,Resistir asalto nocturno
+combat.obj.rescue_engineer,Rescue the engineer,救出工程师,Ingenieur retten,Спасти инженера,Rescatar ingeniero
+combat.obj.last_car,Last car standing,末节孤守,Letzter Wagen,Последний вагон,Último vagón
+combat.obj.scatter_horde,Scatter the horde,冲散尸群,Horde zerstreuen,Рассеять орду,Dispersar horda

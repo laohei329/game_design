@@ -1,0 +1,79 @@
+{
+  "configVersion": 25,
+  "id": "yr_004",
+  "status": "ready",
+  "bucket": "year",
+  "season": null,
+  "minYear": 2,
+  "weightEventId": "evt_recruit",
+  "weight": 1.0,
+  "yieldScale": 1.0,
+  "tags": [
+    "mood",
+    "recruit"
+  ],
+  "title": {
+    "zh": "第二年茶歇",
+    "en": "Second-Year Pause",
+    "de": "Pause im zweiten Jahr",
+    "ru": "Пауза второго года",
+    "es": "Tregua del segundo año"
+  },
+  "body": {
+    "zh": "大家都记得去年冬天；对话里多了几处沉默。有人把热水倒进罐头里分着喝。",
+    "en": "Everyone remembers last winter; more silences slip into ordinary talk. The moment passes without a second signal.",
+    "de": "Alle erinnern sich an den letzten Winter; mehr Pausen schleichen sich ins Gespräch.",
+    "ru": "Все помнят прошлую зиму; в разговорах чаще случаются паузы.",
+    "es": "Todos recuerdan el invierno pasado; hay más silencios en la charla."
+  },
+  "logLine": {
+    "zh": "【第二年茶歇】大家都记得去年冬天；对话里多了几处沉默。有人把热水倒进罐头里分着喝。",
+    "en": "[Second-Year Pause] Everyone remembers last winter; more silences slip into ordinary talk. The moment passes without a second signal.",
+    "de": "«Pause im zweiten Jahr» Alle erinnern sich an den letzten Winter; mehr Pausen schleichen sich ins Gespräch.",
+    "ru": "«Пауза второго года» Все помнят прошлую зиму; в разговорах чаще случаются паузы.",
+    "es": "«Tregua del segundo año» Todos recuerdan el invierno pasado; hay más silencios en la charla."
+  },
+  "options": [
+    {
+      "id": "shelter",
+      "label": {
+        "zh": "腾一张床",
+        "en": "Make room",
+        "de": "Platz schaffen",
+        "ru": "Освободить койку",
+        "es": "Hacer hueco"
+      },
+      "immediate": {
+        "op": "recruit_roll",
+        "targetType": "global",
+        "args": {
+          "p": 0.72
+        }
+      },
+      "delayDays": 3,
+      "op": "flag_set",
+      "targetType": "global",
+      "args": {
+        "key": "evt_yr_004_late",
+        "value": true
+      }
+    },
+    {
+      "id": "pass",
+      "label": {
+        "zh": "鸣笛离开",
+        "en": "Move on",
+        "de": "Weiterfahren",
+        "ru": "Трогаться",
+        "es": "Seguir"
+      },
+      "delayDays": 2,
+      "op": "weight_mod",
+      "targetType": "segment",
+      "args": {
+        "eventTag": "raid",
+        "delta": 0.05
+      }
+    }
+  ]
+}

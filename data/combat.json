@@ -1,0 +1,102 @@
+{
+  "configVersion": 25,
+  "authority": "modules/05-combat.md",
+  "l1Unit": 8,
+  "l1Success": {
+    "base": 0.35,
+    "scaleD": 0.45,
+    "min": 0.15,
+    "max": 0.9
+  },
+  "l1Fail": {
+    "injuryBranchChance": 0.5,
+    "allHpLoss": 8
+  },
+  "combatEnduranceP": 1.0,
+  "combatEnduranceE": 1.0,
+  "maxRoundsL2L3": 4,
+  "yearThreatPerEnemy": 0.15,
+  "outShare": {
+    "min": 0.2,
+    "max": 0.3
+  },
+  "headcountMitigation": {
+    "perPerson": 0.15,
+    "cap": 0.6
+  },
+  "combatDrill": {
+    "guardMult": 1.05,
+    "burstChance": 0.12,
+    "burstOutMult": 1.6
+  },
+  "relationMult": {
+    "defaultMin": 0.8,
+    "defaultMax": 1.2,
+    "rallyLv1Min": 0.75,
+    "rallyLv1Max": 1.25,
+    "rallyLv2Min": 0.72,
+    "rallyLv2Max": 1.28,
+    "divisor": 500
+  },
+  "slots": {
+    "front": {
+      "posOut": 0.95,
+      "posDmg": 1.25
+    },
+    "rear": {
+      "posOut": 1.0,
+      "posOutWithRanged": 1.15,
+      "posDmg": 0.75
+    },
+    "bow": {
+      "posOut": 0.95,
+      "posOutChargeBonus": 1.05,
+      "posDmg": 1.25
+    },
+    "mid": {
+      "posOut": 1.0,
+      "posDmg": 1.0
+    },
+    "stern": {
+      "posOut": 1.0,
+      "posOutWithRanged": 1.15,
+      "posDmg": 0.75
+    },
+    "side": {
+      "posOut": 1.0,
+      "posDmg": 1.15
+    }
+  },
+  "collision": {
+    "slowSpeedMaxKmh": 12,
+    "crushIntervalGameDays": 0.01,
+    "crushBodyHpLoss": 4
+  },
+  "layerRouting": {
+    "stopMaxCountL1": 5
+  },
+  "nonCombat": {
+    "pathChanceBase": 0.25,
+    "pathChanceScaleD": 0.5,
+    "pathChanceMin": 0.1,
+    "pathChanceMax": 0.85,
+    "threatModVariant": 0.15,
+    "threatModNegotiateWithGuard": -0.05,
+    "bypassFuelSurcharge": 0.05,
+    "hornFuelCostPct": 2,
+    "hornFailEmult": 1.1,
+    "negotiateFailProgressE": 0.15,
+    "bypassFailHpLoss": 15,
+    "bypassFailRestrictChance": 0.2,
+    "lootStealOnBypassFail": 0.5
+  },
+  "traumaFormula": {
+    "cap": 0.4,
+    "perRestrictTag": 0.1,
+    "perOtherTraumaTag": 0.05
+  },
+  "moodCombatWinL1": 2,
+  "guardBase": 10,
+  "maxFormations": 4,
+  "maxActiveSlots": 8
+}

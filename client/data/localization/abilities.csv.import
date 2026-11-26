@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://bfddsa8wblens"
+
+[deps]
+
+files=["res://data/localization/abilities.en.translation", "res://data/localization/abilities.zh.translation", "res://data/localization/abilities.de.translation", "res://data/localization/abilities.ru.translation", "res://data/localization/abilities.es.translation"]
+
+source_file="res://data/localization/abilities.csv"
+dest_files=["res://data/localization/abilities.en.translation", "res://data/localization/abilities.zh.translation", "res://data/localization/abilities.de.translation", "res://data/localization/abilities.ru.translation", "res://data/localization/abilities.es.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

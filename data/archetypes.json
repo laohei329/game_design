@@ -1,0 +1,374 @@
+{
+  "configVersion": 25,
+  "authority": "modules/04-population.md §4 · 08-presentation.md §3",
+  "specialtyIds": [
+    "scavenge",
+    "repair",
+    "medicine",
+    "pharmacy",
+    "farming",
+    "haul",
+    "combat_drill"
+  ],
+  "jobIds": [
+    "grower",
+    "crafter",
+    "purifier",
+    "pharmacist",
+    "radar_op",
+    "engineer",
+    "guard",
+    "labor",
+    "none"
+  ],
+  "archetypes": [
+    {
+      "id": "wanderer",
+      "weight": 1.2,
+      "jobBias": {
+        "labor": 0.35,
+        "none": 0.35,
+        "guard": 0.15,
+        "grower": 0.15
+      },
+      "specialtyRolls": 1,
+      "specialtyPool": [
+        "scavenge",
+        "haul",
+        "repair",
+        "farming"
+      ]
+    },
+    {
+      "id": "ex_militia",
+      "weight": 0.9,
+      "jobBias": {
+        "guard": 0.45,
+        "labor": 0.3,
+        "engineer": 0.15,
+        "none": 0.1
+      },
+      "specialtyRolls": 1,
+      "specialtyPool": [
+        "combat_drill",
+        "scavenge",
+        "repair"
+      ]
+    },
+    {
+      "id": "farmhand",
+      "weight": 0.85,
+      "jobBias": {
+        "grower": 0.5,
+        "labor": 0.35,
+        "purifier": 0.15
+      },
+      "specialtyRolls": 1,
+      "specialtyPool": [
+        "farming",
+        "haul",
+        "scavenge"
+      ]
+    },
+    {
+      "id": "tech_grease",
+      "weight": 0.75,
+      "jobBias": {
+        "engineer": 0.4,
+        "crafter": 0.35,
+        "labor": 0.25
+      },
+      "specialtyRolls": 1,
+      "specialtyPool": [
+        "repair",
+        "haul",
+        "scavenge"
+      ]
+    },
+    {
+      "id": "clinic_refugee",
+      "weight": 0.65,
+      "jobBias": {
+        "pharmacist": 0.35,
+        "labor": 0.4,
+        "none": 0.25
+      },
+      "specialtyRolls": 1,
+      "specialtyPool": [
+        "medicine",
+        "pharmacy",
+        "scavenge"
+      ]
+    },
+    {
+      "id": "signal_rat",
+      "weight": 0.55,
+      "jobBias": {
+        "radar_op": 0.3,
+        "engineer": 0.25,
+        "labor": 0.45
+      },
+      "specialtyRolls": 1,
+      "specialtyPool": [
+        "repair",
+        "scavenge",
+        "haul"
+      ]
+    },
+    {
+      "id": "purifier_tech",
+      "weight": 0.6,
+      "jobBias": {
+        "purifier": 0.45,
+        "grower": 0.2,
+        "labor": 0.35
+      },
+      "specialtyRolls": 1,
+      "specialtyPool": [
+        "farming",
+        "repair",
+        "haul"
+      ]
+    },
+    {
+      "id": "workshop_apprentice",
+      "weight": 0.7,
+      "jobBias": {
+        "crafter": 0.45,
+        "labor": 0.35,
+        "engineer": 0.2
+      },
+      "specialtyRolls": 1,
+      "specialtyPool": [
+        "repair",
+        "haul",
+        "scavenge"
+      ]
+    },
+    {
+      "id": "scav_boss",
+      "weight": 0.8,
+      "jobBias": {
+        "labor": 0.55,
+        "guard": 0.2,
+        "none": 0.25
+      },
+      "specialtyRolls": 2,
+      "specialtyPool": [
+        "scavenge",
+        "haul",
+        "combat_drill",
+        "repair"
+      ]
+    },
+    {
+      "id": "deserter",
+      "weight": 0.5,
+      "jobBias": {
+        "guard": 0.35,
+        "none": 0.4,
+        "labor": 0.25
+      },
+      "specialtyRolls": 1,
+      "specialtyPool": [
+        "combat_drill",
+        "scavenge",
+        "repair"
+      ]
+    },
+    {
+      "id": "elder_caretaker",
+      "weight": 0.45,
+      "jobBias": {
+        "grower": 0.25,
+        "pharmacist": 0.2,
+        "none": 0.35,
+        "labor": 0.2
+      },
+      "specialtyRolls": 1,
+      "specialtyPool": [
+        "medicine",
+        "farming",
+        "pharmacy"
+      ]
+    },
+    {
+      "id": "child_survivor",
+      "weight": 0.4,
+      "jobBias": {
+        "none": 0.5,
+        "labor": 0.35,
+        "grower": 0.15
+      },
+      "specialtyRolls": 0,
+      "specialtyPool": [],
+      "ageRange": [
+        14,
+        17
+      ]
+    }
+  ],
+  "backgrounds": [
+    {
+      "id": "bg_rails_worker",
+      "locKey": "member.bg.rails_worker",
+      "weight": 1.0
+    },
+    {
+      "id": "bg_suburbs_teacher",
+      "locKey": "member.bg.suburbs_teacher",
+      "weight": 0.9
+    },
+    {
+      "id": "bg_cold_storage",
+      "locKey": "member.bg.cold_storage",
+      "weight": 0.85
+    },
+    {
+      "id": "bg_militia_drop",
+      "locKey": "member.bg.militia_drop",
+      "weight": 0.8
+    },
+    {
+      "id": "bg_hydro_tech",
+      "locKey": "member.bg.hydro_tech",
+      "weight": 0.75
+    },
+    {
+      "id": "bg_line_medic",
+      "locKey": "member.bg.line_medic",
+      "weight": 0.7
+    },
+    {
+      "id": "bg_convoy_driver",
+      "locKey": "member.bg.convoy_driver",
+      "weight": 0.9
+    },
+    {
+      "id": "bg_greenhouse_aide",
+      "locKey": "member.bg.greenhouse_aide",
+      "weight": 0.85
+    },
+    {
+      "id": "bg_radio_ham",
+      "locKey": "member.bg.radio_ham",
+      "weight": 0.6
+    },
+    {
+      "id": "bg_factory_fitter",
+      "locKey": "member.bg.factory_fitter",
+      "weight": 0.8
+    },
+    {
+      "id": "bg_tunnel_scav",
+      "locKey": "member.bg.tunnel_scav",
+      "weight": 0.95
+    },
+    {
+      "id": "bg_orphan_carriage",
+      "locKey": "member.bg.orphan_carriage",
+      "weight": 0.5
+    }
+  ],
+  "flaws": [
+    {
+      "id": "flaw_claustrophobe",
+      "locKey": "member.flaw.claustrophobe"
+    },
+    {
+      "id": "flaw_hot_head",
+      "locKey": "member.flaw.hot_head"
+    },
+    {
+      "id": "flaw_night_blind",
+      "locKey": "member.flaw.night_blind"
+    },
+    {
+      "id": "flaw_lonely",
+      "locKey": "member.flaw.lonely"
+    },
+    {
+      "id": "flaw_greedy",
+      "locKey": "member.flaw.greedy"
+    },
+    {
+      "id": "flaw_soft_heart",
+      "locKey": "member.flaw.soft_heart"
+    }
+  ],
+  "namePools": {
+    "given": {
+      "zh": [
+        "林岚",
+        "陈渡",
+        "韩葵",
+        "赵明",
+        "苏格",
+        "周塔",
+        "吴尘",
+        "顾野",
+        "叶棠",
+        "何灯"
+      ],
+      "en": [
+        "Mara",
+        "Cole",
+        "Ivy",
+        "Ren",
+        "Ash",
+        "Lane",
+        "Sora",
+        "Eli",
+        "Nova",
+        "Theo"
+      ]
+    },
+    "family": {
+      "zh": [
+        "",
+        "张",
+        "李",
+        "王",
+        "刘"
+      ],
+      "en": [
+        "",
+        "Vale",
+        "Kess",
+        "Bryn",
+        "Locke"
+      ]
+    }
+  },
+  "startPartyTemplate": {
+    "note": "04 §4.3.1 authoritative jobs; names filled at runtime",
+    "members": [
+      {
+        "job": "engineer",
+        "combatRoster": false,
+        "specialties": []
+      },
+      {
+        "job": "guard",
+        "combatRoster": true,
+        "specialties": [
+          "combat_drill"
+        ]
+      },
+      {
+        "job": "labor",
+        "combatRoster": false,
+        "specialties": [
+          "haul"
+        ]
+      },
+      {
+        "job": "labor",
+        "combatRoster": false,
+        "specialties": [
+          "scavenge"
+        ]
+      }
+    ]
+  }
+}

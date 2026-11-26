@@ -1,0 +1,52 @@
+{
+  "configVersion": 25,
+  "authority": "modules/06-region-events.md §2.3",
+  "foodNeedPerCapita": 2.0,
+  "waterNeedPerCapita": 1.5,
+  "supplyFoodBoost": 0.4,
+  "supplyWaterBoost": 0.35,
+  "recruitBedsFullMult": 0.35,
+  "recruitHasBedsMult": 1.25,
+  "recruitLowFoodMult": 1.3,
+  "recruitLowFoodCapMult": 1.2,
+  "raidDeltaTags": [
+    "raid"
+  ],
+  "unclaimedLootRaidBoost": 0.25,
+  "pharmacistOnDutyTagBoost": {
+    "tags": [
+      "supply",
+      "mood"
+    ],
+    "delta": 0.2,
+    "regionOnly": "plague"
+  },
+  "guardOnDutyRaidMult": 0.85,
+  "moodTagDampenMult": 0.9,
+  "forcedLowPressure": {
+    "boostTags": [
+      "mood",
+      "supply",
+      "loot"
+    ],
+    "tagBoost": 0.5,
+    "suppressTagMult": {
+      "raid": 0.35,
+      "weather": 0.65
+    }
+  },
+  "noRepeatWeightEventId": {
+    "windowSegmentsInRun": 2,
+    "weightMult": 0.12
+  },
+  "tagRepeatPenalty": {
+    "lastPrimaryTagMult": 0.35
+  },
+  "lowFuelSupplyBoost": {
+    "fuelFillBelow": 0.35,
+    "tagBoost": 0.25,
+    "tags": [
+      "supply"
+    ]
+  }
+}

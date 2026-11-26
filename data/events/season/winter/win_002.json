@@ -1,0 +1,78 @@
+{
+  "configVersion": 25,
+  "id": "win_002",
+  "status": "ready",
+  "bucket": "season",
+  "season": "winter",
+  "minYear": null,
+  "weightEventId": "evt_recruit",
+  "weight": 1.1,
+  "yieldScale": 1.0,
+  "tags": [
+    "recruit"
+  ],
+  "title": {
+    "zh": "雪窝足迹",
+    "en": "Snow Trail",
+    "de": "Schneespur",
+    "ru": "След на снегу",
+    "es": "Rastro en la nieve"
+  },
+  "body": {
+    "zh": "雪原上有一串走向车站的脚印，半途断了。雪里埋着半截信号旗。",
+    "en": "Footprints cross the drift toward a station—then stop mid-field. No one answers when you call out.",
+    "de": "Fußspuren durchqueren die Schneewehe zur Station — und brechen ab.",
+    "ru": "Следы ведут к станции по сугробам — и обрываются.",
+    "es": "Huellas cruzan la nieve hacia la estación y se cortan a mitad de camino."
+  },
+  "logLine": {
+    "zh": "【雪窝足迹】雪原上有一串走向车站的脚印，半途断了。雪里埋着半截信号旗。",
+    "en": "[Snow Trail] Footprints cross the drift toward a station—then stop mid-field. No one answers when you call out.",
+    "de": "«Schneespur» Fußspuren durchqueren die Schneewehe zur Station — und brechen ab.",
+    "ru": "«След на снегу» Следы ведут к станции по сугробам — и обрываются.",
+    "es": "«Rastro en la nieve» Huellas cruzan la nieve hacia la estación y se cortan a mitad de camino."
+  },
+  "options": [
+    {
+      "id": "shelter",
+      "label": {
+        "zh": "腾一张床",
+        "en": "Make room",
+        "de": "Platz schaffen",
+        "ru": "Освободить койку",
+        "es": "Hacer hueco"
+      },
+      "immediate": {
+        "op": "recruit_roll",
+        "targetType": "global",
+        "args": {
+          "p": 0.72
+        }
+      },
+      "delayDays": 3,
+      "op": "flag_set",
+      "targetType": "global",
+      "args": {
+        "key": "evt_win_002_late",
+        "value": true
+      }
+    },
+    {
+      "id": "pass",
+      "label": {
+        "zh": "鸣笛离开",
+        "en": "Move on",
+        "de": "Weiterfahren",
+        "ru": "Трогаться",
+        "es": "Seguir"
+      },
+      "delayDays": 2,
+      "op": "weight_mod",
+      "targetType": "segment",
+      "args": {
+        "eventTag": "raid",
+        "delta": 0.05
+      }
+    }
+  ]
+}

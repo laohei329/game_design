@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://bpmwi3vdum2mx"
+
+[deps]
+
+files=["res://data/localization/events_season.en.translation", "res://data/localization/events_season.zh.translation", "res://data/localization/events_season.de.translation", "res://data/localization/events_season.ru.translation", "res://data/localization/events_season.es.translation"]
+
+source_file="res://data/localization/events_season.csv"
+dest_files=["res://data/localization/events_season.en.translation", "res://data/localization/events_season.zh.translation", "res://data/localization/events_season.de.translation", "res://data/localization/events_season.ru.translation", "res://data/localization/events_season.es.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

@@ -1,0 +1,86 @@
+{
+  "configVersion": 25,
+  "authority": "modules/01-time-season.md §4.1 / §4.4",
+  "presets": {
+    "region.tundra": {
+      "source": "region",
+      "regionKey": "tundra",
+      "tempMod": -0.5,
+      "weatherBias": {
+        "blizzard": 2.0,
+        "light_snow": 1.5,
+        "cold_snap": 1.5,
+        "heatwave": 0.0,
+        "sandstorm": 0.0
+      },
+      "waterMod": 1.0,
+      "speedMult": 1.0,
+      "pressureAdd": 0.2
+    },
+    "region.valley": {
+      "source": "region",
+      "regionKey": "valley",
+      "tempMod": -0.25,
+      "weatherBias": {
+        "rain": 1.5,
+        "night_rain": 1.4,
+        "fog": 1.3,
+        "thunderstorm": 1.3,
+        "sandstorm": 0.5
+      },
+      "waterMod": 1.0,
+      "speedMult": 1.0,
+      "pressureAdd": 0.0
+    },
+    "region.plague": {
+      "source": "region",
+      "regionKey": "plague",
+      "tempMod": 0.0,
+      "weatherBias": {
+        "fog": 2.0,
+        "ash_haze": 1.5,
+        "clear": 0.7
+      },
+      "waterMod": 1.0,
+      "speedMult": 1.0,
+      "pressureAdd": 0.25
+    },
+    "region.mine": {
+      "source": "region",
+      "regionKey": "mine",
+      "tempMod": 0.0,
+      "weatherBias": {
+        "ash_haze": 2.0,
+        "sandstorm": 1.3,
+        "fog": 1.2
+      },
+      "waterMod": 1.0,
+      "speedMult": 1.0,
+      "pressureAdd": 0.0
+    },
+    "region.urban": {
+      "source": "region",
+      "regionKey": "urban",
+      "tempMod": 0.25,
+      "weatherBias": {
+        "heatwave": 1.3,
+        "clear": 1.1,
+        "fog": 1.2
+      },
+      "waterMod": 1.0,
+      "speedMult": 1.0,
+      "pressureAdd": 0.0
+    },
+    "region.military": {
+      "source": "region",
+      "regionKey": "military",
+      "tempMod": 0.0,
+      "weatherBias": {
+        "ash_haze": 1.2
+      },
+      "waterMod": 1.0,
+      "speedMult": 1.0,
+      "pressureAdd": 0.15
+    }
+  }
+}

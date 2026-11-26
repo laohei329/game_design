@@ -1,0 +1,78 @@
+{
+  "configVersion": 25,
+  "id": "yr_002",
+  "status": "ready",
+  "bucket": "year",
+  "season": null,
+  "minYear": 2,
+  "weightEventId": "evt_loot",
+  "weight": 0.95,
+  "yieldScale": 1.0,
+  "tags": [
+    "loot"
+  ],
+  "title": {
+    "zh": "熟悉的地名",
+    "en": "Wrong Familiar Name",
+    "de": "Vertrauter falscher Name",
+    "ru": "Знакомое имя",
+    "es": "Nombre familiar equivocado"
+  },
+  "body": {
+    "zh": "路牌上的名字和记忆对上了，却不是记忆中的样子。地图折痕与车外景色对不上。",
+    "en": "A placard matches a memory—but nothing else on the skyline does. No one answers when you call out.",
+    "de": "Ein Ortsschild passt zur Erinnerung — doch sonst nichts am Horizont.",
+    "ru": "Табличка совпала с памятью — но пейзаж уже другой.",
+    "es": "El letrero coincide con el recuerdo, pero el paisaje no."
+  },
+  "logLine": {
+    "zh": "【熟悉的地名】路牌上的名字和记忆对上了，却不是记忆中的样子。地图折痕与车外景色对不上。",
+    "en": "[Wrong Familiar Name] A placard matches a memory—but nothing else on the skyline does. No one answers when you call out.",
+    "de": "«Vertrauter falscher Name» Ein Ortsschild passt zur Erinnerung — doch sonst nichts am Horizont.",
+    "ru": "«Знакомое имя» Табличка совпала с памятью — но пейзаж уже другой.",
+    "es": "«Nombre familiar equivocado» El letrero coincide con el recuerdo, pero el paisaje no."
+  },
+  "options": [
+    {
+      "id": "dig",
+      "label": {
+        "zh": "把废墟翻一遍",
+        "en": "Pick through",
+        "de": "Trümmer durchsuchen",
+        "ru": "Перебрать завалы",
+        "es": "Rebuscar escombros"
+      },
+      "immediate": {
+        "op": "grant_item",
+        "targetType": "global",
+        "args": {
+          "res": "parts",
+          "amount": 2
+        }
+      },
+      "delayDays": 2,
+      "op": "spawn_threat",
+      "targetType": "segment",
+      "args": {
+        "threatTemplateId": "horde_small"
+      }
+    },
+    {
+      "id": "skip",
+      "label": {
+        "zh": "不耽搁",
+        "en": "Skip it",
+        "de": "Überspringen",
+        "ru": "Не задерживаться",
+        "es": "No parar"
+      },
+      "delayDays": 1,
+      "op": "flag_set",
+      "targetType": "global",
+      "args": {
+        "key": "evt_yr_002_skip",
+        "value": true
+      }
+    }
+  ]
+}

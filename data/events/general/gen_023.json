@@ -1,0 +1,78 @@
+{
+  "configVersion": 25,
+  "id": "gen_023",
+  "status": "ready",
+  "bucket": "general",
+  "season": null,
+  "minYear": null,
+  "weightEventId": "evt_mood",
+  "weight": 0.8,
+  "yieldScale": 1.0,
+  "tags": [
+    "mood"
+  ],
+  "title": {
+    "zh": "折断的路标",
+    "en": "Broken Signpost",
+    "de": "Umgefallener Wegweiser",
+    "ru": "Сломанный указатель",
+    "es": "Señal caída"
+  },
+  "body": {
+    "zh": "旧城区的方向标倒在地上，字迹被磨平了。断裂口新，像是被车钩拖倒的。",
+    "en": "An old district sign lies face-down; the painted letters are worn off. No one answers when you call out.",
+    "de": "Ein alter Stadtteilschild liegt umgekippt; die Buchstaben sind abgewischt.",
+    "ru": "Старый указатель лежит лицом вниз; буквы стёрты.",
+    "es": "Una señal del barrio viejo yace boca abajo; las letras están borradas."
+  },
+  "logLine": {
+    "zh": "【折断的路标】旧城区的方向标倒在地上，字迹被磨平了。断裂口新，像是被车钩拖倒的。",
+    "en": "[Broken Signpost] An old district sign lies face-down; the painted letters are worn off. No one answers when you call out.",
+    "de": "«Umgefallener Wegweiser» Ein alter Stadtteilschild liegt umgekippt; die Buchstaben sind abgewischt.",
+    "ru": "«Сломанный указатель» Старый указатель лежит лицом вниз; буквы стёрты.",
+    "es": "«Señal caída» Una señal del barrio viejo yace boca abajo; las letras están borradas."
+  },
+  "options": [
+    {
+      "id": "talk",
+      "label": {
+        "zh": "让几个人聊聊",
+        "en": "Let them talk",
+        "de": "Reden lassen",
+        "ru": "Дать поговорить",
+        "es": "Dejar que hablen"
+      },
+      "immediate": {
+        "op": "mood_delta",
+        "targetType": "party",
+        "args": {
+          "delta": 3
+        }
+      },
+      "delayDays": 2,
+      "op": "weight_mod",
+      "targetType": "segment",
+      "args": {
+        "eventTag": "raid",
+        "delta": 0.08
+      }
+    },
+    {
+      "id": "silence",
+      "label": {
+        "zh": "继续沉默",
+        "en": "Stay silent",
+        "de": "Schweigen",
+        "ru": "Молчать",
+        "es": "Guardar silencio"
+      },
+      "delayDays": 1,
+      "op": "mood_delta",
+      "targetType": "party",
+      "args": {
+        "delta": -4
+      },
+      "capture": "snapshot"
+    }
+  ]
+}

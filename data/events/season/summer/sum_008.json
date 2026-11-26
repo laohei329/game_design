@@ -1,0 +1,79 @@
+{
+  "configVersion": 25,
+  "id": "sum_008",
+  "status": "ready",
+  "bucket": "season",
+  "season": "summer",
+  "minYear": null,
+  "weightEventId": "evt_supply",
+  "weight": 1.05,
+  "yieldScale": 1.0,
+  "tags": [
+    "supply"
+  ],
+  "title": {
+    "zh": "干渴风声",
+    "en": "Dry Wind",
+    "de": "Trockener Wind",
+    "ru": "Сухой ветер",
+    "es": "Viento seco"
+  },
+  "body": {
+    "zh": "风里没有一点潮气，水箱盖子烫得不敢碰。车皮漆面晒得起泡。",
+    "en": "The wind carries zero moisture; water-tank lids are too hot to handle. No one answers when you call out.",
+    "de": "Der Wind ist staubtrocken; Wassertankdeckel sind zu heiß zum Anfassen.",
+    "ru": "Ветер без влаги; крышки баков слишком горячие.",
+    "es": "El viento no trae humedad; las tapas de los tanques queman."
+  },
+  "logLine": {
+    "zh": "【干渴风声】风里没有一点潮气，水箱盖子烫得不敢碰。车皮漆面晒得起泡。",
+    "en": "[Dry Wind] The wind carries zero moisture; water-tank lids are too hot to handle. No one answers when you call out.",
+    "de": "«Trockener Wind» Der Wind ist staubtrocken; Wassertankdeckel sind zu heiß zum Anfassen.",
+    "ru": "«Сухой ветер» Ветер без влаги; крышки баков слишком горячие.",
+    "es": "«Viento seco» El viento no trae humedad; las tapas de los tanques queman."
+  },
+  "options": [
+    {
+      "id": "share",
+      "label": {
+        "zh": "匀一点口粮",
+        "en": "Share rations",
+        "de": "Rationen teilen",
+        "ru": "Поделиться пайками",
+        "es": "Compartir raciones"
+      },
+      "immediate": {
+        "op": "grant_item",
+        "targetType": "global",
+        "args": {
+          "res": "food",
+          "amount": 4
+        }
+      },
+      "delayDays": 2,
+      "op": "mood_delta",
+      "targetType": "party",
+      "args": {
+        "delta": -2
+      },
+      "capture": "snapshot"
+    },
+    {
+      "id": "hoard",
+      "label": {
+        "zh": "封仓不动",
+        "en": "Hold stock",
+        "de": "Vorrat halten",
+        "ru": "Не трогать запас",
+        "es": "Guardar reservas"
+      },
+      "delayDays": 1,
+      "op": "flag_set",
+      "targetType": "global",
+      "args": {
+        "key": "evt_sum_008_hoard",
+        "value": true
+      }
+    }
+  ]
+}

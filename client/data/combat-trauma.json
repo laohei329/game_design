@@ -1,0 +1,79 @@
+{
+  "configVersion": 25,
+  "authority": "modules/05-combat.md §4 · 08 §3",
+  "targetNarrativeTotal": 24,
+  "tags": [
+    {
+      "id": "leg_restrict",
+      "restrictsAction": true,
+      "locKey": "injury.leg_restrict",
+      "narrativeWeight": 1.2
+    },
+    {
+      "id": "arm_restrict",
+      "restrictsAction": true,
+      "locKey": "injury.arm_restrict",
+      "narrativeWeight": 1.1
+    },
+    {
+      "id": "head_trauma",
+      "restrictsAction": true,
+      "locKey": "injury.head_trauma",
+      "narrativeWeight": 1.0
+    },
+    {
+      "id": "spine_restrict",
+      "restrictsAction": true,
+      "locKey": "injury.spine_restrict",
+      "narrativeWeight": 1.3
+    },
+    {
+      "id": "crush_restrict",
+      "restrictsAction": true,
+      "locKey": "injury.crush_restrict",
+      "narrativeWeight": 1.0
+    },
+    {
+      "id": "bite_restrict",
+      "restrictsAction": true,
+      "locKey": "injury.bite_restrict",
+      "narrativeWeight": 1.05
+    },
+    {
+      "id": "gash",
+      "restrictsAction": false,
+      "locKey": "injury.gash",
+      "narrativeWeight": 0.8
+    },
+    {
+      "id": "bruise",
+      "restrictsAction": false,
+      "locKey": "injury.bruise",
+      "narrativeWeight": 0.5
+    },
+    {
+      "id": "burn",
+      "restrictsAction": false,
+      "locKey": "injury.burn",
+      "narrativeWeight": 0.7
+    },
+    {
+      "id": "concussion",
+      "restrictsAction": false,
+      "locKey": "injury.concussion",
+      "narrativeWeight": 0.9
+    },
+    {
+      "id": "shrapnel",
+      "restrictsAction": false,
+      "locKey": "injury.shrapnel",
+      "narrativeWeight": 0.85
+    },
+    {
+      "id": "infection_risk",
+      "restrictsAction": false,
+      "locKey": "injury.infection_risk",
+      "narrativeWeight": 0.75
+    }
+  ]
+}

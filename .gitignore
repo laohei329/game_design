@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Local / IDE
+.screenshots/
+.cursor/
+*.tmp
+client/.godot/
+
+# Optional sim outputs (regenerate with run_time_event_sweep.py)
+# sim/TIME_EVENT_SWEEP.md
+
+# VFX bake temp inside toolchain project (portable output lives under assets/vfx_portable/packs/)
+third_party/pixelfx-godot/godot/records/

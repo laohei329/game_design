@@ -1,0 +1,33 @@
+{
+  "configVersion": 25,
+  "authority": "modules/05-combat.md §4",
+  "inventoryKeys": [
+    "ranged",
+    "melee",
+    "defense"
+  ],
+  "types": {
+    "ranged": {
+      "rangedBonus": 8,
+      "guardBoostMult": 1.15,
+      "postBattleLossChance": 0.4,
+      "postBattleLossAmount": 1,
+      "preferredSlot": "rear"
+    },
+    "melee": {
+      "meleeBonus": 6,
+      "guardBoostAdd": 0.1,
+      "postBattleLossChance": 0.25,
+      "postBattleLossAmount": 1,
+      "preferredSlot": "front"
+    },
+    "defense": {
+      "defBonus": 3,
+      "injuryWeightMult": 0.7,
+      "postBattleLossChance": 0.2,
+      "postBattleLossAmount": 1,
+      "preferredSlot": null
+    }
+  },
+  "dualEquipGuardBoostNote": "melee add then ranged mult: (1+0.1)*1.15"
+}

@@ -1,0 +1,89 @@
+{
+  "configVersion": 25,
+  "authority": "modules/03-train.md §2–§5",
+  "templates": {
+    "power": {
+      "templateId": "power",
+      "size": 3,
+      "isLocomotive": true,
+      "armor": 20,
+      "speedBonus": 20,
+      "fuelPerDayAdd": 0.0,
+      "note": "First loco in F04 base 3; each extra loco +0.5"
+    },
+    "living": {
+      "templateId": "living",
+      "size": 2,
+      "beds": 2,
+      "armor": 10,
+      "fuelPerDayAdd": 1.0
+    },
+    "cargo": {
+      "templateId": "cargo",
+      "size": 3,
+      "armor": 10,
+      "fuelPerDayAdd": 1.0
+    },
+    "greenhouse": {
+      "templateId": "greenhouse",
+      "size": 2,
+      "function": "greenhouse",
+      "armor": 10,
+      "efficiency": 100,
+      "fuelPerDayAdd": 1.0
+    },
+    "water": {
+      "templateId": "water",
+      "size": 2,
+      "function": "water",
+      "armor": 10,
+      "efficiency": 100,
+      "fuelPerDayAdd": 1.0
+    },
+    "workshop": {
+      "templateId": "workshop",
+      "size": 3,
+      "function": "workshop",
+      "armor": 20,
+      "fuelPerDayAdd": 1.0
+    },
+    "medical": {
+      "templateId": "medical",
+      "size": 2,
+      "function": "medical",
+      "armor": 10,
+      "fuelPerDayAdd": 1.0
+    },
+    "radar": {
+      "templateId": "radar",
+      "size": 2,
+      "function": "radar",
+      "armor": 10,
+      "fuelPerDayAdd": 1.0
+    },
+    "armor": {
+      "templateId": "armor",
+      "size": 4,
+      "armor": 80,
+      "fuelPerDayAdd": 2.0
+    },
+    "shell": {
+      "templateId": "shell",
+      "size": 2,
+      "armor": 5,
+      "fuelPerDayAdd": 1.0,
+      "function": null
+    }
+  },
+  "starter": [
+    "power",
+    "living",
+    "cargo"
+  ],
+  "repairParts": {
+    "living": 3,
+    "cargo": 3,
+    "default": 5,
+    "tutorialLiving": 1
+  }
+}

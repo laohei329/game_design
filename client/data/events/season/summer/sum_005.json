@@ -1,0 +1,79 @@
+{
+  "configVersion": 25,
+  "id": "sum_005",
+  "status": "ready",
+  "bucket": "season",
+  "season": "summer",
+  "minYear": null,
+  "weightEventId": "evt_recruit",
+  "weight": 1.0,
+  "yieldScale": 1.0,
+  "tags": [
+    "weather",
+    "recruit"
+  ],
+  "title": {
+    "zh": "热浪蒸腾",
+    "en": "Heat Shimmer",
+    "de": "Hitzeflimmern",
+    "ru": "Жаркая дымка",
+    "es": "Calor vibrante"
+  },
+  "body": {
+    "zh": "钢板烫手，远处地表在空气中晃动。水箱外壁晒到烫手。",
+    "en": "Steel plates scorch to the touch; the horizon wavers like open flame. No one answers when you call out.",
+    "de": "Stahlplatten brennen beim Berühren; der Horizont flimmert wie Flammen.",
+    "ru": "Сталь обжигает; горизонт дрожит, как пламя.",
+    "es": "El acero quema al tacto; el horizonte ondea como llama."
+  },
+  "logLine": {
+    "zh": "【热浪蒸腾】钢板烫手，远处地表在空气中晃动。水箱外壁晒到烫手。",
+    "en": "[Heat Shimmer] Steel plates scorch to the touch; the horizon wavers like open flame. No one answers when you call out.",
+    "de": "«Hitzeflimmern» Stahlplatten brennen beim Berühren; der Horizont flimmert wie Flammen.",
+    "ru": "«Жаркая дымка» Сталь обжигает; горизонт дрожит, как пламя.",
+    "es": "«Calor vibrante» El acero quema al tacto; el horizonte ondea como llama."
+  },
+  "options": [
+    {
+      "id": "shelter",
+      "label": {
+        "zh": "腾一张床",
+        "en": "Make room",
+        "de": "Platz schaffen",
+        "ru": "Освободить койку",
+        "es": "Hacer hueco"
+      },
+      "immediate": {
+        "op": "recruit_roll",
+        "targetType": "global",
+        "args": {
+          "p": 0.72
+        }
+      },
+      "delayDays": 3,
+      "op": "flag_set",
+      "targetType": "global",
+      "args": {
+        "key": "evt_sum_005_late",
+        "value": true
+      }
+    },
+    {
+      "id": "pass",
+      "label": {
+        "zh": "鸣笛离开",
+        "en": "Move on",
+        "de": "Weiterfahren",
+        "ru": "Трогаться",
+        "es": "Seguir"
+      },
+      "delayDays": 2,
+      "op": "weight_mod",
+      "targetType": "segment",
+      "args": {
+        "eventTag": "raid",
+        "delta": 0.05
+      }
+    }
+  ]
+}

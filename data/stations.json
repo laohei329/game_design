@@ -1,0 +1,76 @@
+{
+  "configVersion": 25,
+  "authority": "modules/06-region-events.md §1.1 / modules/03-train.md §5",
+  "segmentLengthMin": 40,
+  "segmentLengthMax": 60,
+  "guaranteeAfter": 4,
+  "poolOfferChance": 0.9,
+  "emptyChance": 0.1,
+  "nonePoolChance": 0.08,
+  "stationCountWeights": {
+    "0": 0.35,
+    "1": 0.45,
+    "2": 0.2
+  },
+  "sizeWeights": {
+    "small": 0.5,
+    "medium": 0.35,
+    "large": 0.15
+  },
+  "conditionWeights": {
+    "intact": 0.15,
+    "damaged": 0.6,
+    "wreck": 0.25
+  },
+  "tutorialRegion": "urban",
+  "tutorialForceLivingOffer": true,
+  "tutorialLivingRepairCost": 1,
+  "tutorialForcePointTypes": [
+    "supermarket",
+    "water_plant"
+  ],
+  "pools": {
+    "small": [
+      "living",
+      "cargo",
+      "shell"
+    ],
+    "medium": [
+      "workshop",
+      "medical",
+      "radar",
+      "greenhouse",
+      "water",
+      "shell"
+    ],
+    "large": [
+      "power",
+      "armor",
+      "workshop",
+      "greenhouse",
+      "shell"
+    ]
+  },
+  "discoverCount": {
+    "small": [
+      1,
+      2
+    ],
+    "medium": [
+      1,
+      1
+    ],
+    "large": [
+      1,
+      2
+    ],
+    "none_pool": [
+      0,
+      0
+    ]
+  },
+  "militaryLargeWeightMult": 1.4,
+  "spurChance": 0.35,
+  "spurLengthKmMin": 12,
+  "spurLengthKmMax": 24
+}

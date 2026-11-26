@@ -1,0 +1,79 @@
+{
+  "configVersion": 25,
+  "id": "gen_013",
+  "status": "ready",
+  "bucket": "general",
+  "season": null,
+  "minYear": null,
+  "weightEventId": "evt_recruit",
+  "weight": 1.1,
+  "yieldScale": 1.0,
+  "tags": [
+    "supply",
+    "recruit"
+  ],
+  "title": {
+    "zh": "路边信号",
+    "en": "Roadside Signal",
+    "de": "Signal am Gleis",
+    "ru": "Сигнал у путей",
+    "es": "Señal junto a la vía"
+  },
+  "body": {
+    "zh": "有人在废轨旁举起手电。手电只亮了三秒就熄灭，像怕被远处听见。",
+    "en": "Someone flashes a hand lamp beside the buckled rails, then freezes when the headlight catches them. The moment passes without a second signal.",
+    "de": "Jemand blinkt mit einer Handlampe neben verbogenen Schienen und erstarrt im Scheinwerferlicht.",
+    "ru": "Кто-то машет ручным фонарём у погнутых рельсов и замирает в луче прожектора.",
+    "es": "Alguien enciende una linterna junto a los raíles torcidos y se queda quieto bajo el faro."
+  },
+  "logLine": {
+    "zh": "【路边信号】有人在废轨旁举起手电。手电只亮了三秒就熄灭，像怕被远处听见。",
+    "en": "[Roadside Signal] Someone flashes a hand lamp beside the buckled rails, then freezes when the headlight catches them. The moment passes without a second signal.",
+    "de": "«Signal am Gleis» Jemand blinkt mit einer Handlampe neben verbogenen Schienen und erstarrt im Scheinwerferlicht.",
+    "ru": "«Сигнал у путей» Кто-то машет ручным фонарём у погнутых рельсов и замирает в луче прожектора.",
+    "es": "«Señal junto a la vía» Alguien enciende una linterna junto a los raíles torcidos y se queda quieto bajo el faro."
+  },
+  "options": [
+    {
+      "id": "shelter",
+      "label": {
+        "zh": "腾一张床",
+        "en": "Make room",
+        "de": "Platz schaffen",
+        "ru": "Освободить койку",
+        "es": "Hacer hueco"
+      },
+      "immediate": {
+        "op": "recruit_roll",
+        "targetType": "global",
+        "args": {
+          "p": 0.72
+        }
+      },
+      "delayDays": 3,
+      "op": "flag_set",
+      "targetType": "global",
+      "args": {
+        "key": "evt_gen_013_late",
+        "value": true
+      }
+    },
+    {
+      "id": "pass",
+      "label": {
+        "zh": "鸣笛离开",
+        "en": "Move on",
+        "de": "Weiterfahren",
+        "ru": "Трогаться",
+        "es": "Seguir"
+      },
+      "delayDays": 2,
+      "op": "weight_mod",
+      "targetType": "segment",
+      "args": {
+        "eventTag": "raid",
+        "delta": 0.05
+      }
+    }
+  ]
+}

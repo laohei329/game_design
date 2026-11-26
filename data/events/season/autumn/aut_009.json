@@ -1,0 +1,78 @@
+{
+  "configVersion": 25,
+  "id": "aut_009",
+  "status": "ready",
+  "bucket": "season",
+  "season": "autumn",
+  "minYear": null,
+  "weightEventId": "evt_loot",
+  "weight": 1.0,
+  "yieldScale": 1.0,
+  "tags": [
+    "loot"
+  ],
+  "title": {
+    "zh": "落叶塞轨",
+    "en": "Leaf Jam",
+    "de": "Laubstau",
+    "ru": "Листья на путях",
+    "es": "Hojas en la vía"
+  },
+  "body": {
+    "zh": "枯枝堆在道岔口，像有人仓促离开。轧过去会冒出一阵霉味。",
+    "en": "Dry branches pile at a turnout, as if someone left in a hurry. Tracks ahead look freshly disturbed.",
+    "de": "Trockene Äste stauen sich an einer Weiche, als wäre jemand geflohen.",
+    "ru": "Сухие ветки забили стрелку — будто кто-то ушёл впопыхах.",
+    "es": "Ramas secas bloquean el desvío; alguien se marchó con prisa."
+  },
+  "logLine": {
+    "zh": "【落叶塞轨】枯枝堆在道岔口，像有人仓促离开。轧过去会冒出一阵霉味。",
+    "en": "[Leaf Jam] Dry branches pile at a turnout, as if someone left in a hurry. Tracks ahead look freshly disturbed.",
+    "de": "«Laubstau» Trockene Äste stauen sich an einer Weiche, als wäre jemand geflohen.",
+    "ru": "«Листья на путях» Сухие ветки забили стрелку — будто кто-то ушёл впопыхах.",
+    "es": "«Hojas en la vía» Ramas secas bloquean el desvío; alguien se marchó con prisa."
+  },
+  "options": [
+    {
+      "id": "dig",
+      "label": {
+        "zh": "把废墟翻一遍",
+        "en": "Pick through",
+        "de": "Trümmer durchsuchen",
+        "ru": "Перебрать завалы",
+        "es": "Rebuscar escombros"
+      },
+      "immediate": {
+        "op": "grant_item",
+        "targetType": "global",
+        "args": {
+          "res": "parts",
+          "amount": 2
+        }
+      },
+      "delayDays": 2,
+      "op": "spawn_threat",
+      "targetType": "segment",
+      "args": {
+        "threatTemplateId": "horde_small"
+      }
+    },
+    {
+      "id": "skip",
+      "label": {
+        "zh": "不耽搁",
+        "en": "Skip it",
+        "de": "Überspringen",
+        "ru": "Не задерживаться",
+        "es": "No parar"
+      },
+      "delayDays": 1,
+      "op": "flag_set",
+      "targetType": "global",
+      "args": {
+        "key": "evt_aut_009_skip",
+        "value": true
+      }
+    }
+  ]
+}

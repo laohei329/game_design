@@ -1,0 +1,49 @@
+{
+  "configVersion": 25,
+  "authority": "modules/02-resources.md §2–2.3",
+  "coreSix": [
+    "food",
+    "water",
+    "fuel",
+    "parts",
+    "medicine",
+    "crystal"
+  ],
+  "materialFour": [
+    "scrap",
+    "seed",
+    "chem",
+    "cloth"
+  ],
+  "potions": {
+    "potion.awaken": {
+      "stackCap": null,
+      "craftedOnly": true,
+      "consumesOnUse": true,
+      "useHook": "ability_awaken"
+    },
+    "potion.upgrade": {
+      "stackCap": 5,
+      "craftedOnly": true,
+      "consumesOnUse": true,
+      "useHook": "ability_upgrade"
+    },
+    "potion.catalyst": {
+      "stackCap": 10,
+      "craftedOnly": true,
+      "consumesOnUse": true,
+      "useHook": "ability_cast_or_tech_lv3"
+    }
+  },
+  "gearInventoryKeys": [
+    "gear.ranged",
+    "gear.melee",
+    "gear.defense"
+  ],
+  "blueprintLines": [
+    "power",
+    "armor",
+    "radar",
+    "living"
+  ]
+}

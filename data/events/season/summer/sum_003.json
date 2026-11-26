@@ -1,0 +1,86 @@
+{
+  "configVersion": 25,
+  "id": "sum_003",
+  "status": "ready",
+  "bucket": "season",
+  "season": "summer",
+  "minYear": null,
+  "weightEventId": "evt_weather",
+  "weight": 1.0,
+  "yieldScale": 1.0,
+  "tags": [
+    "weather"
+  ],
+  "title": {
+    "zh": "热浪蒸腾",
+    "en": "Heat Shimmer",
+    "de": "Hitzeflimmern",
+    "ru": "Жаркая дымка",
+    "es": "Calor vibrante"
+  },
+  "body": {
+    "zh": "钢板烫手，远处地表在空气中晃动。远处有扭曲的空气像失火。",
+    "en": "Steel plates scorch to the touch; the horizon wavers like open flame. Tracks ahead look freshly disturbed.",
+    "de": "Stahlplatten brennen beim Berühren; der Horizont flimmert wie Flammen.",
+    "ru": "Сталь обжигает; горизонт дрожит, как пламя.",
+    "es": "El acero quema al tacto; el horizonte ondea como llama."
+  },
+  "logLine": {
+    "zh": "【热浪蒸腾】钢板烫手，远处地表在空气中晃动。远处有扭曲的空气像失火。",
+    "en": "[Heat Shimmer] Steel plates scorch to the touch; the horizon wavers like open flame. Tracks ahead look freshly disturbed.",
+    "de": "«Hitzeflimmern» Stahlplatten brennen beim Berühren; der Horizont flimmert wie Flammen.",
+    "ru": "«Жаркая дымка» Сталь обжигает; горизонт дрожит, как пламя.",
+    "es": "«Calor vibrante» El acero quema al tacto; el horizonte ondea como llama."
+  },
+  "options": [
+    {
+      "id": "brace",
+      "label": {
+        "zh": "收紧供暖",
+        "en": "Brace heat",
+        "de": "Heizung anziehen",
+        "ru": "Усилить обогрев",
+        "es": "Subir calefacción"
+      },
+      "immediate": {
+        "op": "grant_influence",
+        "targetType": "global",
+        "args": {
+          "id": "event.sum_003.temp",
+          "source": "event",
+          "tempMod": -0.35,
+          "weatherBias": {
+            "cold_snap": 1.2
+          },
+          "waterMod": 1.0,
+          "speedMult": 1.0,
+          "pressureAdd": 0.0,
+          "expiresSegment": 2
+        }
+      },
+      "delayDays": 2,
+      "op": "clear_influence",
+      "targetType": "global",
+      "args": {
+        "id": "event.sum_003.temp"
+      }
+    },
+    {
+      "id": "ignore",
+      "label": {
+        "zh": "按原计划走",
+        "en": "Stay course",
+        "de": "Kurs halten",
+        "ru": "Держать курс",
+        "es": "Mantener rumbo"
+      },
+      "delayDays": 1,
+      "op": "mood_delta",
+      "targetType": "party",
+      "args": {
+        "delta": -3
+      },
+      "capture": "snapshot"
+    }
+  ]
+}

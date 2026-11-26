@@ -1,0 +1,79 @@
+{
+  "configVersion": 25,
+  "id": "spr_005",
+  "status": "ready",
+  "bucket": "season",
+  "season": "spring",
+  "minYear": null,
+  "weightEventId": "evt_recruit",
+  "weight": 1.0,
+  "yieldScale": 1.0,
+  "tags": [
+    "supply",
+    "recruit"
+  ],
+  "title": {
+    "zh": "融雪渗水",
+    "en": "Thaw Seep",
+    "de": "Tauwasser",
+    "ru": "Талая вода",
+    "es": "Filtración del deshielo"
+  },
+  "body": {
+    "zh": "路基两旁积雪化成泥水，渗进枕木缝里。路基边缘露出半截塑料管道。",
+    "en": "Snowmelt turns the ballast into slurry; water creeps between the ties. No one answers when you call out.",
+    "de": "Schmelzwasser macht den Schotterbrei; Wasser sickert zwischen den Schwellen.",
+    "ru": "Талая вода превращает балласт в жижу; вода просачивается между шпалами.",
+    "es": "El deshielo convierte el balasto en barro; el agua se cuela entre los traviesas."
+  },
+  "logLine": {
+    "zh": "【融雪渗水】路基两旁积雪化成泥水，渗进枕木缝里。路基边缘露出半截塑料管道。",
+    "en": "[Thaw Seep] Snowmelt turns the ballast into slurry; water creeps between the ties. No one answers when you call out.",
+    "de": "«Tauwasser» Schmelzwasser macht den Schotterbrei; Wasser sickert zwischen den Schwellen.",
+    "ru": "«Талая вода» Талая вода превращает балласт в жижу; вода просачивается между шпалами.",
+    "es": "«Filtración del deshielo» El deshielo convierte el balasto en barro; el agua se cuela entre los traviesas."
+  },
+  "options": [
+    {
+      "id": "shelter",
+      "label": {
+        "zh": "腾一张床",
+        "en": "Make room",
+        "de": "Platz schaffen",
+        "ru": "Освободить койку",
+        "es": "Hacer hueco"
+      },
+      "immediate": {
+        "op": "recruit_roll",
+        "targetType": "global",
+        "args": {
+          "p": 0.72
+        }
+      },
+      "delayDays": 3,
+      "op": "flag_set",
+      "targetType": "global",
+      "args": {
+        "key": "evt_spr_005_late",
+        "value": true
+      }
+    },
+    {
+      "id": "pass",
+      "label": {
+        "zh": "鸣笛离开",
+        "en": "Move on",
+        "de": "Weiterfahren",
+        "ru": "Трогаться",
+        "es": "Seguir"
+      },
+      "delayDays": 2,
+      "op": "weight_mod",
+      "targetType": "segment",
+      "args": {
+        "eventTag": "raid",
+        "delta": 0.05
+      }
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "configVersion": 25,
+  "id": "win_007",
+  "status": "ready",
+  "bucket": "season",
+  "season": "winter",
+  "minYear": null,
+  "weightEventId": "evt_raid",
+  "weight": 1.0,
+  "yieldScale": 1.0,
+  "tags": [
+    "raid"
+  ],
+  "title": {
+    "zh": "冻结的车门",
+    "en": "Frozen Door",
+    "de": "Gefrorene Tür",
+    "ru": "Замёрзшая дверь",
+    "es": "Puerta helada"
+  },
+  "body": {
+    "zh": "一节抛锚客车门下结着冰凌，里面黑漆漆的。门缝里结霜，像有人刚呼过气。",
+    "en": "Ice fangs hang from a stranded coach door; the cabin inside is pitch black. The moment passes without a second signal.",
+    "de": "Eiszapfen hängen an einer liegen gebliebenen Wagentür; drinnen ist Finsternis.",
+    "ru": "Сосульки на двери брошенного вагона; внутри тьма.",
+    "es": "Carámbanos cuelgan de un vagón varado; adentro no hay luz."
+  },
+  "logLine": {
+    "zh": "【冻结的车门】一节抛锚客车门下结着冰凌，里面黑漆漆的。门缝里结霜，像有人刚呼过气。",
+    "en": "[Frozen Door] Ice fangs hang from a stranded coach door; the cabin inside is pitch black. The moment passes without a second signal.",
+    "de": "«Gefrorene Tür» Eiszapfen hängen an einer liegen gebliebenen Wagentür; drinnen ist Finsternis.",
+    "ru": "«Замёрзшая дверь» Сосульки на двери брошенного вагона; внутри тьма.",
+    "es": "«Puerta helada» Carámbanos cuelgan de un vagón varado; adentro no hay luz."
+  },
+  "options": [
+    {
+      "id": "scout",
+      "label": {
+        "zh": "派人摸近",
+        "en": "Scout ahead",
+        "de": "Späher voraus",
+        "ru": "Разведать впереди",
+        "es": "Explorar adelante"
+      },
+      "delayDays": 1,
+      "op": "loot_halve",
+      "targetType": "segment",
+      "args": {
+        "ratio": 0.35
+      },
+      "capture": "live"
+    },
+    {
+      "id": "detour",
+      "label": {
+        "zh": "绕开这段",
+        "en": "Detour",
+        "de": "Umleitung",
+        "ru": "Объехать",
+        "es": "Desvío"
+      },
+      "immediate": {
+        "op": "remove_item",
+        "targetType": "global",
+        "args": {
+          "res": "fuel",
+          "amount": 2
+        }
+      }
+    }
+  ]
+}

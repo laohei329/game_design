@@ -1,0 +1,79 @@
+{
+  "configVersion": 25,
+  "id": "sum_002",
+  "status": "ready",
+  "bucket": "season",
+  "season": "summer",
+  "minYear": null,
+  "weightEventId": "evt_recruit",
+  "weight": 1.05,
+  "yieldScale": 1.0,
+  "tags": [
+    "supply",
+    "recruit"
+  ],
+  "title": {
+    "zh": "干渴风声",
+    "en": "Dry Wind",
+    "de": "Trockener Wind",
+    "ru": "Сухой ветер",
+    "es": "Viento seco"
+  },
+  "body": {
+    "zh": "风里没有一点潮气，水箱盖子烫得不敢碰。车皮漆面晒得起泡。",
+    "en": "The wind carries zero moisture; water-tank lids are too hot to handle. No one answers when you call out.",
+    "de": "Der Wind ist staubtrocken; Wassertankdeckel sind zu heiß zum Anfassen.",
+    "ru": "Ветер без влаги; крышки баков слишком горячие.",
+    "es": "El viento no trae humedad; las tapas de los tanques queman."
+  },
+  "logLine": {
+    "zh": "【干渴风声】风里没有一点潮气，水箱盖子烫得不敢碰。车皮漆面晒得起泡。",
+    "en": "[Dry Wind] The wind carries zero moisture; water-tank lids are too hot to handle. No one answers when you call out.",
+    "de": "«Trockener Wind» Der Wind ist staubtrocken; Wassertankdeckel sind zu heiß zum Anfassen.",
+    "ru": "«Сухой ветер» Ветер без влаги; крышки баков слишком горячие.",
+    "es": "«Viento seco» El viento no trae humedad; las tapas de los tanques queman."
+  },
+  "options": [
+    {
+      "id": "shelter",
+      "label": {
+        "zh": "腾一张床",
+        "en": "Make room",
+        "de": "Platz schaffen",
+        "ru": "Освободить койку",
+        "es": "Hacer hueco"
+      },
+      "immediate": {
+        "op": "recruit_roll",
+        "targetType": "global",
+        "args": {
+          "p": 0.72
+        }
+      },
+      "delayDays": 3,
+      "op": "flag_set",
+      "targetType": "global",
+      "args": {
+        "key": "evt_sum_002_late",
+        "value": true
+      }
+    },
+    {
+      "id": "pass",
+      "label": {
+        "zh": "鸣笛离开",
+        "en": "Move on",
+        "de": "Weiterfahren",
+        "ru": "Трогаться",
+        "es": "Seguir"
+      },
+      "delayDays": 2,
+      "op": "weight_mod",
+      "targetType": "segment",
+      "args": {
+        "eventTag": "raid",
+        "delta": 0.05
+      }
+    }
+  ]
+}

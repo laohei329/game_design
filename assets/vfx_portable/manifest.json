@@ -1,0 +1,14 @@
+{
+  "packId": "train_juice_v1",
+  "notes": "Edit effects[] then run tools/vfx_export/bake_pack.ps1. Ids must exist in pixelfx registry.",
+  "effects": [
+    "explosions/small-explosion",
+    "impacts/hit-spark",
+    "ui/damage-number",
+    "ui/crit-number",
+    "ui/coin-collect",
+    "pickups/collect-burst",
+    "status/poisoned",
+    "fire/torch"
+  ]
+}

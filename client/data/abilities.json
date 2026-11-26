@@ -1,0 +1,205 @@
+{
+  "configVersion": 25,
+  "authority": "modules/04-population.md §8.3",
+  "maxAwakenedPerRun": 3,
+  "maxLv": 2,
+  "abilities": [
+    {
+      "id": "sense",
+      "school": "support",
+      "costCatalyst": 1,
+      "costMedicine": 0,
+      "cooldownDays": 3,
+      "failRate": 0.1,
+      "hooks": {
+        "lv1": {
+          "addAFromBPercent": 0.1,
+          "revealEnemyTrait": true
+        },
+        "lv2": {
+          "addAFromBPercent": 0.15,
+          "revealEnemyTrait": true
+        }
+      }
+    },
+    {
+      "id": "barrier",
+      "school": "defense",
+      "costCatalyst": 3,
+      "costMedicine": 0,
+      "cooldownDays": 7,
+      "failRate": 0.15,
+      "hooks": {
+        "lv1": {
+          "addAFlat": 15
+        },
+        "lv2": {
+          "addAFlat": 22
+        }
+      }
+    },
+    {
+      "id": "heal",
+      "school": "support",
+      "costCatalyst": 2,
+      "costMedicine": 3,
+      "cooldownDays": 14,
+      "failRate": 0.2,
+      "hooks": {
+        "lv1": {
+          "clearRestrictInjuryOrHpToPercent": 0.5,
+          "targets": 1
+        },
+        "lv2": {
+          "clearRestrictInjuryOrHpToPercent": 0.7,
+          "targets": 2
+        }
+      }
+    },
+    {
+      "id": "telekinesis",
+      "school": "combat",
+      "costCatalyst": 2,
+      "costMedicine": 0,
+      "cooldownDays": 2,
+      "failRate": 0.25,
+      "hooks": {
+        "lv1": {
+          "addAFlat": 8,
+          "frontMeleeGuardBoostAdd": 0.05
+        },
+        "lv2": {
+          "addAFlat": 12,
+          "frontMeleeGuardBoostAdd": 0.08
+        }
+      }
+    },
+    {
+      "id": "shockwave",
+      "school": "combat",
+      "costCatalyst": 2,
+      "costMedicine": 0,
+      "cooldownDays": 4,
+      "failRate": 0.2,
+      "hooks": {
+        "lv1": {
+          "addAFlat": 12,
+          "firstRoundOutPMult": 1.15
+        },
+        "lv2": {
+          "addAFlat": 16,
+          "firstRoundOutPMult": 1.25
+        }
+      }
+    },
+    {
+      "id": "armor_break",
+      "school": "combat",
+      "costCatalyst": 2,
+      "costMedicine": 0,
+      "cooldownDays": 5,
+      "failRate": 0.22,
+      "hooks": {
+        "lv1": {
+          "enemyMitigationDelta": -0.1,
+          "enemyMitigationFloor": 0,
+          "addAFlat": 4
+        },
+        "lv2": {
+          "enemyMitigationDelta": -0.15,
+          "enemyMitigationFloor": 0,
+          "addAFlat": 6
+        }
+      }
+    },
+    {
+      "id": "berserk",
+      "school": "combat",
+      "costCatalyst": 1,
+      "costMedicine": 0,
+      "cooldownDays": 3,
+      "failRate": 0.3,
+      "hooks": {
+        "lv1": {
+          "selfGuardMult": 1.4,
+          "selfPosDmgMult": 1.2
+        },
+        "lv2": {
+          "selfGuardMult": 1.55,
+          "selfPosDmgMult": 1.15
+        }
+      }
+    },
+    {
+      "id": "carapace",
+      "school": "defense",
+      "costCatalyst": 2,
+      "costMedicine": 0,
+      "cooldownDays": 5,
+      "failRate": 0.18,
+      "hooks": {
+        "lv1": {
+          "selfInjuryWeightMult": 0.5,
+          "addAFlat": 5
+        },
+        "lv2": {
+          "selfInjuryWeightMult": 0.4,
+          "addAFlat": 8
+        }
+      }
+    },
+    {
+      "id": "rally",
+      "school": "support",
+      "costCatalyst": 1,
+      "costMedicine": 0,
+      "cooldownDays": 4,
+      "failRate": 0.15,
+      "hooks": {
+        "lv1": {
+          "moodDeltaAll": 8,
+          "relationOuterBandLv": 1
+        },
+        "lv2": {
+          "moodDeltaAll": 12,
+          "relationOuterBandLv": 2
+        }
+      }
+    },
+    {
+      "id": "silence",
+      "school": "support",
+      "costCatalyst": 2,
+      "costMedicine": 0,
+      "cooldownDays": 6,
+      "failRate": 0.2,
+      "hooks": {
+        "lv1": {
+          "cancelReinforcementRollL3": true,
+          "addAFlatIfL2NoReinf": 6
+        },
+        "lv2": {
+          "cancelReinforcementRollL3": true,
+          "addAFlatIfL2NoReinf": 10
+        }
+      }
+    },
+    {
+      "id": "blink_aid",
+      "school": "support",
+      "costCatalyst": 2,
+      "costMedicine": 0,
+      "cooldownDays": 5,
+      "failRate": 0.25,
+      "hooks": {
+        "lv1": {
+          "pullReserveToEmptySlot": 1
+        },
+        "lv2": {
+          "pullReserveToEmptySlot": 1,
+          "pulledGuardMult": 1.1
+        }
+      }
+    }
+  ]
+}

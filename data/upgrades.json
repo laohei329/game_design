@@ -1,0 +1,66 @@
+{
+  "configVersion": 25,
+  "authority": "modules/03-train.md §7",
+  "lines": [
+    "power",
+    "armor",
+    "radar",
+    "living"
+  ],
+  "precisionGate": [
+    20,
+    40,
+    60,
+    80,
+    100
+  ],
+  "levels": [
+    {
+      "lv": 1,
+      "parts": 2,
+      "medicine": 0,
+      "catalyst": 0,
+      "fuel": 1.0,
+      "blueprint": false
+    },
+    {
+      "lv": 2,
+      "parts": 4,
+      "medicine": 1,
+      "catalyst": 0,
+      "fuel": 0.0,
+      "blueprint": false
+    },
+    {
+      "lv": 3,
+      "parts": 6,
+      "medicine": 0,
+      "catalyst": 1,
+      "fuel": 0.0,
+      "blueprint": false
+    },
+    {
+      "lv": 4,
+      "parts": 8,
+      "medicine": 0,
+      "catalyst": 2,
+      "fuel": 0.0,
+      "blueprint": true
+    },
+    {
+      "lv": 5,
+      "parts": 10,
+      "medicine": 0,
+      "catalyst": 3,
+      "fuel": 0.0,
+      "blueprint": true
+    }
+  ],
+  "effects": {
+    "power": "traction and panel speed cap",
+    "armor": "trainDR collision + combat force",
+    "radar": "vision and threat mitigation",
+    "living": "beds +2/level and stock/morale"
+  },
+  "stageZeroSmokeMaxLv": 3
+}

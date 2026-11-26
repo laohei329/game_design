@@ -1,0 +1,119 @@
+{
+  "configVersion": 25,
+  "authority": "modules/02-resources.md §7.1 · modules/06-region-events.md §3",
+  "poolMultiplier": 2.5,
+  "notes": "Segment.points[].type 与 regions.pointTypeWeightMods 键必须用上表 id；simYield 仅零 A 冒烟收窄入库键。",
+  "types": {
+    "supermarket": {
+      "baseWeight": 1.0,
+      "median": 8.0,
+      "inventoryPrimary": "food",
+      "simYield": "food",
+      "inPool": true
+    },
+    "farm": {
+      "baseWeight": 1.0,
+      "median": 4.0,
+      "inventoryPrimary": "seed",
+      "simYield": "seed",
+      "inPool": true
+    },
+    "water_plant": {
+      "baseWeight": 1.0,
+      "median": 11.0,
+      "inventoryPrimary": "water",
+      "simYield": "water",
+      "inPool": true
+    },
+    "gas_station": {
+      "baseWeight": 1.0,
+      "median": 30.0,
+      "inventoryPrimary": "fuel",
+      "simYield": "fuel",
+      "weightModKey": "fuel",
+      "inPool": true
+    },
+    "factory": {
+      "baseWeight": 0.8,
+      "median": 3.5,
+      "inventoryPrimary": "parts",
+      "simYield": "parts",
+      "inPool": true
+    },
+    "scrapyard": {
+      "baseWeight": 0.8,
+      "median": 6.0,
+      "inventoryPrimary": "scrap",
+      "simYield": "parts",
+      "inPool": true
+    },
+    "hospital": {
+      "baseWeight": 0.6,
+      "median": 3.0,
+      "inventoryPrimary": "medicine",
+      "simYield": "med",
+      "weightModKey": "medicine_point",
+      "inPool": true
+    },
+    "lab": {
+      "baseWeight": 0.6,
+      "median": 4.0,
+      "inventoryPrimary": "chem",
+      "simYield": "med",
+      "weightModKey": "medicine_point",
+      "inPool": true
+    },
+    "residential": {
+      "baseWeight": 0.7,
+      "median": 3.0,
+      "inventoryPrimary": "cloth",
+      "simYield": "mixed",
+      "inPool": true
+    },
+    "military_depot": {
+      "baseWeight": 0.4,
+      "median": 1.5,
+      "inventoryPrimary": "parts",
+      "simYield": "parts",
+      "militaryOnly": true,
+      "inPool": true
+    },
+    "armory_boss": {
+      "baseWeight": 0.0,
+      "median": 0.0,
+      "inventoryPrimary": "blueprints",
+      "simYield": "parts",
+      "inPool": false
+    },
+    "horde": {
+      "baseWeight": 0.5,
+      "median": 0.0,
+      "inventoryPrimary": "threat",
+      "simYield": "mixed",
+      "inPool": false,
+      "sweepOnly": true
+    }
+  },
+  "seasonWeightMods": {
+    "spring": {
+      "food": 1.2,
+      "water": 1.2,
+      "fuel": 1.2,
+      "mixed": 1.2,
+      "seed": 1.2
+    },
+    "summer": {
+      "water": 1.4
+    },
+    "autumn": {
+      "food": 1.3,
+      "water": 1.3,
+      "fuel": 1.3,
+      "mixed": 1.3,
+      "seed": 1.3
+    },
+    "winter": {
+      "fuel": 1.4
+    }
+  }
+}

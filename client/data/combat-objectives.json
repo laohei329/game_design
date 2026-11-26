@@ -1,0 +1,142 @@
+{
+  "configVersion": 25,
+  "authority": "modules/05-combat.md §8 · modules/08-presentation.md §3",
+  "targetTotal": 16,
+  "objectives": [
+    {
+      "id": "obj_clear_track",
+      "weight": 1.0,
+      "tags": [
+        "rescue"
+      ],
+      "locKey": "combat.obj.clear_track"
+    },
+    {
+      "id": "obj_protect_rear",
+      "weight": 1.0,
+      "tags": [
+        "train"
+      ],
+      "locKey": "combat.obj.protect_rear"
+    },
+    {
+      "id": "obj_hold_door",
+      "weight": 0.9,
+      "tags": [
+        "train",
+        "siege"
+      ],
+      "locKey": "combat.obj.hold_door"
+    },
+    {
+      "id": "obj_salvage_coupling",
+      "weight": 0.8,
+      "tags": [
+        "loot"
+      ],
+      "locKey": "combat.obj.salvage_coupling"
+    },
+    {
+      "id": "obj_evac_families",
+      "weight": 0.85,
+      "tags": [
+        "rescue"
+      ],
+      "locKey": "combat.obj.evac_families"
+    },
+    {
+      "id": "obj_snipe_leader",
+      "weight": 0.75,
+      "tags": [
+        "elite"
+      ],
+      "locKey": "combat.obj.snipe_leader"
+    },
+    {
+      "id": "obj_fuel_convoy",
+      "weight": 0.9,
+      "tags": [
+        "loot",
+        "fuel"
+      ],
+      "locKey": "combat.obj.fuel_convoy"
+    },
+    {
+      "id": "obj_med_cache",
+      "weight": 0.8,
+      "tags": [
+        "loot",
+        "med"
+      ],
+      "locKey": "combat.obj.med_cache"
+    },
+    {
+      "id": "obj_silence_alarm",
+      "weight": 0.7,
+      "tags": [
+        "stealth"
+      ],
+      "locKey": "combat.obj.silence_alarm"
+    },
+    {
+      "id": "obj_breach_armor_car",
+      "weight": 0.65,
+      "tags": [
+        "train",
+        "elite"
+      ],
+      "locKey": "combat.obj.breach_armor_car"
+    },
+    {
+      "id": "obj_defuse_trap",
+      "weight": 0.7,
+      "tags": [
+        "military"
+      ],
+      "locKey": "combat.obj.defuse_trap"
+    },
+    {
+      "id": "obj_cover_purifier",
+      "weight": 0.85,
+      "tags": [
+        "train",
+        "support"
+      ],
+      "locKey": "combat.obj.cover_purifier"
+    },
+    {
+      "id": "obj_night_raid",
+      "weight": 0.6,
+      "tags": [
+        "night"
+      ],
+      "locKey": "combat.obj.night_raid"
+    },
+    {
+      "id": "obj_rescue_engineer",
+      "weight": 0.75,
+      "tags": [
+        "rescue",
+        "support"
+      ],
+      "locKey": "combat.obj.rescue_engineer"
+    },
+    {
+      "id": "obj_last_car",
+      "weight": 0.8,
+      "tags": [
+        "train",
+        "desperate"
+      ],
+      "locKey": "combat.obj.last_car"
+    },
+    {
+      "id": "obj_scatter_horde",
+      "weight": 0.9,
+      "tags": [
+        "swarm"
+      ],
+      "locKey": "combat.obj.scatter_horde"
+    }
+  ]
+}

@@ -1,0 +1,79 @@
+{
+  "configVersion": 25,
+  "id": "spr_002",
+  "status": "ready",
+  "bucket": "season",
+  "season": "spring",
+  "minYear": null,
+  "weightEventId": "evt_recruit",
+  "weight": 0.9,
+  "yieldScale": 1.0,
+  "tags": [
+    "mood",
+    "recruit"
+  ],
+  "title": {
+    "zh": "返青的栅栏",
+    "en": "Green Wire",
+    "de": "Grüner Zaun",
+    "ru": "Зелёный забор",
+    "es": "Alambrada verde"
+  },
+  "body": {
+    "zh": "野草从铁丝网里钻出来，像是不久前才有人路过。栅栏缺口刚好容一人侧身。",
+    "en": "Weeds punch through a chain-link fence as if someone walked the line yesterday. No one answers when you call out.",
+    "de": "Unkraut bricht durch den Maschendraht, als wäre gestern noch jemand die Strecke gegangen.",
+    "ru": "Сорняки пробиваются сквозь сетку, будто вчера здесь кто-то ходил.",
+    "es": "Hierbas rompen la valla metálica como si alguien pasó ayer."
+  },
+  "logLine": {
+    "zh": "【返青的栅栏】野草从铁丝网里钻出来，像是不久前才有人路过。栅栏缺口刚好容一人侧身。",
+    "en": "[Green Wire] Weeds punch through a chain-link fence as if someone walked the line yesterday. No one answers when you call out.",
+    "de": "«Grüner Zaun» Unkraut bricht durch den Maschendraht, als wäre gestern noch jemand die Strecke gegangen.",
+    "ru": "«Зелёный забор» Сорняки пробиваются сквозь сетку, будто вчера здесь кто-то ходил.",
+    "es": "«Alambrada verde» Hierbas rompen la valla metálica como si alguien pasó ayer."
+  },
+  "options": [
+    {
+      "id": "shelter",
+      "label": {
+        "zh": "腾一张床",
+        "en": "Make room",
+        "de": "Platz schaffen",
+        "ru": "Освободить койку",
+        "es": "Hacer hueco"
+      },
+      "immediate": {
+        "op": "recruit_roll",
+        "targetType": "global",
+        "args": {
+          "p": 0.72
+        }
+      },
+      "delayDays": 3,
+      "op": "flag_set",
+      "targetType": "global",
+      "args": {
+        "key": "evt_spr_002_late",
+        "value": true
+      }
+    },
+    {
+      "id": "pass",
+      "label": {
+        "zh": "鸣笛离开",
+        "en": "Move on",
+        "de": "Weiterfahren",
+        "ru": "Трогаться",
+        "es": "Seguir"
+      },
+      "delayDays": 2,
+      "op": "weight_mod",
+      "targetType": "segment",
+      "args": {
+        "eventTag": "raid",
+        "delta": 0.05
+      }
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "configVersion": 25,
+  "authority": "modules/04-population.md §7",
+  "streakThreshold": 3,
+  "hungerLatentCheckP": 0.35,
+  "stages": [
+    "latent",
+    "active",
+    "recovered"
+  ],
+  "active": {
+    "hpLossPerDay": 4,
+    "deathChancePerDay": 0.1,
+    "autoRecoverOnDay": 7,
+    "blocksOutdoorTasks": true
+  },
+  "spread": {
+    "sameCarPerDay": 0.15,
+    "sameCarWithMedicalPerDay": 0.05,
+    "hallwayPerDay": 0.2
+  },
+  "hallwaySeed": {
+    "dailyP": 0.05,
+    "requiresBedsFull": true,
+    "requiresNoOutbreakEventToday": true
+  },
+  "treatment": {
+    "defaultDays": 3,
+    "medicineSpecialtyDays": 2,
+    "medicinePerDay": 1,
+    "intensiveMedicineSameDay": 2,
+    "requiresPharmacistOnDuty": true
+  }
+}

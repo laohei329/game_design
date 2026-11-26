@@ -1,0 +1,78 @@
+{
+  "configVersion": 25,
+  "id": "gen_014",
+  "status": "ready",
+  "bucket": "general",
+  "season": null,
+  "minYear": null,
+  "weightEventId": "evt_loot",
+  "weight": 1.0,
+  "yieldScale": 1.0,
+  "tags": [
+    "loot"
+  ],
+  "title": {
+    "zh": "余烬营地",
+    "en": "Ember Camp",
+    "de": "Glutlager",
+    "ru": "Лагерь углей",
+    "es": "Campamento de brasas"
+  },
+  "body": {
+    "zh": "远处有未熄尽的火，不确定还有没有幸存者。帐篷骨架还在，帆布被撕走了一大块。",
+    "en": "A fire still smolders ahead; you cannot tell if anyone is left watching it. No one answers when you call out.",
+    "de": "Vorne glimmt noch ein Feuer; unklar, ob noch jemand Wache hält.",
+    "ru": "Впереди тлеет костёр; неясно, остался ли кто-то нести вахту.",
+    "es": "Un fuego aún humea adelante; no se sabe si alguien lo vigila."
+  },
+  "logLine": {
+    "zh": "【余烬营地】远处有未熄尽的火，不确定还有没有幸存者。帐篷骨架还在，帆布被撕走了一大块。",
+    "en": "[Ember Camp] A fire still smolders ahead; you cannot tell if anyone is left watching it. No one answers when you call out.",
+    "de": "«Glutlager» Vorne glimmt noch ein Feuer; unklar, ob noch jemand Wache hält.",
+    "ru": "«Лагерь углей» Впереди тлеет костёр; неясно, остался ли кто-то нести вахту.",
+    "es": "«Campamento de brasas» Un fuego aún humea adelante; no se sabe si alguien lo vigila."
+  },
+  "options": [
+    {
+      "id": "dig",
+      "label": {
+        "zh": "把废墟翻一遍",
+        "en": "Pick through",
+        "de": "Trümmer durchsuchen",
+        "ru": "Перебрать завалы",
+        "es": "Rebuscar escombros"
+      },
+      "immediate": {
+        "op": "grant_item",
+        "targetType": "global",
+        "args": {
+          "res": "parts",
+          "amount": 2
+        }
+      },
+      "delayDays": 2,
+      "op": "spawn_threat",
+      "targetType": "segment",
+      "args": {
+        "threatTemplateId": "horde_small"
+      }
+    },
+    {
+      "id": "skip",
+      "label": {
+        "zh": "不耽搁",
+        "en": "Skip it",
+        "de": "Überspringen",
+        "ru": "Не задерживаться",
+        "es": "No parar"
+      },
+      "delayDays": 1,
+      "op": "flag_set",
+      "targetType": "global",
+      "args": {
+        "key": "evt_gen_014_skip",
+        "value": true
+      }
+    }
+  ]
+}

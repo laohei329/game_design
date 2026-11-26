@@ -1,0 +1,79 @@
+{
+  "configVersion": 25,
+  "id": "aut_005",
+  "status": "ready",
+  "bucket": "season",
+  "season": "autumn",
+  "minYear": null,
+  "weightEventId": "evt_recruit",
+  "weight": 1.0,
+  "yieldScale": 1.0,
+  "tags": [
+    "loot",
+    "recruit"
+  ],
+  "title": {
+    "zh": "落叶塞轨",
+    "en": "Leaf Jam",
+    "de": "Laubstau",
+    "ru": "Листья на путях",
+    "es": "Hojas en la vía"
+  },
+  "body": {
+    "zh": "枯枝堆在道岔口，像有人仓促离开。叶堆里露出一只儿童雨靴。",
+    "en": "Dry branches pile at a turnout, as if someone left in a hurry. No one answers when you call out.",
+    "de": "Trockene Äste stauen sich an einer Weiche, als wäre jemand geflohen.",
+    "ru": "Сухие ветки забили стрелку — будто кто-то ушёл впопыхах.",
+    "es": "Ramas secas bloquean el desvío; alguien se marchó con prisa."
+  },
+  "logLine": {
+    "zh": "【落叶塞轨】枯枝堆在道岔口，像有人仓促离开。叶堆里露出一只儿童雨靴。",
+    "en": "[Leaf Jam] Dry branches pile at a turnout, as if someone left in a hurry. No one answers when you call out.",
+    "de": "«Laubstau» Trockene Äste stauen sich an einer Weiche, als wäre jemand geflohen.",
+    "ru": "«Листья на путях» Сухие ветки забили стрелку — будто кто-то ушёл впопыхах.",
+    "es": "«Hojas en la vía» Ramas secas bloquean el desvío; alguien se marchó con prisa."
+  },
+  "options": [
+    {
+      "id": "shelter",
+      "label": {
+        "zh": "腾一张床",
+        "en": "Make room",
+        "de": "Platz schaffen",
+        "ru": "Освободить койку",
+        "es": "Hacer hueco"
+      },
+      "immediate": {
+        "op": "recruit_roll",
+        "targetType": "global",
+        "args": {
+          "p": 0.72
+        }
+      },
+      "delayDays": 3,
+      "op": "flag_set",
+      "targetType": "global",
+      "args": {
+        "key": "evt_aut_005_late",
+        "value": true
+      }
+    },
+    {
+      "id": "pass",
+      "label": {
+        "zh": "鸣笛离开",
+        "en": "Move on",
+        "de": "Weiterfahren",
+        "ru": "Трогаться",
+        "es": "Seguir"
+      },
+      "delayDays": 2,
+      "op": "weight_mod",
+      "targetType": "segment",
+      "args": {
+        "eventTag": "raid",
+        "delta": 0.05
+      }
+    }
+  ]
+}

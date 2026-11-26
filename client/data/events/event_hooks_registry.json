@@ -1,0 +1,188 @@
+{
+  "configVersion": 25,
+  "authority": "modules/08-presentation.md §3 · R3 钩子参考（只读；落盘改 localization/events_*.csv）",
+  "general": [
+    {
+      "title_zh": "路边信号",
+      "title_en": "Roadside Signal",
+      "body_en": "Someone flashes a hand lamp beside the buckled rails, then freezes when the headlight catches them.",
+      "details_zh": [
+        "手电只亮了三秒就熄灭，像怕被远处听见。",
+        "对方袖子上沾着机油，不像纯过路的难民。",
+        "铁轨另一侧有刚熄灭的炭火余温。"
+      ]
+    },
+    {
+      "title_zh": "余烬营地",
+      "title_en": "Ember Camp",
+      "body_en": "A fire still smolders ahead; you cannot tell if anyone is left watching it.",
+      "details_zh": [
+        "风里带着烤糊的淀粉味。",
+        "帐篷骨架还在，帆布被撕走了一大块。",
+        "地上有列车螺栓规格的痕迹，像有人拆过配件。"
+      ]
+    },
+    {
+      "title_zh": "铁轨异响",
+      "title_en": "Rail Joint Scream",
+      "body_en": "The wheels hammer a bent fishplate—something heavy passed here recently.",
+      "details_zh": [
+        "道钉新拧过，扭矩不均，像仓促抢修。",
+        "接缝处撒了沙，仍挡不住金属尖叫。",
+        "枕木边缘有暗红色擦痕，不像铁锈。"
+      ]
+    },
+    {
+      "title_zh": "黏稠雾气",
+      "title_en": "Iron Fog",
+      "body_en": "Rust-tanged fog rolls in sheets; visibility flickers between clear and blind.",
+      "details_zh": [
+        "雾里有机油味，近处水汽反而更冷。",
+        "雷达屏上一阵雪花，随即自己恢复。",
+        "车体外侧结了一层细铁屑霜。"
+      ]
+    },
+    {
+      "title_zh": "折断的路标",
+      "title_en": "Broken Signpost",
+      "body_en": "An old district sign lies face-down; the painted letters are worn off.",
+      "details_zh": [
+        "路标背面刻着小孩身高刻度，年份对不上。",
+        "断裂口新，像是被车钩拖倒的。",
+        "旁边堆着广告传单，日期停在末日前两周。"
+      ]
+    },
+    {
+      "title_zh": "求援涂鸦",
+      "title_en": "Chalk Plea",
+      "body_en": "Fresh chalk arrows on a boxcar point toward a shanty belt along the yard.",
+      "details_zh": [
+        "粉笔灰里混着鞋印，至少三人走过。",
+        "箭头旁写着「有水」但笔迹发抖。",
+        "涂鸦被雨洗过一遍，边缘仍湿润。"
+      ]
+    }
+  ],
+  "season": {
+    "spring": [
+      {
+        "title_zh": "融雪渗水",
+        "title_en": "Thaw Seep",
+        "body_en": "Snowmelt turns the ballast into slurry; water creeps between the ties.",
+        "details_zh": [
+          "枕木吸水后发胀，紧固件嘎吱作响。",
+          "路基边缘露出半截塑料管道。",
+          "远处有农田塑料棚塌了一角。"
+        ]
+      },
+      {
+        "title_zh": "返青的栅栏",
+        "title_en": "Green Wire",
+        "body_en": "Weeds punch through a chain-link fence as if someone walked the line yesterday.",
+        "details_zh": [
+          "铁丝上新挂了一块撕破的布条。",
+          "栅栏缺口刚好容一人侧身。",
+          "草皮下有熄灭不久的烟蒂。"
+        ]
+      }
+    ],
+    "summer": [
+      {
+        "title_zh": "热浪蒸腾",
+        "title_en": "Heat Shimmer",
+        "body_en": "Steel plates scorch to the touch; the horizon wavers like open flame.",
+        "details_zh": [
+          "金属接缝处冒出热气，烫得手套发粘。",
+          "水箱外壁晒到烫手。",
+          "远处有扭曲的空气像失火。"
+        ]
+      },
+      {
+        "title_zh": "干渴风声",
+        "title_en": "Dry Wind",
+        "body_en": "The wind carries zero moisture; water-tank lids are too hot to handle.",
+        "details_zh": [
+          "嘴唇发裂，过滤器比平时更快堵塞。",
+          "车皮漆面晒得起泡。",
+          "风声里夹着远处犬吠。"
+        ]
+      }
+    ],
+    "autumn": [
+      {
+        "title_zh": "落叶塞轨",
+        "title_en": "Leaf Jam",
+        "body_en": "Dry branches pile at a turnout, as if someone left in a hurry.",
+        "details_zh": [
+          "道岔手柄被落叶塞死。",
+          "叶堆里露出一只儿童雨靴。",
+          "轧过去会冒出一阵霉味。"
+        ]
+      },
+      {
+        "title_zh": "仓房烟囱",
+        "title_en": "Silo Smoke",
+        "body_en": "Smoke rises from a grain hall—shelves inside might still hold stock.",
+        "details_zh": [
+          "烟色发白，像烧湿草。",
+          "仓门半开，滑轮卡住。",
+          "有老鼠沿墙根逃开。"
+        ]
+      }
+    ],
+    "winter": [
+      {
+        "title_zh": "冻结的车门",
+        "title_en": "Frozen Door",
+        "body_en": "Ice fangs hang from a stranded coach door; the cabin inside is pitch black.",
+        "details_zh": [
+          "门缝里结霜，像有人刚呼过气。",
+          "窗玻璃内侧有手指划痕。",
+          "车钩上挂着断掉的链条。"
+        ]
+      },
+      {
+        "title_zh": "雪窝足迹",
+        "title_en": "Snow Trail",
+        "body_en": "Footprints cross the drift toward a station—then stop mid-field.",
+        "details_zh": [
+          "足迹旁有拖行重物痕迹。",
+          "雪里埋着半截信号旗。",
+          "尽头有团犬类刨痕。"
+        ]
+      }
+    ]
+  },
+  "year": [
+    {
+      "title_zh": "第二年茶歇",
+      "title_en": "Second-Year Pause",
+      "body_en": "Everyone remembers last winter; more silences slip into ordinary talk.",
+      "details_zh": [
+        "有人把热水倒进罐头里分着喝。",
+        "电台背景里有人哼旧旋律又停了。",
+        "日历页被钉在餐室墙上。"
+      ]
+    },
+    {
+      "title_zh": "熟悉的地名",
+      "title_en": "Wrong Familiar Name",
+      "body_en": "A placard matches a memory—but nothing else on the skyline does.",
+      "details_zh": [
+        "站名牌被颠倒钉着。",
+        "地图折痕与车外景色对不上。",
+        "孩子们争论这是不是同一条河。"
+      ]
+    },
+    {
+      "title_zh": "长线威胁",
+      "title_en": "Long Frequency",
+      "body_en": "Broken radio chatter uses a code you cannot decode.",
+      "details_zh": [
+        "讯号每晚同一时刻响起。",
+        "有人辨认出军事呼号前缀。",
+        "电池因此多耗了一格。"
+      ]
+    }
+  ]
+}

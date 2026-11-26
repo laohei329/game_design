@@ -1,0 +1,25 @@
+key,en,zh,de,ru,es
+job.grower,Grower,种植,Ackerbauer,Фермер,Cultivador
+job.crafter,Workshop,工坊,Werkstatt,Мастерская,Taller
+job.purifier,Purifier,净水,Reiniger,Очиститель,Depurador
+job.pharmacist,Pharmacist,药剂师,Apotheker,Фармацевт,Farmacéutico
+job.radar_op,Radar,雷达员,Radar,Радист,Radar
+job.engineer,Engineer,动力看护,Ingenieur,Инженер,Ingeniero
+job.guard,Guard,守卫,Wache,Охранник,Guardia
+job.labor,Laborer,杂工,Arbeiter,Разнорабочий,Obrero
+job.none,Unassigned,无岗,Ohne Aufgabe,Без должности,Sin puesto
+spec.scavenge,Scavenger,搜刮,Klaue,Собиратель,Saqueo
+spec.repair,Repair,维修,Reparatur,Ремонт,Reparación
+spec.medicine,Medicine,医疗,Medizin,Медицина,Medicina
+spec.pharmacy,Pharmacy,配药,Pharmazie,Фармация,Farmacia
+spec.farming,Farming,种植加成,Anbau,Фермерство,Cultivo
+spec.haul,Haul,搬运,Transport,Переноска,Transporte
+spec.combat_drill,Drill,战训,Drill,Натаск,Instrucción
+combat.layer.L1,Skirmish,遭遇战,Plänkler,Стычка,Escaramuza
+combat.layer.L2,Battle,战斗,Schlacht,Бой,Batalla
+combat.layer.L3,Siege,围攻,Belagerung,Осада,Sitio
+combat.tactic.assault,Assault,强攻,Sturm,Штурм,Asalto
+combat.tactic.negotiate,Negotiate,谈判,Verhandeln,Переговоры,Negociar
+combat.tactic.bypass,Bypass,绕行,Umgehen,Обход,Evitar
+combat.tactic.horn,Horn,鸣笛,Hupe,Гудок,Claxon
+combat.tactic.evacuate,Evacuate,徒步撤离,Evakuieren,Эвакуация,Evacuar

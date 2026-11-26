@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://dtb1ywdgkes0d"
+
+[deps]
+
+files=["res://data/localization/events_year.en.translation", "res://data/localization/events_year.zh.translation", "res://data/localization/events_year.de.translation", "res://data/localization/events_year.ru.translation", "res://data/localization/events_year.es.translation"]
+
+source_file="res://data/localization/events_year.csv"
+dest_files=["res://data/localization/events_year.en.translation", "res://data/localization/events_year.zh.translation", "res://data/localization/events_year.de.translation", "res://data/localization/events_year.ru.translation", "res://data/localization/events_year.es.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

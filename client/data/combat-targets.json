@@ -1,0 +1,112 @@
+{
+  "configVersion": 25,
+  "authority": "modules/05-combat.md §7",
+  "defaultEnemyBoost": 1.0,
+  "targets": [
+    {
+      "id": "shambler",
+      "layerDefault": "L1",
+      "countMin": 2,
+      "countMax": 5,
+      "unitBase": 8,
+      "typeCoef": 1.0,
+      "enemyBoost": 1.0,
+      "tags": [
+        "undead",
+        "slow"
+      ]
+    },
+    {
+      "id": "shambler_pack",
+      "layerDefault": "L2",
+      "countMin": 6,
+      "countMax": 12,
+      "unitBase": 8,
+      "typeCoef": 1.0,
+      "enemyBoost": 1.0,
+      "tags": [
+        "undead",
+        "swarm"
+      ]
+    },
+    {
+      "id": "runner",
+      "layerDefault": "L2",
+      "countMin": 4,
+      "countMax": 8,
+      "unitBase": 7,
+      "typeCoef": 1.1,
+      "enemyBoost": 1.05,
+      "tags": [
+        "undead",
+        "fast"
+      ]
+    },
+    {
+      "id": "armored_dead",
+      "layerDefault": "L2",
+      "countMin": 3,
+      "countMax": 6,
+      "unitBase": 10,
+      "typeCoef": 1.15,
+      "enemyBoost": 1.1,
+      "tags": [
+        "undead",
+        "armored"
+      ]
+    },
+    {
+      "id": "screecher",
+      "layerDefault": "L2",
+      "countMin": 5,
+      "countMax": 10,
+      "unitBase": 7,
+      "typeCoef": 1.05,
+      "enemyBoost": 1.15,
+      "tags": [
+        "undead",
+        "variant",
+        "alarm"
+      ]
+    },
+    {
+      "id": "brute",
+      "layerDefault": "L2",
+      "countMin": 2,
+      "countMax": 4,
+      "unitBase": 14,
+      "typeCoef": 1.2,
+      "enemyBoost": 1.15,
+      "tags": [
+        "undead",
+        "elite"
+      ]
+    },
+    {
+      "id": "hive_swarm",
+      "layerDefault": "L3",
+      "countMin": 12,
+      "countMax": 24,
+      "unitBase": 8,
+      "typeCoef": 1.0,
+      "enemyBoost": 1.0,
+      "tags": [
+        "undead",
+        "nest"
+      ]
+    },
+    {
+      "id": "tunnel_king",
+      "layerDefault": "L3",
+      "countMin": 1,
+      "countMax": 1,
+      "unitBase": 48,
+      "typeCoef": 1.35,
+      "enemyBoost": 1.25,
+      "tags": [
+        "boss",
+        "undead"
+      ]
+    }
+  ]
+}

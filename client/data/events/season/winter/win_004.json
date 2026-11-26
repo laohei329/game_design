@@ -1,0 +1,78 @@
+{
+  "configVersion": 25,
+  "id": "win_004",
+  "status": "ready",
+  "bucket": "season",
+  "season": "winter",
+  "minYear": null,
+  "weightEventId": "evt_mood",
+  "weight": 1.1,
+  "yieldScale": 1.0,
+  "tags": [
+    "mood"
+  ],
+  "title": {
+    "zh": "雪窝足迹",
+    "en": "Snow Trail",
+    "de": "Schneespur",
+    "ru": "След на снегу",
+    "es": "Rastro en la nieve"
+  },
+  "body": {
+    "zh": "雪原上有一串走向车站的脚印，半途断了。足迹旁有拖行重物痕迹。",
+    "en": "Footprints cross the drift toward a station—then stop mid-field. The moment passes without a second signal.",
+    "de": "Fußspuren durchqueren die Schneewehe zur Station — und brechen ab.",
+    "ru": "Следы ведут к станции по сугробам — и обрываются.",
+    "es": "Huellas cruzan la nieve hacia la estación y se cortan a mitad de camino."
+  },
+  "logLine": {
+    "zh": "【雪窝足迹】雪原上有一串走向车站的脚印，半途断了。足迹旁有拖行重物痕迹。",
+    "en": "[Snow Trail] Footprints cross the drift toward a station—then stop mid-field. The moment passes without a second signal.",
+    "de": "«Schneespur» Fußspuren durchqueren die Schneewehe zur Station — und brechen ab.",
+    "ru": "«След на снегу» Следы ведут к станции по сугробам — и обрываются.",
+    "es": "«Rastro en la nieve» Huellas cruzan la nieve hacia la estación y se cortan a mitad de camino."
+  },
+  "options": [
+    {
+      "id": "talk",
+      "label": {
+        "zh": "让几个人聊聊",
+        "en": "Let them talk",
+        "de": "Reden lassen",
+        "ru": "Дать поговорить",
+        "es": "Dejar que hablen"
+      },
+      "immediate": {
+        "op": "mood_delta",
+        "targetType": "party",
+        "args": {
+          "delta": 3
+        }
+      },
+      "delayDays": 2,
+      "op": "weight_mod",
+      "targetType": "segment",
+      "args": {
+        "eventTag": "raid",
+        "delta": 0.08
+      }
+    },
+    {
+      "id": "silence",
+      "label": {
+        "zh": "继续沉默",
+        "en": "Stay silent",
+        "de": "Schweigen",
+        "ru": "Молчать",
+        "es": "Guardar silencio"
+      },
+      "delayDays": 1,
+      "op": "mood_delta",
+      "targetType": "party",
+      "args": {
+        "delta": -4
+      },
+      "capture": "snapshot"
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "configVersion": 25,
+  "id": "gen_039",
+  "status": "ready",
+  "bucket": "general",
+  "season": null,
+  "minYear": null,
+  "weightEventId": "evt_raid",
+  "weight": 0.9,
+  "yieldScale": 1.0,
+  "tags": [
+    "raid"
+  ],
+  "title": {
+    "zh": "铁轨异响",
+    "en": "Rail Joint Scream",
+    "de": "Schrei der Schiene",
+    "ru": "Визг стыка",
+    "es": "Chirriar del raíl"
+  },
+  "body": {
+    "zh": "车轮压过变形的接头，像是刚发生过撞击。枕木边缘有暗红色擦痕，不像铁锈。",
+    "en": "The wheels hammer a bent fishplate—something heavy passed here recently. Tracks ahead look freshly disturbed.",
+    "de": "Räder hämmern auf eine verbogene Schienenlasche—hier rollte kürzlich etwas Schweres.",
+    "ru": "Колёса бьют по погнутой накладке—недавно здесь прошло что-то тяжёлое.",
+    "es": "Las ruedas golpean una junta torcida; algo pesado pasó hace poco."
+  },
+  "logLine": {
+    "zh": "【铁轨异响】车轮压过变形的接头，像是刚发生过撞击。枕木边缘有暗红色擦痕，不像铁锈。",
+    "en": "[Rail Joint Scream] The wheels hammer a bent fishplate—something heavy passed here recently. Tracks ahead look freshly disturbed.",
+    "de": "«Schrei der Schiene» Räder hämmern auf eine verbogene Schienenlasche—hier rollte kürzlich etwas Schweres.",
+    "ru": "«Визг стыка» Колёса бьют по погнутой накладке—недавно здесь прошло что-то тяжёлое.",
+    "es": "«Chirriar del raíl» Las ruedas golpean una junta torcida; algo pesado pasó hace poco."
+  },
+  "options": [
+    {
+      "id": "scout",
+      "label": {
+        "zh": "派人摸近",
+        "en": "Scout ahead",
+        "de": "Späher voraus",
+        "ru": "Разведать впереди",
+        "es": "Explorar adelante"
+      },
+      "delayDays": 1,
+      "op": "loot_halve",
+      "targetType": "segment",
+      "args": {
+        "ratio": 0.35
+      },
+      "capture": "live"
+    },
+    {
+      "id": "detour",
+      "label": {
+        "zh": "绕开这段",
+        "en": "Detour",
+        "de": "Umleitung",
+        "ru": "Объехать",
+        "es": "Desvío"
+      },
+      "immediate": {
+        "op": "remove_item",
+        "targetType": "global",
+        "args": {
+          "res": "fuel",
+          "amount": 2
+        }
+      }
+    }
+  ]
+}

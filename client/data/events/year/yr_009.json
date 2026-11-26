@@ -1,0 +1,72 @@
+{
+  "configVersion": 25,
+  "id": "yr_009",
+  "status": "ready",
+  "bucket": "year",
+  "season": null,
+  "minYear": 2,
+  "weightEventId": "evt_raid",
+  "weight": 1.1,
+  "yieldScale": 1.0,
+  "tags": [
+    "raid"
+  ],
+  "title": {
+    "zh": "长线威胁",
+    "en": "Long Frequency",
+    "de": "Lange Frequenz",
+    "ru": "Длинная частота",
+    "es": "Frecuencia larga"
+  },
+  "body": {
+    "zh": "无线电里断续的口令——不是他们能解开的频率。电池因此多耗了一格。",
+    "en": "Broken radio chatter uses a code you cannot decode. Tracks ahead look freshly disturbed.",
+    "de": "Funkstörgeräusche in einer Frequenz, die ihr nicht entschlüsseln könnt.",
+    "ru": "По рации идёт шифр, который вы не можете разобрать.",
+    "es": "La radio transmite un código que no pueden descifrar."
+  },
+  "logLine": {
+    "zh": "【长线威胁】无线电里断续的口令——不是他们能解开的频率。电池因此多耗了一格。",
+    "en": "[Long Frequency] Broken radio chatter uses a code you cannot decode. Tracks ahead look freshly disturbed.",
+    "de": "«Lange Frequenz» Funkstörgeräusche in einer Frequenz, die ihr nicht entschlüsseln könnt.",
+    "ru": "«Длинная частота» По рации идёт шифр, который вы не можете разобрать.",
+    "es": "«Frecuencia larga» La radio transmite un código que no pueden descifrar."
+  },
+  "options": [
+    {
+      "id": "scout",
+      "label": {
+        "zh": "派人摸近",
+        "en": "Scout ahead",
+        "de": "Späher voraus",
+        "ru": "Разведать впереди",
+        "es": "Explorar adelante"
+      },
+      "delayDays": 1,
+      "op": "loot_halve",
+      "targetType": "segment",
+      "args": {
+        "ratio": 0.35
+      },
+      "capture": "live"
+    },
+    {
+      "id": "detour",
+      "label": {
+        "zh": "绕开这段",
+        "en": "Detour",
+        "de": "Umleitung",
+        "ru": "Объехать",
+        "es": "Desvío"
+      },
+      "immediate": {
+        "op": "remove_item",
+        "targetType": "global",
+        "args": {
+          "res": "fuel",
+          "amount": 2
+        }
+      }
+    }
+  ]
+}

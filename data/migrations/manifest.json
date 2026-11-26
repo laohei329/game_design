@@ -1,0 +1,18 @@
+{
+  "saveSchemaCurrent": 12,
+  "authority": "modules/09-data-platform.md §2",
+  "runtimeNote": "Godot executes GDScript in client scripts/data/migrations/; this manifest is the contract only.",
+  "chain": [
+    { "from": 2, "to": 3, "id": "v2_to_v3" },
+    { "from": 3, "to": 4, "id": "v3_to_v4" },
+    { "from": 4, "to": 5, "id": "v4_to_v5" },
+    { "from": 5, "to": 6, "id": "v5_to_v6" },
+    { "from": 6, "to": 7, "id": "v6_to_v7" },
+    { "from": 7, "to": 8, "id": "v7_to_v8" },
+    { "from": 8, "to": 9, "id": "v8_to_v9" },
+    { "from": 9, "to": 10, "id": "v9_to_v10" },
+    { "from": 10, "to": 11, "id": "v10_to_v11" },
+    { "from": 11, "to": 12, "id": "v11_to_v12" }
+  ],
+  "p1MinimumForS1b": ["v8_to_v9", "v9_to_v10", "v10_to_v11", "v11_to_v12"]
+}

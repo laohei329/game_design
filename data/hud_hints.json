@@ -1,0 +1,67 @@
+{
+  "configVersion": 25,
+  "authority": "modules/08-presentation.md §4 · 03-train §4.1 · sim/engine.py",
+  "notes": "只读阈值与文案键；不改 balance 乘子。客户端与 TIPS 须与本表 + 08 §4 一致。",
+  "fuelFill": {
+    "tipT1Critical": 0.35,
+    "tipT2Tight": 0.5,
+    "tipT3AutumnStock": 0.7,
+    "expansionThrottle": 0.55,
+    "highBurnOfferBlock": 0.28,
+    "craftPauseFloor": 0.4,
+    "deferLivingYear1": 0.45,
+    "heatingFloorTundra": 0.16
+  },
+  "carCount": {
+    "lengthBurdenBanner": 12,
+    "expansionRadarWorkshopBlock": 10,
+    "cargoPriorityMinCars": 9
+  },
+  "beds": {
+    "year2SpringMin": 16,
+    "year2SummerMin": 20
+  },
+  "offerDeferCodes": {
+    "FUEL_TIGHT_ARMOR": {
+      "when": "fuelFill < expansionThrottle && offer.templateId == armor",
+      "playerRules": "R2",
+      "tipId": "T2",
+      "ui": "发现面板主按钮默认可点；旁注「油紧·高耗」+ 一键暂不挂"
+    },
+    "FUEL_TIGHT_HIGH_BURN": {
+      "when": "fuelFill < highBurnOfferBlock && car.fuelPerDay >= 2",
+      "playerRules": "R1",
+      "tipId": "T1",
+      "ui": "高耗车卡片角标"
+    },
+    "LENGTH_WHITELIST": {
+      "when": "preferExpansion && fuelFill < expansionThrottle && cars >= lengthBurdenBanner",
+      "playerRules": "R2",
+      "tipId": "T9",
+      "ui": "非白名单车型灰底；悬停「长编组油紧：先货/动力/粮水/冲床」"
+    },
+    "PARTS_BUFFER": {
+      "when": "conservative && parts < repair + buffer + reserve",
+      "playerRules": "R5",
+      "tipId": "T8",
+      "ui": "零件不足时显示需留足第二动力"
+    }
+  },
+  "whitelistWhenLongTrainTight": [
+    "power",
+    "cargo",
+    "greenhouse",
+    "water",
+    "living"
+  ],
+  "lengthBurdenCopy": {
+    "zh": "长度即负担：油紧时长编组每多挂一节，过冬都难一点。",
+    "en": "Length is load: when fuel is tight, each extra car makes winter harder."
+  },
+  "abandonCarriage": {
+    "fuelFillSuggestMax": 0.35,
+    "minCarsForTip": 12,
+    "tipId": "T11",
+    "playerRules": "R6"
+  }
+}

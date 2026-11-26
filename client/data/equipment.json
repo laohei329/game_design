@@ -1,0 +1,175 @@
+{
+  "configVersion": 25,
+  "authority": "modules/03-train.md §3.4",
+  "equipment": {
+    "workbench": {
+      "id": "workbench",
+      "shell": [
+        "workshop"
+      ],
+      "function": "workshop",
+      "slotCost": 1,
+      "jobs": [
+        "crafter",
+        "crafter"
+      ],
+      "removable": true
+    },
+    "workbench_adv": {
+      "id": "workbench_adv",
+      "shell": [
+        "workshop"
+      ],
+      "function": "workshop",
+      "slotCost": 2,
+      "jobs": [
+        "crafter",
+        "crafter"
+      ],
+      "removable": true,
+      "efficiencyBonus": 15
+    },
+    "med_bay": {
+      "id": "med_bay",
+      "shell": [
+        "medical"
+      ],
+      "function": "medical",
+      "slotCost": 1,
+      "jobs": [
+        "pharmacist"
+      ],
+      "removable": true
+    },
+    "med_bay_adv": {
+      "id": "med_bay_adv",
+      "shell": [
+        "medical"
+      ],
+      "function": "medical",
+      "slotCost": 2,
+      "jobs": [
+        "pharmacist"
+      ],
+      "removable": true,
+      "efficiencyBonus": 15
+    },
+    "radar_array": {
+      "id": "radar_array",
+      "shell": [
+        "radar"
+      ],
+      "function": "radar",
+      "slotCost": 1,
+      "jobs": [
+        "radar_op"
+      ],
+      "removable": true
+    },
+    "purifier_unit": {
+      "id": "purifier_unit",
+      "shell": [
+        "water"
+      ],
+      "function": "water",
+      "slotCost": 1,
+      "jobs": [
+        "purifier"
+      ],
+      "removable": true
+    },
+    "purifier_unit_adv": {
+      "id": "purifier_unit_adv",
+      "shell": [
+        "water"
+      ],
+      "function": "water",
+      "slotCost": 2,
+      "jobs": [
+        "purifier"
+      ],
+      "removable": true,
+      "efficiencyMax": 150
+    },
+    "grow_rack": {
+      "id": "grow_rack",
+      "shell": [
+        "greenhouse"
+      ],
+      "function": "greenhouse",
+      "slotCost": 1,
+      "jobs": [
+        "grower"
+      ],
+      "removable": true
+    },
+    "grow_rack_dual": {
+      "id": "grow_rack_dual",
+      "shell": [
+        "greenhouse"
+      ],
+      "function": "greenhouse",
+      "slotCost": 2,
+      "jobs": [
+        "grower"
+      ],
+      "removable": true,
+      "efficiencyBonus": 15
+    },
+    "engine": {
+      "id": "engine",
+      "shell": [
+        "power"
+      ],
+      "function": null,
+      "slotCost": 1,
+      "jobs": [
+        "engineer"
+      ],
+      "removable": false
+    },
+    "bunk": {
+      "id": "bunk",
+      "shell": [
+        "living"
+      ],
+      "function": null,
+      "slotCost": 1,
+      "beds": 2,
+      "jobs": [],
+      "removable": true
+    },
+    "cargo_rack": {
+      "id": "cargo_rack",
+      "shell": [
+        "cargo",
+        "living"
+      ],
+      "function": null,
+      "slotCost": 1,
+      "foodWaterBonus": 8,
+      "jobs": [],
+      "removable": true
+    },
+    "cargo_rack_wide": {
+      "id": "cargo_rack_wide",
+      "shell": [
+        "cargo"
+      ],
+      "function": null,
+      "slotCost": 2,
+      "jobs": [],
+      "removable": true
+    },
+    "armor_frame": {
+      "id": "armor_frame",
+      "shell": [
+        "armor"
+      ],
+      "function": null,
+      "slotCost": 1,
+      "jobs": [],
+      "removable": true
+    }
+  }
+}

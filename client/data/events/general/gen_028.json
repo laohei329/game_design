@@ -1,0 +1,86 @@
+{
+  "configVersion": 25,
+  "id": "gen_028",
+  "status": "ready",
+  "bucket": "general",
+  "season": null,
+  "minYear": null,
+  "weightEventId": "evt_weather",
+  "weight": 0.85,
+  "yieldScale": 1.0,
+  "tags": [
+    "weather"
+  ],
+  "title": {
+    "zh": "黏稠雾气",
+    "en": "Iron Fog",
+    "de": "Eisennebel",
+    "ru": "Железный туман",
+    "es": "Niebla de hierro"
+  },
+  "body": {
+    "zh": "风里带着铁锈味，能见度一阵好一阵坏。雾里有机油味，近处水汽反而更冷。",
+    "en": "Rust-tanged fog rolls in sheets; visibility flickers between clear and blind. The moment passes without a second signal.",
+    "de": "Rostig riechender Nebel zieht in Böen; die Sicht flackert.",
+    "ru": "Туман пахнет ржавчиной; видимость то улучшается, то падает.",
+    "es": "La niebla huele a óxido; la visibilidad va y viene."
+  },
+  "logLine": {
+    "zh": "【黏稠雾气】风里带着铁锈味，能见度一阵好一阵坏。雾里有机油味，近处水汽反而更冷。",
+    "en": "[Iron Fog] Rust-tanged fog rolls in sheets; visibility flickers between clear and blind. The moment passes without a second signal.",
+    "de": "«Eisennebel» Rostig riechender Nebel zieht in Böen; die Sicht flackert.",
+    "ru": "«Железный туман» Туман пахнет ржавчиной; видимость то улучшается, то падает.",
+    "es": "«Niebla de hierro» La niebla huele a óxido; la visibilidad va y viene."
+  },
+  "options": [
+    {
+      "id": "brace",
+      "label": {
+        "zh": "收紧供暖",
+        "en": "Brace heat",
+        "de": "Heizung anziehen",
+        "ru": "Усилить обогрев",
+        "es": "Subir calefacción"
+      },
+      "immediate": {
+        "op": "grant_influence",
+        "targetType": "global",
+        "args": {
+          "id": "event.gen_028.temp",
+          "source": "event",
+          "tempMod": -0.35,
+          "weatherBias": {
+            "cold_snap": 1.2
+          },
+          "waterMod": 1.0,
+          "speedMult": 1.0,
+          "pressureAdd": 0.0,
+          "expiresSegment": 2
+        }
+      },
+      "delayDays": 2,
+      "op": "clear_influence",
+      "targetType": "global",
+      "args": {
+        "id": "event.gen_028.temp"
+      }
+    },
+    {
+      "id": "ignore",
+      "label": {
+        "zh": "按原计划走",
+        "en": "Stay course",
+        "de": "Kurs halten",
+        "ru": "Держать курс",
+        "es": "Mantener rumbo"
+      },
+      "delayDays": 1,
+      "op": "mood_delta",
+      "targetType": "party",
+      "args": {
+        "delta": -3
+      },
+      "capture": "snapshot"
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/presentation/debug_overlay.gd" id="1_dbg"]
+
+[node name="DebugOverlay" type="CanvasLayer"]
+layer = 20
+script = ExtResource("1_dbg")
+
+[node name="Panel" type="PanelContainer" parent="."]
+offset_left = 16.0
+offset_top = 130.0
+offset_right = 420.0
+offset_bottom = 380.0
+
+[node name="Margin" type="MarginContainer" parent="Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBox" type="VBoxContainer" parent="Panel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Title" type="Label" parent="Panel/Margin/VBox"]
+layout_mode = 2
+text = "Debug (F3)"
+
+[node name="Body" type="Label" parent="Panel/Margin/VBox"]
+layout_mode = 2
+autowrap_mode = 3
+text = "…"
+
+[node name="DevRow" type="HBoxContainer" parent="Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="DevSave" type="Button" parent="Panel/Margin/VBox/DevRow"]
+layout_mode = 2
+text = "存档 0"
+
+[node name="DevLoad" type="Button" parent="Panel/Margin/VBox/DevRow"]
+layout_mode = 2
+text = "读档 0"
+
+[node name="DevRegionMult" type="Button" parent="Panel/Margin/VBox"]
+layout_mode = 2
+text = "切换 regionFuelMult 1.0 ↔ 1.3"
