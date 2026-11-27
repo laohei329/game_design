@@ -13,8 +13,8 @@
 | [DEV-day-clock-manual-2026-11-26.md](DEV-day-clock-manual-2026-11-26.md) | 日钟 / 户外工时 5 步 |
 | [RF-11.md](RF-11.md) | 客户端 / sim 对照 |
 | [../modules/06-incident-migration.md](../modules/06-incident-migration.md) | 事件卡 → Incident |
-| [doc-consistency-report.md](doc-consistency-report.md) | `check_doc_consistency.py` 输出 |
-| [locale-key-audit.md](locale-key-audit.md) | `audit_locale_keys.py` 输出 |
+| （本地生成） | `check_doc_consistency.py` → `qa/doc-consistency-report.md` |
+| （本地生成） | `audit_locale_keys.py --write` → `qa/locale-key-audit.md` |
 
 ## 回归命令
 

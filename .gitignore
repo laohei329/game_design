@@ -9,8 +9,9 @@ __pycache__/
 *.tmp
 client/.godot/
 
-# Optional sim outputs (regenerate with run_time_event_sweep.py)
-# sim/TIME_EVENT_SWEEP.md
+# QA 探针输出（本地再生成）
+qa/doc-consistency-report.md
+qa/locale-key-audit.md
 
 # VFX bake temp inside toolchain project (portable output lives under assets/vfx_portable/packs/)
 third_party/pixelfx-godot/godot/records/

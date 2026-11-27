@@ -13,4 +13,3 @@
 | `DEV-S1a7-soft-lock.md` | 软锁人工 8 步 |
 | `代码模块审计报告*.md` | 分模块审计 R1–R3 |
 | `DEV-code-audit-*` · `DEV-code-quality-*` | 代码层审计 |
-| `DEV-RF-11-parity.md` | 已合并入 [qa/RF-11.md](../../qa/RF-11.md) |

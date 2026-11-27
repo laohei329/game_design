@@ -3,12 +3,12 @@
 | 脚本 | 用途 |
 |------|------|
 | `sync_config_version.py` | 全库 `data/` + `client/data/` JSON 对齐 manifest `configVersion` |
-| `check_doc_consistency.py` | Markdown 死链、过期脚本引用、权威头 `configVersion` 落后 → `qa/doc-consistency-report.md` |
+| `check_doc_consistency.py` | Markdown 探针 → `qa/doc-consistency-report.md`（gitignore，本地生成） |
 | `smoke_config.py` | 最小回归：`ConfigDb.load_all` + `event_ops_sim` + `stress_sweep` |
 | `stress_sweep.py` | 合成应力 → incident 触发（阶段 6/7） |
 | `scan_hardcode_gd.py` | GDScript 玩法硬编码启发式扫描 |
 | `link_client_data.ps1` | `client/data` ↔ 仓库 `data/` junction |
-| `audit_locale_keys.py` | `ui.csv` ↔ `LocaleApi.tr_*` 引用（`--write` → `qa/locale-key-audit.md`） |
+| `audit_locale_keys.py` | `ui.csv` ↔ 代码 key（`--write` → `qa/locale-key-audit.md`，gitignore） |
 | `annotate_gdscript_docs.py` | 函数体首行 `##` 上移到签名前 |
 | `fill_gdscript_missing_docs.py` | 缺 `##` 的 func 按 `DOCS` 表补一行 |
 | `enrich_core_service_docs.py` | README 核心 Service 多行 `##` + `@param` |
