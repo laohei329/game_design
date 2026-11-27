@@ -17,6 +17,7 @@
 | L7 | 规格标注 | **已关** | |
 | L8 | 30 日可玩 | **搁置** | 计划在 GODOT_ARCH §9–10 |
 | L9 | 故意开口 | **有意不关** | 定居点等 |
+| **L10** | **事件卡 → Incident** | **进行中** | [06-incident-migration.md](06-incident-migration.md)；默认自发开；**待** [30 日手签](../qa/DEV-incident-30d-signoff.md) |
 
 ---
 
@@ -33,6 +34,7 @@
 | DR5 | 低 | combat/abilities **P1 表已落** | 客户端加载 + S1b L1 验收 |
 | DR6 | 低 | SEASON_BASE_TEMP 硬编码 | 可进 balance |
 | DR7 | 低 | 手算未签字 | 主策再签 |
+| **DR8** | **部分** | 120 卡与自发双轨 | 冻结新卡 · 默认 incident；legacy 开关+`legacyFiles` 对照 |
 
 **总判**：设计债（D/O）已清；堵在 **DR2（S1a 可玩切片）** 与 L1/L8。
 
@@ -59,7 +61,7 @@
 
 ## 5. 重新审计追加（2026-11-26）
 
-基线：设计 v1.3.33 / 执行规格 v1.52 / 配置 **`configVersion` 26**（零 A 闸口径仍记 config25）/ 存档 **`version.save` 12**。  
+基线：设计 v1.3.33 / 执行规格 v1.52 / 实体 **`configVersion` 30**（零 A 闸口径仍记 config25）/ 存档 **`version.save` 12**。  
 口径：先查设计与规则逻辑闭环，再登记配置、内容、工程补充项。以下是**新增发现**，不覆盖上文缺口编号。
 
 ### 5.1 设计与规则逻辑（优先处理）
@@ -89,7 +91,7 @@
 |---|---|---|---|---|
 | **C1** | **已关** | T9 / T10 | [08 §4](08-presentation.md) P1 表 | |
 | **C2** | **已关** | **事件五语 120** | `events_{general,season,year}.csv` + `sync_event_locale.py --bucket` | 细调走 CSV；机制仍手改 JSON |
-| **C3** | **已关** | 事件 sweep 报告 | 见 `sim/TIME_EVENT_SWEEP.md`（`run_time_event_sweep.py`） | |
+| **C3** | **已关** | 事件 sweep 报告 | 历史报告已删；按需重跑 sweep | |
 | **C4** | 低 | 「壳」文案统一 | 03 §1 已用 `templateId`；全库扫尾可后置 | |
 | **C5** | **已关** | GODOT_ARCH 排版 | 反斜杠已清 | |
 | **C6** | **已关** | `seasonWeightMods` | `point_types.json` + 01 §6 注 | |
@@ -135,7 +137,7 @@
 |---|---|---|---|
 | A7 | **已关** | OPEN_LOOPS 风险 **DR*** | 全库无陈旧 `OPEN_LOOPS R[0-9]` 链（2026-11-26） |
 | A8 | 低 | **总判**曾写「堵 DR1」（已裁定） | 已改堵 **DR2** |
-| A9 | 低 | **§4.1** 三处不同义 | architecture §8.1 已登记；引用带模块前缀 |
+| A9 | 低 | **§4.1** 四处不同义（含 **01** 影响因子） | architecture §8.1 已登记；引用带模块前缀 |
 
 #### B. 配置与校验
 
@@ -193,7 +195,7 @@
 
 ### 5.9 日钟多轮审计（2026-11-26 · 闭环债）
 
-基线：**`configVersion=26`**（sim 冻结阈仍称 config25 见 [10 §1](10-validation.md)）。
+基线：**`configVersion=27`**（十项 AUDIT K / Item 规则仍称 config25 见 [10 §1.1](10-validation.md)）。
 
 | 序 | ID | 处理 | 状态 |
 |---|---|---|---|
@@ -202,7 +204,7 @@
 | 3 | T1 | `END_DAY` → `_force_end_game_day` 补 tick 再日界 | **已关** |
 | 4 | E1 | 抛锚 `breakdownStopHoursRemaining` + `DriveService.tick_breakdown_stop` | **已关（薄）** |
 | 5 | T4 | 饥渴 `state_changed` 0.25s 节流 | **已关** |
-| 6 | U1 | 本表 + [qa/DEV-code-audit](qa/DEV-code-audit-2026-11-26.md) §7 | **已关** |
+| 6 | U1 | 本表 + [archive DEV-code-audit](../archive/qa-history/DEV-code-audit-2026-11-26.md) §7 | **已关** |
 | 7 | T2/S3 | `restore` 认 `simDayFractionToday`；SaveSchema 注释写盘路径 | **已关** |
 
 ### 5.10 多入口收敛（M1–M7 · 2026-11-26）
@@ -228,3 +230,15 @@
 | R2-D | **已关** | 09 §3.0.1 `eventTagWeights` / `pendingThreat` |
 | R2-E | **已关** | `SearchService.localize_err`（Intent 域不再调 `_search_err_zh`） |
 | R2-F | **已关** | `Segment.from_dict` + SaveSchema 去重 |
+
+### 5.12 模块审计第 3 批扫尾（2026-11-27）
+
+| ID | 状态 | 项 |
+|---|---|---|
+| A3-C5 | **已关** | `GODOT_ARCH` 目录表：`inventory_service` 归 `gameplay/` |
+| A3-T4/T5 | **已关** | `region_fuel_mult_active` + `DEV_TOGGLE_REGION_FUEL`；`GameClock.next_speed_after` / `speed_hotkey_tier` |
+| A3-E3/E4/E5 | **已关** | 删 `onboard_pop`；缺键 `require`；`balance.start.carriages` 单源 |
+| A3-G3/G4/G5 | **已关** | 车站 `affordable`；`combat.l1Armor*`；[qa/RF-11.md](../qa/RF-11.md) |
+| A3-U1 | **已关** | `SELECT_ABANDON_CARRIAGE`；调试倍率走 Intent |
+| A3-S7 | **已关** | `sync_event_locale` / `annotate` / `enrich_core_service_docs` 文案与死分支 |
+| A3-S6 | **已关** | `validate_data_ci` CSV 镜像 + 威胁别名表 + 事件卡字段/op；`config_db` 卡级 op/configVersion |

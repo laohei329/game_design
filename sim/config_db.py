@@ -67,6 +67,24 @@ class ConfigDb:
             except OSError as exc:
                 self._fail(f"table {table_name!r}: {exc}")
 
+        legacy = self.manifests.get("legacyFiles")
+        if isinstance(legacy, dict):
+            for table_name, rel in legacy.items():
+                path = self.data_root / str(rel).replace("\\", "/")
+                if not path.is_file():
+                    self._fail(f"legacy table {table_name!r}: file not found ({rel})")
+                    continue
+                try:
+                    payload = json.loads(path.read_text(encoding="utf-8"))
+                    if not isinstance(payload, dict):
+                        self._fail(f"legacy table {table_name!r}: root must be object")
+                        continue
+                    self.tables[table_name] = payload
+                except json.JSONDecodeError as exc:
+                    self._fail(f"legacy table {table_name!r} ({rel}): {exc}")
+                except OSError as exc:
+                    self._fail(f"legacy table {table_name!r}: {exc}")
+
         self._cross_validate()
         return 0 if not self.errors else 1
 
@@ -329,6 +347,36 @@ def _validate_p1(db: ConfigDb) -> List[str]:
     return errs
 
 
+_EVENT_OP_WHITELIST = frozenset(
+    {
+        "grant_item",
+        "grant_blueprint",
+        "remove_item",
+        "mood_delta",
+        "grant_influence",
+        "clear_influence",
+        "spawn_threat",
+        "weight_mod",
+        "flag_set",
+        "recruit_roll",
+        "loot_halve",
+    }
+)
+
+
+def _iter_event_card_ops(card: dict) -> List[str]:
+    ops: List[str] = []
+    for opt in card.get("options") or []:
+        if not isinstance(opt, dict):
+            continue
+        imm = opt.get("immediate")
+        if isinstance(imm, dict) and imm.get("op"):
+            ops.append(str(imm["op"]))
+        if opt.get("op"):
+            ops.append(str(opt["op"]))
+    return ops
+
+
 def _validate_events(db: ConfigDb) -> List[str]:
     errs: List[str] = []
     try:
@@ -344,6 +392,22 @@ def _validate_events(db: ConfigDb) -> List[str]:
             errs.append(f"events: catalog {len(catalog)} != targetTotal {target}")
         if index.get("configVersion") != db.config_version():
             errs.append("events/_index configVersion != manifest")
+        want_cv = db.config_version()
+        for eid, card in catalog.items():
+            if not isinstance(card, dict):
+                errs.append(f"events: {eid} not a dict")
+                continue
+            if int(card.get("configVersion", 0)) != want_cv:
+                errs.append(f"events: {eid} configVersion != manifest")
+            for req_key in ("weightEventId", "weight", "yieldScale"):
+                if req_key not in card:
+                    errs.append(f"events: {eid} missing {req_key}")
+            opts = card.get("options")
+            if not isinstance(opts, list) or len(opts) < 2:
+                errs.append(f"events: {eid} options len < 2")
+            for op in _iter_event_card_ops(card):
+                if op not in _EVENT_OP_WHITELIST:
+                    errs.append(f"events: {eid} unknown op {op!r}")
     except Exception as exc:  # noqa: BLE001 — validator aggregates
         errs.append(f"events: {exc}")
     return errs
@@ -359,6 +423,9 @@ def _required_paths_for_stage(stage: str) -> Sequence[str]:
         "balance.start.fuel",
         "balance.start.parts",
         "balance.start.med",
+        "balance.start.carriages",
+        "balance.start.precision",
+        "balance.start.seed",
         "balance.fuel.base",
         "balance.greenhouse.heatingFuelPerCarDay",
         "balance.greenhouse.heatingMult",
@@ -420,8 +487,6 @@ def run_validation(
     messages = list(db.errors)
     if code == 0:
         messages.extend(db.validate_stage(stage))
-        if stage in ("s2", "all"):
-            messages.extend(db.validate_stage("s2"))
     if messages:
         return 1, messages
     return 0, []

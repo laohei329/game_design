@@ -1,5 +1,5 @@
 {
-  "configVersion": 26,
+  "configVersion": 30,
   "authority": "modules/08-presentation.md §4 · 03-train §4.1 · sim/engine.py",
   "notes": "只读阈值与文案键；不改 balance 乘子。客户端与 TIPS 须与本表 + 08 §4 一致。",
   "fuelFill": {
@@ -8,6 +8,7 @@
     "tipT3AutumnStock": 0.7,
     "expansionThrottle": 0.55,
     "highBurnOfferBlock": 0.28,
+    "highBurnFuelPerDayMin": 2.0,
     "craftPauseFloor": 0.4,
     "deferLivingYear1": 0.45,
     "heatingFloorTundra": 0.16

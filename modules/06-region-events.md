@@ -202,7 +202,9 @@ Spur {
 
 ## 2. 事件卡与收留
 
-### 2.1 事件硬规则
+> **迁移中**：自发路径以 [`incidents.json`](../data/incidents.json) + [`06-incident-migration.md`](06-incident-migration.md) 为准；`useLegacyEventCards=false` 时本节 **卡库** 仅作对照，`§2.2` 收留 **日结/段** 可由 incident 类型承接。
+
+### 2.1 事件硬规则（Legacy 卡库）
 
 - 2–4 个选项；禁止纯奖励  
 - 每张至少一处延迟后果（flag + 天数）；`op`/`args` 见 [09 §3](09-data-platform.md)  

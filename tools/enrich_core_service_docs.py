@@ -268,6 +268,8 @@ def context_lines(rel: str, name: str) -> list[str]:
         out.append("## 公开 API：UI 经 `IntentBus` → `GameSession`，勿在 presentation 改 state。")
     elif rel == "content/event_catalog.gd":
         out.append("## 事件卡只读缓存；写 state 走 EventOps / EventDraw。")
+    elif rel == "content/event_ops.gd":
+        out.append("## 事件 op 管线：`EventOps.choose_option` / `fire_delayed` 唯一写 state 入口。")
     elif rel.startswith("content/"):
         out.append("## 事件内容层；由 EventService / RegionService 段建造钩子调用。")
     elif rel == "data/save_service.gd":

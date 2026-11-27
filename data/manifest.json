@@ -1,9 +1,9 @@
 {
-  "configVersion": 26,
+  "configVersion": 30,
   "designVersion": "1.3.33",
   "specVersion": "1.52",
   "saveSchemaHint": 12,
-  "notes": "STAGE1 P0 + P1 combat/population pack (see data/P1_README.md).",
+  "notes": "STAGE1 P0 + P1; segment narrative primary = incidents.json. events_index 仅 legacyFiles（Godot 默认不载）。",
   "files": {
     "balance": "balance.json",
     "combat": "combat.json",
@@ -25,8 +25,9 @@
     "climate_influences": "climate_influences.json",
     "equipment": "equipment.json",
     "difficulty": "difficulty.json",
-    "events_index": "events/_index.json",
     "event_draw_rules": "event_draw_rules.json",
+    "incidents": "incidents.json",
+    "stress": "stress.json",
     "hud_hints": "hud_hints.json",
     "localization_ui": "localization/ui.csv",
     "localization_combat": "localization/combat.csv",
@@ -35,5 +36,8 @@
     "localization_events_season": "localization/events_season.csv",
     "localization_events_year": "localization/events_year.csv",
     "migrations_manifest": "migrations/manifest.json"
+  },
+  "legacyFiles": {
+    "events_index": "events/_index.json"
   }
 }

@@ -1,10 +1,16 @@
 {
-  "configVersion": 26,
+  "configVersion": 30,
   "time": {
     "secondsPerDay": 180,
     "daysPerSeason": 30,
     "seasonsPerYear": 4,
     "driveHoursPerDayCap": 1.0,
+    "seasonBaseTemp": {
+      "spring": 0.0,
+      "summer": 1.0,
+      "autumn": 0.0,
+      "winter": -1.0
+    },
     "metabolismMultByIntent": {
       "stop": 1.35,
       "forward": 0.55,
@@ -19,7 +25,24 @@
     "seed": 1,
     "parts": 6,
     "med": 4,
-    "precision": 40
+    "precision": 40,
+    "carriages": [
+      {
+        "id": "car_pwr",
+        "templateId": "power",
+        "size": 3
+      },
+      {
+        "id": "car_liv",
+        "templateId": "living",
+        "size": 2
+      },
+      {
+        "id": "car_cgo",
+        "templateId": "cargo",
+        "size": 3
+      }
+    ]
   },
   "population": {
     "foodPerCapitaDay": 0.9,
@@ -30,6 +53,12 @@
     "drinkUrgeThreshold": 18.0,
     "satisfactionHungerPerFullDayRation": 55.0,
     "satisfactionThirstPerFullDayRation": 50.0,
+    "reconcileHungerFedDelta": 12.0,
+    "reconcileHungerShortfallDelta": 18.0,
+    "reconcileThirstFedDelta": 8.0,
+    "reconcileThirstShortfallDelta": 15.0,
+    "tickPartialShortfallPenalty": 12.0,
+    "thirstStarvingHpLossFraction": 0.6,
     "starvingHungerThreshold": 90.0,
     "hpLossPerDayAtStarving": 22.0,
     "injuredHpThreshold": 30,
@@ -45,6 +74,10 @@
     "moraleOffsetRecoverPerDay": 2,
     "moraleOffsetDecayPositivePerDay": 1,
     "moraleZeroStreakFail": 3,
+    "fuelZeroStreakFail": 3,
+    "resourceZeroStreakF39": 3,
+    "breakdownCounterTrigger": 3,
+    "breakdownStopHours": 2.0,
     "f39HpLoss": 20,
     "bodyHpBreakdownThreshold": 30,
     "jobAssignLaborKeepMin": 2,
@@ -61,42 +94,6 @@
     "summerWater": 1.4,
     "springSupply": 1.2,
     "autumnSupply": 1.3
-  },
-  "inventory": {
-    "_authority": "modules/02-resources.md §6（S1a 货舱 size 线性增量）",
-    "base": {
-      "food": 60,
-      "water": 60,
-      "parts": 20,
-      "scrap": 30,
-      "medicine": 15,
-      "seed": 20,
-      "chem": 15,
-      "cloth": 20
-    },
-    "cargoPerSize": {
-      "foodWater": 10,
-      "partsMedicineChemTenth": 10,
-      "scrap": 8,
-      "seed": 4,
-      "cloth": 5
-    },
-    "unknownResourceCap": 9999
-  },
-  "fuelTank": {
-    "_note": "S1a 绝对油库容量；正式百分比口径见 02 §6",
-    "baseAmount": 60,
-    "perCargoSize": 10
-  },
-  "travel": {
-    "_authority": "modules/03-train.md §6.2 走廊速度",
-    "corridorMult": 2.5,
-    "tacticalBaseKmh": 60,
-    "tacticalDivisor": 30
-  },
-  "eventDraw": {
-    "scenarioEventRate": 1.0,
-    "_note": "难度档 event 乘子延后；接 difficulty 前固定 1.0"
   },
   "inventory": {
     "_authority": "modules/02-resources.md §6（S1a 货舱 size 线性增量）",
@@ -164,21 +161,37 @@
     "precisionStart": 40,
     "precisionPerCraftDay": 1,
     "precisionIdleDecay": -1,
-    "partsPerPrecision": 300
+    "partsPerPrecision": 300,
+    "scrapPerRefineBatch": 3,
+    "partsPerRefineBatch": 1
   },
   "search": {
     "maxAssignPerPointPerDay": 3,
     "hoursPerTask": 4,
-    "hoursProgressPerDay": 4
+    "hoursProgressPerDay": 4,
+    "teamEffBase": 0.9,
+    "teamEffPerMember": 0.02,
+    "yieldJitterMin": 0.55,
+    "yieldJitterSpan": 0.5,
+    "yieldMultBase": 0.9,
+    "yieldMultPerTeamEff": 0.08,
+    "yieldMultCap": 1.25,
+    "scavengeSkillDivisor": 0.85
+  },
+  "eventOps": {
+    "defaultRecruitRollP": 0.7,
+    "defaultLootHalveRatio": 0.5
   },
   "haul": {
     "hoursPerTask": 0.4,
-    "hoursProgressPerDay": 4
+    "hoursProgressPerDay": 4,
+    "haulSpecialtyMult": 0.85
   },
   "train": {
     "abandonPartsCost": 1,
     "abandonScrapRatio": 0.35,
     "abandonFuelCostPct": 0.01,
+    "abandonDayFraction": 0.5,
     "abandonAiFuelFillMax": 0.35,
     "abandonAiMinCars": 12
   },
@@ -256,6 +269,10 @@
     "_mirrorOf": "data/combat.json"
   },
   "crystalHiddenChance": 0.09,
+  "climateHeatWater": {
+    "heat1": 1.5,
+    "heat0_5": 1.2
+  },
   "climateColdFoodFuel": {
     "cold2": {
       "food": 1.4,
@@ -269,6 +286,11 @@
       "food": 1.1,
       "fuel": 1.15
     }
+  },
+  "featureFlags": {
+    "useLegacyEventCards": false,
+    "useIncidentDirector": true,
+    "loadLegacyEventCatalog": false
   },
   "_authority": [
     "modules/10-validation.md §1.1",

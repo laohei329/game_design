@@ -1,5 +1,5 @@
 {
-  "configVersion": 26,
+  "configVersion": 30,
   "authority": "modules/06-region-events.md §2.3",
   "foodNeedPerCapita": 2.0,
   "waterNeedPerCapita": 1.5,
@@ -12,6 +12,10 @@
   "raidDeltaTags": [
     "raid"
   ],
+  "pressureClassRoll": {
+    "lowMax": 0.25,
+    "mediumMax": 0.7
+  },
   "unclaimedLootRaidBoost": 0.25,
   "pharmacistOnDutyTagBoost": {
     "tags": [

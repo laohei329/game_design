@@ -1,6 +1,6 @@
 # 末日列车：生存序列 — 文档
 
-> 版本：设计 v1.3.33 / 规格 v1.52 / configVersion 25 / version.save 12  
+> 版本：设计 v1.3.33 / 规格 v1.52 / configVersion **30**（十项闸 config25）/ version.save 12  
 > 结构：总架构 → 玩法模块 → 工程附件
 
 ## 怎么读
@@ -12,7 +12,7 @@
 | 3 | [MILESTONES](modules/MILESTONES.md) | **里程碑 · 验收**（M0–M6 · **M-D Demo · M-EA**） |
 | 4 | [GODOT_ARCH](modules/GODOT_ARCH.md) | 客户端分层 · Intent · S0–S3 细项 |
 | 5 | [OPEN_LOOPS](modules/OPEN_LOOPS.md) | 缺口与剩余风险 |
-| 6 | [sim/](sim/) | 自动模拟冒烟 |
+| 6 | [sim/](sim/) | Python 数值沙盒库（无固定 runner） |
 | — | [client/](client/) | Godot 4 工程；实施勾选 **[开发计划 §12](开发计划.md#12-godot-单人实施client)** · 验收 **[qa/](qa/README.md)** · 工具 **[tools/README.md](tools/README.md)** |
 | — | [assets/vfx_portable/](assets/vfx_portable/) | 可移植 VFX 资源包（烘焙产出，可拷到其他 Godot 工程） |
 | 7 | [archive/VERSION.md](archive/VERSION.md) | 版本沿革 |
@@ -40,6 +40,7 @@
 | [开发计划](开发计划.md) | **项目排期 + Godot 单人实施 §12**（服务/界面/勾选） |
 | [MILESTONES](modules/MILESTONES.md) | **排期与验收索引** |
 | [GODOT_ARCH](modules/GODOT_ARCH.md) | **Godot/GDScript** · 分层 · S0–S3 |
+| [整体审计报告（第五轮）](qa/整体审计报告-第五轮.md) | **现行**全面审计索引 |
 | [OPEN_LOOPS](modules/OPEN_LOOPS.md) | L 缺口 · 剩余风险 |
 | [data/](data/) | 配置权威 |
 
@@ -56,4 +57,4 @@
 1. 只改对应模块正文  
 2. 同步配置键与验收  
 3. 触碰红线/分层 → architecture  
-4. **冻结期内**（config **25**）不随意改乘子/开局/验收阈；须改时走 [10 §1.1](modules/10-validation.md) 解冻流程并重跑 `sim/run_zero_a`  
+4. **冻结期内**（config **25**）不随意改乘子/开局/验收阈；须改时走 [10 §1.1](modules/10-validation.md) 解冻流程并按当时现状重做数值验收  

@@ -1,0 +1,132 @@
+{
+  "configVersion": 30,
+  "authority": "modules/06-incident-migration.md",
+  "notes": "段建成：所有匹配的 silent 可叠乘（weightBase<1 为概率门控）；modal 每 hook 至多 1 个加权抽出。",
+  "types": {
+    "supply_food_pressure": {
+      "hook": "onSegmentBuild",
+      "presentation": "silent",
+      "tags": ["supply"],
+      "weightBase": 1.0,
+      "triggersAll": ["food_below_need"],
+      "effects": [
+        {
+          "op": "weight_mod",
+          "args": { "eventTag": "supply", "delta": 0.4 },
+          "targetType": "segment"
+        }
+      ]
+    },
+    "supply_water_pressure": {
+      "hook": "onSegmentBuild",
+      "presentation": "silent",
+      "tags": ["supply"],
+      "weightBase": 1.0,
+      "triggersAll": ["water_below_need"],
+      "effects": [
+        {
+          "op": "weight_mod",
+          "args": { "eventTag": "supply", "delta": 0.35 },
+          "targetType": "segment"
+        }
+      ]
+    },
+    "raid_unclaimed_pressure": {
+      "hook": "onSegmentBuild",
+      "presentation": "silent",
+      "tags": ["raid"],
+      "weightBase": 1.0,
+      "triggersAll": ["unclaimed_loot"],
+      "effects": [
+        {
+          "op": "weight_mod",
+          "args": { "eventTag": "raid", "delta": 0.25 },
+          "targetType": "segment"
+        }
+      ]
+    },
+    "guard_raid_dampen": {
+      "hook": "onSegmentBuild",
+      "presentation": "silent",
+      "tags": ["raid"],
+      "weightBase": 1.0,
+      "triggersAll": ["guard_on_duty", "unclaimed_loot"],
+      "effects": [
+        {
+          "op": "weight_mod",
+          "args": { "eventTag": "raid", "delta": -0.15 },
+          "targetType": "segment"
+        }
+      ]
+    },
+    "low_fuel_supply_nudge": {
+      "hook": "onSegmentBuild",
+      "presentation": "silent",
+      "tags": ["supply"],
+      "weightBase": 1.0,
+      "triggersAll": ["fuel_fill_below"],
+      "effects": [
+        {
+          "op": "weight_mod",
+          "args": { "eventTag": "supply", "delta": 0.25 },
+          "targetType": "segment"
+        }
+      ]
+    },
+    "pressure_relief_content": {
+      "hook": "onSegmentBuild",
+      "presentation": "silent",
+      "tags": ["mood", "supply", "loot"],
+      "weightBase": 1.0,
+      "triggersAll": ["forced_low_content"],
+      "effects": [
+        {
+          "op": "weight_mod",
+          "args": { "eventTag": "mood", "delta": 0.5 },
+          "targetType": "segment"
+        }
+      ]
+    },
+    "recruit_segment_offer": {
+      "hook": "onSegmentBuild",
+      "presentation": "modal",
+      "tags": ["recruit"],
+      "titleKey": "incident.recruit_segment.title",
+      "bodyKey": "incident.recruit_segment.body",
+      "weightBase": 1.0,
+      "triggersAll": ["has_beds"],
+      "actions": [
+        {
+          "id": "accept",
+          "labelKey": "incident.recruit_segment.action.accept",
+          "effects": [
+            {
+              "op": "recruit_roll",
+              "args": {},
+              "targetType": "global"
+            }
+          ]
+        },
+        {
+          "id": "decline",
+          "labelKey": "incident.recruit_segment.action.decline",
+          "effects": []
+        }
+      ]
+    },
+    "recruit_day_end": {
+      "hook": "onDayEnd",
+      "presentation": "silent",
+      "tags": ["recruit"],
+      "weightBase": 1.0,
+      "triggersAll": ["day_end_recruit_eligible"],
+      "effects": [
+        {
+          "op": "recruit_roll",
+          "args": { "p": 0.05 },
+          "targetType": "global"
+        }
+      ]
+    }
+  }
+}

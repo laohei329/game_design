@@ -1,5 +1,5 @@
 {
-  "configVersion": 26,
+  "configVersion": 30,
   "authority": "modules/05-combat.md §8 batch 3",
   "status": "deferred_ea",
   "note": "Enemy adaptation counters player tactics; not loaded in S1b.",

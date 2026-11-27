@@ -10,6 +10,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/tech_panel.tscn" id="8_tp"]
 [ext_resource type="PackedScene" path="res://scenes/ui/combat_panel.tscn" id="9_cp"]
 [ext_resource type="PackedScene" path="res://scenes/ui/event_modal.tscn" id="10_ev"]
+[ext_resource type="PackedScene" path="res://scenes/ui/incident_modal.tscn" id="11_in"]
 
 [node name="RunMain" type="Control" unique_id=223065799]
 layout_mode = 3
@@ -86,3 +87,5 @@ layer = 17
 layer = 23
 
 [node name="EventModal" parent="EventLayer" instance=ExtResource("10_ev")]
+
+[node name="IncidentModal" parent="EventLayer" instance=ExtResource("11_in")]

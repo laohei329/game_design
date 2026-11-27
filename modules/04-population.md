@@ -48,7 +48,7 @@
 
 ## 3. 规模：床位门控，不设人数天花板
 
-- 床位权威：[列车 §3.2](03-train.md)（预满 `size×2` + 生活科技）  
+- 床位权威：[列车 §3.2](03-train.md)（预满 `Σ(living.size×carriages.livingBedsPerSize) + living_tech×carriages.techBedsPerLivingLevel`；默认两键均为 2）  
 - **无** `maxPopulation`；门槛是床位与粮水  
 - 开局：休息 size2 → 4 床 = 4 人住满  
 - **满床不封锁收留**（有意软压）：无空床仍可收留进过道（`carId=null`），权重 ×0.35，mood −3/日；教程站送休息车正是为缓解此压

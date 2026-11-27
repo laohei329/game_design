@@ -47,7 +47,7 @@
 派生：
 
 - `isLocomotive = (templateId == power)` — **不能**靠拉高 speedBonus 变成动力车  
-- 床位：只统计休息车厢内的**床铺类设备**（§3.2）；等价口径仍为 `Σ(living 的 size×2) + 2×生活科技`（开局预装满床铺时）  
+- 床位：只统计休息车厢内的**床铺类设备**（§3.2）；无设备拆装时等价口径为 `Σ(living.size × carriages.livingBedsPerSize) + living_tech × carriages.techBedsPerLivingLevel`（`carriages.json` 顶层键；当前默认同 §3.2 表）  
 - 货舱容量只统计 `cargo`  
 - UI/文案统一用「种植车厢」；配置 id 仍为 `greenhouse`（避免存档断裂）
 
@@ -76,9 +76,9 @@
 
 ### 3.2 休息车厢床位（权威）
 
-**定稿密度：预满时 `size × 2`（每槽 1 组床铺 = 2 床）。**
+**定稿密度（配置键）**：预满单节床位 = `size × carriages.livingBedsPerSize`；生活科技加床 = `living_tech × carriages.techBedsPerLivingLevel`（`carriages.json` 顶层；**实现** `TrainService.living_beds_for_car` / `living_tech_bed_bonus`）。默认两键均为 **2**（每槽 1 组 `bunk` = `equipment.beds` 2 床）。
 
-| size | 预满床位 | 体感 |
+| size | 预满床位（`livingBedsPerSize=2`） | 体感 |
 |---|---|---|
 | 1 | 2 | 窄隔间 |
 | **2（开局）** | **4** | 标准卧铺节 |
@@ -88,13 +88,13 @@
 
 | 项 | 规则 |
 |---|---|
-| 单节床位 | Σ 该节床铺设备；预满 = `size × 2` |
+| 单节床位 | Σ 该节床铺设备；预满 = `size × carriages.livingBedsPerSize` |
 | `carriages.json` 的 `beds` | **仅 UI/发现预览占位**；运行时床位只认设备安装。开局休息 size2 **预装 2 组床铺** → 运行态 **4 床**（与 `beds:2` 字段无关） |
-| 全车床位 | `Σ(休息车厢床位设备) + 2 × 生活科技等级`；科技加床**优先写入休息车**（提高可住 `carId`），禁止科技加床变成无车籍虚空床 |
+| 全车床位 | `Σ(休息车厢床位设备) + living_tech × carriages.techBedsPerLivingLevel`；科技加床**优先写入休息车**（提高可住 `carId`），禁止科技加床变成无车籍虚空床 |
 | 开局 | 1 节休息 size2 → **4 床 = 4 人**，开局即住满（制造「先找休息车/腾床」压力） |
 | 设备 | `bunk`：`slotCost=1`，`beds=2`；可拆床腾槽给储物 → 床位下降 |
 
-**为何是 ×2**：开局 4 床对齐 4 人；之后**人口无硬顶**——多挂休息车即可多住人（见 [04](04-population.md)）。×1 早期过虐；×3 开局空床、早期无压力。
+**为何默认 `livingBedsPerSize` / `techBedsPerLivingLevel` = 2**：开局 4 床对齐 4 人；之后**人口无硬顶**——多挂休息车即可多住人（见 [04](04-population.md)）。改为 1 早期过虐；改为 3 开局空床、早期无压力。调密度只改 `carriages.json` 两键，禁止在玩法代码写死乘子。
 
 里程碑（非上限）：车上约 20 人 ≈ 休息 size 合计 8–10，或 size8 + 生活 Lv2。
 
@@ -472,7 +472,7 @@ effectiveVision = visionRaw × weather.visibilityMult
 `night_rain` / `blizzard` / `fog` 的尸潮·搜索险内容权重 × `(1 − 0.08×雷达科技等级)`（地板 0.60）——雷达是**减险**，不是加尸。  
 禁止「夜间尸群权重随雷达等级上升」。
 
-**生活**：床位见 §3.2（预满时 `Σ(living 床位) + 2×等级`）；**科技床**优先摊入已有休息车空床槽（提高该节容量），摊不下才允许过道；库存 ×(1+0.10×等级)（晶核、药剂、装备、图纸除外）；**心情日恢复 +0.2/级**（[04 §9.1](04-population.md)）。
+**生活**：床位见 §3.2（`Σ(living 床位设备)` 或预满 `Σ(size×livingBedsPerSize) + living_tech×techBedsPerLivingLevel`）；**科技床**优先摊入已有休息车空床槽（提高该节容量），摊不下才允许过道；库存 ×(1+0.10×等级)（晶核、药剂、装备、图纸除外）；**心情日恢复 +0.2/级**（[04 §9.1](04-population.md)）。
 
 升级**不**触发对应资源点权重下调。
 

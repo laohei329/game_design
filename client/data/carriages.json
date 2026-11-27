@@ -1,6 +1,8 @@
 {
-  "configVersion": 26,
+  "configVersion": 30,
   "authority": "modules/03-train.md §2–§5",
+  "livingBedsPerSize": 2,
+  "techBedsPerLivingLevel": 2,
   "templates": {
     "power": {
       "templateId": "power",

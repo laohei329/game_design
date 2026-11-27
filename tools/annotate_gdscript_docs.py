@@ -44,28 +44,7 @@ def leading_body_docs(lines: list[str], body_start: int) -> tuple[list[str], int
 
 
 def default_doc(name: str, is_static: bool) -> str | None:
-    """Return None to skip auto-generated placeholder docs."""
-    _SKIP = {
-        "_ready",
-        "_unhandled_input",
-        "_close",
-        "toggle",
-        "emit_intent",
-        "load_all",
-        "get_table",
-        "require",
-        "record",
-        "to_dict",
-        "audit",
-    }
-    if name in _SKIP or name.startswith("_on_") or name in ("_sync", "_refresh"):
-        return None
-    if name.startswith("errors_"):
-        return None
-    if name.startswith("_"):
-        return None
-    if is_static:
-        return None
+    """Return None: placeholders are added by enrich_core_service_docs only."""
     return None
 
 

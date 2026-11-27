@@ -4,22 +4,22 @@
 > 自动模拟 ≠ 真人测试，二者不可互相替代  
 > 含原：BALANCE_FREEZE · HANDCALC_9_10 · ZERO_B_KIT
 
-**规格现状（设计 v1.3.33 / 规格 v1.52 / config 25）**：时间专审见 01 §2.2；存档/缩写见 architecture §8.1 / 09。下列十项是**数值/模拟验收闸**，与设计自洽分开；未跑通 ≠ 设计未定。  
+**规格现状（设计 v1.3.33 / 规格 v1.52 / 实体 config 29 · 冻结闸 config25）**：时间专审见 01 §2.2；存档/缩写见 architecture §8.1 / 09。下列十项是**数值/模拟验收闸**，与设计自洽分开；未跑通 ≠ 设计未定。  
 **里程碑总表**：[MILESTONES](MILESTONES.md)（M0 零 A / M2–M3 Godot / M4 零 B）。未闭环：[OPEN_LOOPS](OPEN_LOOPS.md)。
 
 ---
 
 ## 1. 自动模拟（阶段零 A）
 
-**与 Godot S1b 分工**：`sim/run_zero_a.py` 按 **日总** `food`/`water` 扣减与 streak 验收（十项 #2/#6/#9/#10 等）；**不建模** `members[].hunger/thirst` 曲线。客户端日内饥渴 + `reconcile_day_end` 须 **日总耗与 sim 口径一致**，不要求逐人条与 sim 对表。
+**与 Godot S1b 分工**：历史 **`run_zero_a.py`** 曾按 **日总** `food`/`water` 扣减与 streak 验收（十项 #2/#6/#9/#10）；**不建模** `members[].hunger/thirst`。runner 已移除，阈表仍作冻结基准。客户端日内饥渴 + `reconcile_day_end` 须 **日总耗与曾用 sim 口径一致**。
 
 > 「零 A」= 阶段零·自动模拟；**不是**战斗战力式字母 `A`。
 - 2 策略（保守 / 扩张）× 各 ≥200 局 × 240 游戏日（原「定居」策略随定居点延后）  
 - 共用固定种子集  
 
-**十项全部满足才过**（**config 25 量化**见下表；@500 固定种子集）：
+**十项全部满足才过**（**config 26 量化**见下表；@500 固定种子集）：
 
-| # | config 25 验收阈值（sim） | config24 历史（存档） |
+| # | config 26 验收阈值（sim） | config25 历史 |
 |---|---|---|
 | 2 | 食物缺口不早于第 5 日；**存活≥120 日：各策略 ≥40%** | 曾用 ≥50% |
 | 6 | 扩张相对保守：**pop≥20 率差 ≥5pp**，或 **beds≥20 触达率扩张 ≥ 保守**（油紧节流下 **不要求** hung 中位 +15%） | 曾用 hungΔ≥15% 或 peak_cars+hangRate |
@@ -49,7 +49,7 @@
 | | pop≥20 55% | 56% | |
 | | 燃料失败 38% | 40% | |
 | | 死因峰值 68% | 66% | |
-| **config 25**（现行 · 2026-11-26） | 存活 **46%** | **48%** | `python sim/run_zero_a.py --runs 500` |
+| **config 25**（冻结闸 · 2026-11-26） | 存活 **46%** | **48%** | 解冻时重做 `@500` runner |
 | | pop≥20 **23%** | **32%** | |
 | | 燃料失败 **71%** | **69%** | |
 | | 死因峰值 **68%** | **63%** | |
@@ -76,9 +76,10 @@
 
 ## 1.1 数值表冻结（零 B 前）
 
-> **冻结版本**：设计 v1.3.33 / 规格 v1.52 / `configVersion` **25** · 冻结日 2026-11-26（开局 6/4 · 催化对齐 · 教程点位）  
-> **主策（2026-11-26 补）**：冻结期内 **不**再为对齐冒烟表、或为新增玩法（如遗弃车厢）**改乘子/开局/十项阈**；AUDIT K 以本文件 **config 25** 行为准。参数调整留到 **客户端/零 B 实测** 暴露问题后，按下方「解冻」流程再做。  
-> 将来若解冻：须 bump `configVersion` 并重跑 `sim/run_zero_a.py --runs 500`。意图见 [08 §4](08-presentation.md)。
+> **冻结验收基准**：设计 v1.3.33 / 规格 v1.52 / **十项闸阈与 AUDIT K 仍以 config 25 数字为准**（冻结日 2026-11-26）。  
+> **现行配置实体**：`data/*/configVersion` 随 09 §1 递增（当前 **30**，见 manifest）；实体 bump **不**自动改写 §1 表内验收阈，除非走下方「解冻」并重做 `@500`。  
+> **主策（2026-11-26 补）**：冻结期内 **不**再为对齐冒烟表、或为新增玩法 **改乘子/开局/十项阈**；调整留到客户端/零 B 实测后解冻。  
+> 将来若解冻：须 bump `configVersion` 并按当时现状重写数值 runner。意图见 [08 §4](08-presentation.md)。
 
 | 域 | 冻结项（权威出处） |
 |---|---|
@@ -100,14 +101,9 @@
 
 **状态**：已冻结；零 B **包就绪 · 场次搁置**；优先提示/AI，不解冻乘子 / F04。
 
-### 1.1.1 Godot 无头冒烟（S1b · 客户端）
+### 1.1.1 Godot 客户端验收（S1b）
 
-| 命令 | 闸 |
-|---|---|
-| `powershell tools/run_all_smoke.ps1` | 配置镜像 + §12.7 + 15 日 + 存档 kill |
-| `SmokeAssertions.errors_outdoor_day_clock_p0_a` | 户外日钟：forward 全日无补课、无日钟补满工日、停 0.5+行 0.5≈半工日、haul forward |
-
-手工清单：[qa/DEV-day-clock-manual-2026-11-26.md](../qa/DEV-day-clock-manual-2026-11-26.md)。
+固定无头冒烟已移除。现行：**手工清单** [qa/DEV-functional-checklist.md](../qa/DEV-functional-checklist.md)、日钟 [qa/DEV-day-clock-manual-2026-11-26.md](../qa/DEV-day-clock-manual-2026-11-26.md)；文档一致性 `python tools/check_doc_consistency.py`。
 
 ---
 
@@ -302,7 +298,7 @@
 |---|---|---|
 | 阶段零 A/B | 模拟报告 + 灰盒操控 | **制作 P0**（≠ 战力式 P0） |
 | 一 | 核心循环可跑 30 日 | 制作 P0 |
-| 二 | 120 事件 + 战斗层级 L2/L3 + 疾病 | 制作 P1 |
+| 二 | Incident 叙事 + 战斗 L2/L3 + 疾病（legacy 120 卡冻结） | 制作 P1 |
 | 三 | UI/音效/埋点/存档 | 制作 P1 |
 | 四 | Demo | 制作 P1 · 验收 **[MILESTONES §9](MILESTONES.md)** |
 | 五 | Early Access $19.99 | 制作 P2 · 验收 **[MILESTONES §10](MILESTONES.md)** |

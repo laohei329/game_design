@@ -2,7 +2,7 @@
 
 **权威**：[01 §2.3](../modules/01-time-season.md) · [04 §5](../modules/04-population.md) · `SmokeAssertions.errors_outdoor_day_clock_p0_a`
 
-**自动**：`powershell tools/run_all_smoke.ps1`（含 forward 全日 / 无日钟 / 停 0.5+行 0.5 / haul forward）
+**自动（历史）**：曾由 `run_all_smoke.ps1` 覆盖；runner 已删，以下仅手工步骤。
 
 ## 手工场景（约 3 分钟）
 
@@ -17,5 +17,5 @@
 ## 回归命令
 
 ```powershell
-powershell tools/run_all_smoke.ps1
+# 历史：run_all_smoke.ps1
 ```

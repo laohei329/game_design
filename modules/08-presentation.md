@@ -92,7 +92,7 @@ P0 反馈：**搜索/搬运 `ProgressBar`（日钟刷新）**、搬运完成飞�
 ## 4. 玩家软规则 · 提示与扩张 HUD
 
 > 给玩家看的**软规则** + 程序触发表。**不**改 F04 / 季节乘子。  
-> 灰盒：[10 §2](10-validation.md) · 冻结：[10 §1.1](10-validation.md) · configVersion **25**
+> 灰盒：[10 §2](10-validation.md) · 冻结闸：[10 §1.1](10-validation.md) · **config25**（实体 CV 见 manifest）
 
 ### R1 · 油紧时你有五条路（勿只挂动力）
 

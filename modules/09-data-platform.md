@@ -21,7 +21,8 @@
 **落盘状态**：上列 P1 战斗/人口/本地化表 **已落**（见 `data/P1_README.md`）；`migrations/*.js` **S1b 客户端**；MOD 脚本 **不做**。
 
 `weather.json`：**已落** [`data/weather.json`](../data/weather.json)；天气 id、`weightBySeason`、`tempMod`、`waterMod`、`speedClimate`、`visibilityMult`、`weatherPressure`、`nodeWeightMods`（见 [01](01-time-season.md) §7）；**sim 权威来源**（`engine` / `sweep` 经 `point_types.load_weather_*`）。  
-`events/_index.json`：**已落** [`data/events/_index.json`](../data/events/_index.json)；120 卡 `status: ready`；客户端 [GODOT_ARCH §10 S2](GODOT_ARCH.md)。  
+`incidents.json` / `stress.json`：**段叙事主表**（[06-incident-migration](06-incident-migration.md)）。  
+`events/_index.json`：**Legacy** · 登记在 `manifest.legacyFiles`（Godot `files` 不载）；索引 [`archive/events-legacy/README.md`](../archive/events-legacy/README.md)。冻结新卡；`useLegacyEventCards` / `loadLegacyEventCatalog` 控制读盘。  
 `hud_hints.json`：**已落** [`data/hud_hints.json`](../data/hud_hints.json)；TIPS/进站 defer 阈值（不改 balance）。  
 `climate_influences.json`：**已落** [`data/climate_influences.json`](../data/climate_influences.json)；区域预设 `presets["region.*"]`（`tempMod`、`weatherBias`、`waterMod`、`speedMult`、`pressureAdd`；见 01 §4）。  
 `difficulty.json`：**已落** [`data/difficulty.json`](../data/difficulty.json)；首发仅 `normal` 一档（见下表）。  
@@ -32,7 +33,7 @@
 岗位枚举：`grower|crafter|purifier|pharmacist|radar_op|engineer|guard|labor|none`（[04 §4.2](04-population.md)；无 `medic`）。  
 专长枚举：`scavenge|repair|medicine|pharmacy|farming|haul|combat_drill`。  
 `balance.power.unattendedFaultChance=0.10`。  
-`manifest.json`：当前 `configVersion: 26`（见仓库 [`data/manifest.json`](../data/manifest.json)）。改配置必须递增；`dataHash` 由构建生成。  
+`manifest.json`：当前 `configVersion` 见仓库 [`data/manifest.json`](../data/manifest.json)（**实体 30**，2026-11-27）。改配置必须递增；十项模拟闸阈仍记 config25（[10 §1.1](10-validation.md)）；`dataHash` 由构建生成。全库对齐：`python tools/sync_config_version.py`。  
 `balance.json`：**已落** [`data/balance.json`](../data/balance.json)，与 [10 §1.1](10-validation.md) 对齐。  
 **P1 包（S1b）已落**：[`combat.json`](../data/combat.json)、[`gear.json`](../data/gear.json)、[`abilities.json`](../data/abilities.json)、[`archetypes.json`](../data/archetypes.json)、[`disease.json`](../data/disease.json)、[`items.json`](../data/items.json)、`combat-*.json`、`localization/*.csv`、`migrations/manifest.json` — 清单见 [`data/P1_README.md`](../data/P1_README.md)。  
 存档迁移 **实现**仍在 Godot `client/scripts/data/migrations/`（见 [GODOT_ARCH](GODOT_ARCH.md)）；禁止一次交全空壳以外的未文档化表。  

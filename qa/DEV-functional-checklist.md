@@ -1,23 +1,14 @@
 # Godot 客户端 · 功能验收清单（不测数值手感）
 
 > **范围**：按钮/Intent/面板/存读档/埋点是否**能走通**；不评判粮够不够、教程节奏、难度是否合理。  
-> **自动化**：`powershell tools/run_all_smoke.ps1`  
+> **2026-11-27**：固定无头冒烟已删；**B–E 人工**仍有效。需要自动化时按现状重写。  
 > **人工**：在编辑器 F5，打勾即可；异常记「现象 + 操作顺序」。
 
 ---
 
-## A. 自动化（每次提交前）
+## A. 自动化（历史 · 已移除）
 
-| # | 功能 | 命令/场景 | 期望 |
-|---|------|-----------|------|
-| A1 | 配置加载 | `validate_config_db.py` | exit 0 |
-| A2 | 缺表失败 | 脚本内 weather 探针 | 删表后 fail |
-| A3 | 主场景可载 | headless `run_main.tscn` | 无脚本错 |
-| A4 | 新局 + 15 日 | `headless_smoke.tscn` | exit 0 |
-| A5 | 动力红线 | 冒烟 `violates_min_power` | 仅 1 节不可弃 |
-| A6 | 搜索 cap | 同点第 4 次 | `cap_exceeded` |
-| A7 | 遗弃货舱 | 冒烟 telemetry | `carriage_abandon` |
-| A8 | 存读档堆 | 槽 90 | lootPile 一致 |
+曾由 `run_all_smoke.ps1` 覆盖；证据 [archive/DEV-M1-M2-smoke](../archive/qa-history/DEV-M1-M2-smoke-2026-11-26.md)。提交前建议：`python tools/check_doc_consistency.py`。
 
 ---
 
@@ -116,14 +107,14 @@
 
 ---
 
-## K. 事件（S2 · 冒烟 + 可选人工）
+## K. 段叙事（默认 Incident · Legacy 可选）
 
-| # | 操作 | 期望 | 冒烟 |
-|---|------|------|------|
-| K1 | 教程后 **结束一天** 跨段 | 可出事件弹窗；选一项后段内不重开 | `errors_event_*` |
-| K2 | 选项含延迟 / snapshot | `delayedEvents` 入档；`capture=snapshot` 不还原空堆 | `errors_event_snapshot_and_load_pending` |
-| K3 | **搜索** 首次 | 概率点位遭遇 → L1 模板 | `errors_event_and_point_encounter` |
-| K4 | 存读档（未决事件） | `sync_after_load` 恢复弹窗 | 同上 |
+| # | 操作 | 期望 |
+|---|------|------|
+| K1 | 教程后段建成 / 跨段 | **默认** incident（silent/modal）；非 120 卡选项池 |
+| K2 | 收留 modal | 收/拒；读档续办 | 见 [DEV-incident-30d-signoff](DEV-incident-30d-signoff.md) |
+| K3 | **Legacy 对照** | F3 开 `useLegacyEventCards` 后可出 EventModal | 仅回归 |
+| K4 | 点位遭遇 L1 | **搜索** 首次仍可开战 | 人工 J 节 |
 
 ---
 
@@ -137,14 +128,16 @@
 
 ---
 
-## F. 自动化已覆盖（免重复手工）
+## F. 自动化（现行 · Python）
 
-| 项 | 冒烟 |
+| 项 | 命令 |
 |----|------|
-| 三选一 pick 雪原 1.3 · 动力 Lv1 | `headless_smoke` |
-| precision / morale 存盘子集 | `headless_smoke` + `save_kill` |
-| 教程挂车 | `headless_smoke` |
-| 事件 op / 读档未决 / 点位遭遇 | `errors_event_*` in `headless_smoke` |
+| 配置全表 + incident 开关 + 段 loot | `python tools/smoke_config.py` |
+| 应力 → incident 类型 | `python tools/stress_sweep.py` |
+| GD 硬编码启发式 | `python tools/scan_hardcode_gd.py` |
+| 文档死链 / 过期 runner 引用 | `python tools/check_doc_consistency.py` |
+
+历史无头冒烟见 [archive/qa-history](../archive/qa-history/)；Godot 旧 QA 冒烟脚本已移除。
 
 ---
 
@@ -152,4 +145,4 @@
 
 | 日期 | 测试人 | A 自动化 | B–E 人工 | 备注 |
 |------|--------|----------|----------|------|
-| 2026-11-26 | — | PASS | 部分（搜索/进站/F3/遗弃逻辑） | E5 已修；见 [DEV-code-audit](DEV-code-audit-2026-11-26.md) |
+| 2026-11-26 | — | PASS（历史） | 部分（搜索/进站/F3/遗弃逻辑） | 见 [archive DEV-code-audit](../archive/qa-history/DEV-code-audit-2026-11-26.md) |

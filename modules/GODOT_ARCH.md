@@ -2,10 +2,10 @@
 
 > **平台**：Godot **4.x** · 单机 PC（Steam）· Windows 优先  
 > **语言**：**GDScript**（全栈默认；不混 C# 玩法逻辑）  
-> **配置权威**：仓库 [`data/`](../data/) · `configVersion` **25** · 存档 `version.save` **12**  
+> **配置权威**：仓库 [`data/`](../data/) · `configVersion` **30**（验收闸 config25）· 存档 `version.save` **12**  
 > 对齐：[architecture](../architecture.md) §3–4 · [09](09-data-platform.md) · [02 §8](02-resources.md) · [08 §4](08-presentation.md)  
 > **本页含**：代码分层 + 阶段一玩法切片 + S2 事件接入  
-> **状态**：`client/` **S1a 可玩 + S1b 入口已接**（三选一 · 科技 Lv1 薄 · 日结 6–8 薄 · 杀进程冒烟）；**勾选**：[开发计划 §12](../开发计划.md#12-godot-单人实施client) · **审计**：[qa/DEV-code-audit-2026-11-26.md](../qa/DEV-code-audit-2026-11-26.md)
+> **状态**：**S1a 可玩**；**S1b 入口部分接入**（三选一 · 科技 Lv1 · L1 薄）；**M3 未过**（30 日 ×3 人未签）。**勾选**：[开发计划 §12](../开发计划.md#12-godot-单人实施client) · **审计**：[qa/整体审计报告-第四轮.md](../qa/整体审计报告-第四轮.md)
 
 ---
 
@@ -17,7 +17,7 @@
 | 语言 | GDScript |
 | 表现 | 2D 侧视 + 长车列表（08） |
 | 数值调试 | **禁止**玩法常数硬编码；一律 `data/*.json` |
-| Python `sim/` | 仅验收/冒烟沙盒；**不**链进运行时 |
+| Python `sim/` | 数值库（`engine` 等）；**不**链进运行时；固定 runner 按需重建 |
 | `third_party/` | **烘焙工具**（不进包）：`pixelfx-godot/godot` · 天气参考：`godot-weather-2D` |
 | `assets/vfx_portable/` | **可移植 VFX**（PNG/JSON/SpriteFrames）→ 任意 Godot 工程，无 pixelfx 运行时（见 [`assets/vfx_portable/README.md`](../assets/vfx_portable/README.md)） |
 | 工程根建议 | 仓库旁 `client/`（Godot 项目），`data/` 用复制或 junction 指向本仓库 `data/` |
@@ -51,6 +51,7 @@ res://
   scripts/
     data/
       config_db.gd               # Autoload ConfigDb
+      balance_start.gd           # balance.start 单点（NEW_RUN / 存档缺字段回填）
       save_service.gd            # Autoload SaveService
       rng_service.gd             # Autoload RngService
       migrations/
@@ -70,12 +71,12 @@ res://
       climate_service.gd         # recompute() 唯一写入口
       weather_draw.gd
     economy/
-      inventory_service.gd
       member_morale.gd           # 日结逐人 mood（sim morale_settle 成员环）
       day_settle.gd
       production_service.gd
       fuel_f04.gd
     gameplay/
+      inventory_service.gd       # 库存增减/cap（S0 单入口；物理目录在 gameplay/）
       region_service.gd
       segment_build.gd
       drive_service.gd
@@ -95,14 +96,6 @@ res://
       session_intents_lifecycle.gd # 局周期 / 时间 / 供暖 / 存读档
       session_intents_train.gd     # 驾驶 · 搜索/搬运 · 进站 · 遗弃
       session_intents_world.gd     # 三选一 · 科技 · 战斗 · 事件选项
-    qa/                          # 无头冒烟（不进正式包；仓库 tools/run_all_smoke.ps1 驱动）
-      headless_smoke.gd
-      smoke_assertions.gd          # 薄门面（API 稳定，headless 只调此类名）
-      smoke_assertions_helpers.gd  # Intent 驱动 · 搜索复位 · telemetry 扫描
-      smoke_assertions_core.gd    # 场景 · ConfigDb · 开局 · 日结差分
-      smoke_assertions_world.gd   # 气候 · 车站 · 搜索 cap · 战斗/科技/区域
-      smoke_assertions_outdoor.gd  # 户外日钟 · runtime 存档 roundtrip
-      smoke_assertions_events.gd # 事件链 · EventOps · 读档 · 招募 morale
     presentation/
       hud_top.gd
       rail_view.gd
@@ -155,7 +148,8 @@ domain       → （无服务依赖；可被任意层引用）
 1. 玩法数值 / 权重 / 阈值 / 模板 id → **只来自 json**  
 2. `ConfigDb.require("balance.fuel.base")`；缺键 → **启动失败并打印完整路径**  
 3. 调参：改 json → 开发菜单 Reload Config（**仅未开局或下一局生效**；进行中默认不热更）  
-4. 改键语义 → `configVersion++`；对照 [10 §1.1](10-validation.md) / [09](09-data-platform.md)
+4. 改键语义 → `configVersion++`；对照 [10 §1.1](10-validation.md) / [09](09-data-platform.md)  
+5. **开局**（`NEW_RUN`、读档 `inventory` 缺字段、`RuntimeSavePatch` precision 等）数值与编组 → 只经 `data/balance_start.gd`（`BalanceStart`）；玩法层勿再散写 `balance.start.*`
 
 ### 2.2 ConfigDb API（约定）
 
@@ -238,6 +232,9 @@ config_version() -> int
 | `RECALL_SEARCH` | `memberIds[]?` | 召回 |
 | `END_DAY` | — | 完整日结（02 §8 顺序） |
 | `ABANDON_CARRIAGE` | `carId: string` | 停靠遗弃一节（[03 §4.1](03-train.md)）；扣件/油、返 scrap、校验动力与床位 |
+| `SELECT_ABANDON_CARRIAGE` | `carId: string` | 遗弃面板选中预览车节（不写其它字段） |
+| `OPEN_ABANDON` / `CLOSE_ABANDON` | — | 遗弃面板开关 |
+| `DEV_TOGGLE_REGION_FUEL` | — | **仅 debug 构建**：`RegionRun.regionFuelMult` 1.0↔1.3 |
 
 ### 4.3 S1b+
 
@@ -258,9 +255,9 @@ config_version() -> int
 
 | 模块 | 脚本 | 典型 Intent |
 |---|---|---|
-| Lifecycle | `session_intents_lifecycle.gd` | `NEW_RUN` · `END_DAY`/`ADVANCE_DAY` · `SET_TIME_SPEED` · `TOGGLE_TIME_PAUSE` · `SET_HEATING` · `SAVE_GAME`/`LOAD_GAME` |
-| Train | `session_intents_train.gd` | `SET_DRIVE_INTENT` · `ASSIGN_SEARCH`/`RECALL_SEARCH` · `OPEN_SEARCH`/`CLOSE_SEARCH` · `ASSIGN_HAUL`/`RECALL_HAUL` · `ENTER_STATION` · `RESOLVE_OFFER` · `ABANDON_CARRIAGE` · `OPEN_ABANDON`/`CLOSE_ABANDON` |
-| World | `session_intents_world.gd` | `PICK_REGION` · `CLOSE_REGION_PICK` · `OPEN_TECH`/`CLOSE_TECH` · `BUY_UPGRADE` · `OPEN_COMBAT`/`CLOSE_COMBAT` · `RESOLVE_COMBAT_*` · `CHOOSE_EVENT_OPTION` |
+| Lifecycle | `session_intents_lifecycle.gd` | `NEW_RUN` · `END_DAY`/`ADVANCE_DAY` · `SET_TIME_SPEED` · `TOGGLE_TIME_PAUSE` · `SET_HEATING` · `DEV_TOGGLE_REGION_FUEL`（debug） · `SAVE_GAME`/`LOAD_GAME` |
+| Train | `session_intents_train.gd` | `SET_DRIVE_INTENT` · `ASSIGN_SEARCH`/`RECALL_SEARCH` · `OPEN_SEARCH`/`CLOSE_SEARCH` · `ASSIGN_HAUL`/`RECALL_HAUL` · `ENTER_STATION` · `RESOLVE_OFFER` · `ABANDON_CARRIAGE` · `SELECT_ABANDON_CARRIAGE` · `OPEN_ABANDON`/`CLOSE_ABANDON` |
+| World | `session_intents_world.gd` | `PICK_REGION` · `CLOSE_REGION_PICK` · `OPEN_TECH`/`CLOSE_TECH` · `BUY_UPGRADE` · `OPEN_COMBAT`/`CLOSE_COMBAT` · `RESOLVE_COMBAT_*` · `CHOOSE_EVENT_OPTION` · `RESOLVE_INCIDENT` |
 
 各域实现 `try_handle(session, intent_name, payload) -> int`：
 
@@ -274,17 +271,9 @@ config_version() -> int
 
 实现约定：`session_intent_router.gd` 与 `game_session.gd` 对域模块 **`preload`**；路由器用 `call("try_handle", …)` 调用静态入口，避免全局 `class_name` 未注册时的编译顺序问题。
 
-### 4.5 无头冒烟断言布局（`scripts/qa/`）
+### 4.5 自动化验收（按需）
 
-| 项 | 约定 |
-|---|---|
-| 入口 | `headless_smoke.gd`（Godot `--headless`）；仓库侧 [`tools/run_all_smoke.ps1`](../tools/run_all_smoke.ps1) |
-| 对外 API | 仅 `SmokeAssertions`（`smoke_assertions.gd`）；**禁止** headless 直接引用 `SmokeAssertionsWorld` 等子模块 |
-| 断言实现 | 按主题拆文件（见 §1.1 `qa/` 树）；子模块可 `preload` `smoke_assertions_helpers.gd` 做 Intent 驱动 |
-| 新增用例 | 逻辑写入最贴切的主题 `.gd`，在门面加一行 `static` 委托；cap/机器码等需直连 Service 的例外在子模块内注释说明 |
-| 再拆分 | 可选跑 [`tools/split_smoke_assertions.py`](../tools/split_smoke_assertions.py)（按 `static func` 名分组；门面需 hand-tune `preload`） |
-
-与 §11：`sim/` Python 沙盒与 `qa/` Godot 冒烟**并列**验收通道；玩家运行时**不** Autoload `SmokeAssertions`。
+2026-11-27 起仓库**不**内置固定 Godot 无头冒烟或 Python runner。需要回归时：按当时 `configVersion` 重写探针；手工清单见 [qa/DEV-functional-checklist.md](../qa/DEV-functional-checklist.md)；文档一致性见 `tools/check_doc_consistency.py`。
 
 ---
 
@@ -404,7 +393,7 @@ S0.2 须加载 manifest 全表；缺文件加载器报键名。
 | # | 验收 | 过线 |
 |---|---|---|
 | S0.1 | Autoload 齐；工程可运行 | 启动无报错 |
-| S0.2 | S0 表全加载；缺文件报键名 | 删 weather 必失败；CI：`python sim/validate_config_db.py` |
+| S0.2 | S0 表全加载；缺文件报键名 | 删 `weather.json` 后 `ConfigDb` 启动必须报错（手工或临时脚本） |
 | S0.3 | 教程跨度第 0 段；dayTotal+1 | 顶栏春日 |
 | S0.4 | 开局 = balance.start.* | 改 json 开局变 |
 | S0.5 | recompute 后倍率随区域变 | 调试可见 |
@@ -421,16 +410,19 @@ S0.2 须加载 manifest 全表；缺文件加载器报键名。
 | S1a.6 | 供暖开关 | 粮/油变化 |
 | S1a.7 | 连续 15 游戏日无软锁 | QA 表 |
 
-### S1b · 30 日包
+### S1b · 30 日包（编号与 [MILESTONES §5](MILESTONES.md) 一致）
 
 | # | 验收 | 过线 |
 |---|---|---|
-| S1b.1 | 三选一 ≥3 词条 | 雪原可感 |
-| S1b.2 | 科技 Lv1；upgrades.json | 字段真实变 |
-| S1b.3 | 战斗 L1 | 非跳过即胜 |
-| S1b.4 | 本地存档 save 12 子集 | 杀进程不漂 |
-| S1b.5 | ≥3 人各满 30 日 | 无阻断 |
-| S1b.6 | 改 emptyChance 可感 | 调参验收 |
+| S1b.1 | S1a 稳定无软锁 | 无已知阻断 |
+| S1b.2 | 区域三选一 ≥3 词条 | 雪原可感 |
+| S1b.3 | 四线科技 Lv1 | `upgrades.json` 真实扣费 |
+| S1b.4 | 战斗 L1 | 非跳过即胜 |
+| S1b.5 | 本地存档 save 12 | 杀进程不漂 |
+| S1b.6 | data P0+P1 | manifest 全表 |
+| S1b.7 | 08 §4 提示 | 可后置 |
+| S1b.8 | ≥3 人各满 30 日 | 无阻断 |
+| S1b.9 | 改 `emptyChance` 可感 | 调参验收 |
 
 ### S2 · 事件 + spur
 
@@ -451,7 +443,8 @@ S0.2 须加载 manifest 全表；缺文件加载器报键名。
 
 | # | 验收 | 过线 |
 |---|---|---|
-| S2.1 | 120 卡过滤 | 季/年正确 |
+| S2.1 | Incident + `RESOLVE_INCIDENT` | `tools/stress_sweep.py` OK |
+| S2.1b | Legacy 120 卡（可选） | 季/年池（`useLegacyEventCards`） |
 | S2.2 | 选项 immediate+delay | 气候即时 |
 | S2.3 | spurChance | 跨度 ≤1 |
 | S2.4 | 内容加厚 | 按排期 |
@@ -464,11 +457,11 @@ S0.2 须加载 manifest 全表；缺文件加载器报键名。
 
 ## 11. 与 sim · 排期 · 风险
 
-| | sim | Godot `scripts/qa/` |
+| | `sim/` Python | Godot `client/` |
 |---|---|---|
-| 职责 | 配置/表级冒烟 | 无头 `headless_smoke` + `SmokeAssertions` 切片 |
-| 配置 | 同 data/ | 同 data/ |
-| 触发 | sim 脚本 | `tools/run_all_smoke.ps1` |
+| 职责 | 可选日循环对照（`engine.py`） | 玩家运行时唯一权威 |
+| 配置 | 读 `data/` | `ConfigDb` 读 `res://data/`（须与仓库同步） |
+| 验收 | 按需临时脚本 | 手工清单 + 里程碑录屏 |
 
 | 周 | 焦点 | 退出 |
 |---|---|---|

@@ -1,7 +1,9 @@
 {
-  "configVersion": 26,
+  "configVersion": 30,
   "authority": "modules/05-combat.md",
   "l1Unit": 8,
+  "l1ArmorCarPower": 12,
+  "l1ArmorTechPerLevel": 4,
   "l1Success": {
     "base": 0.35,
     "scaleD": 0.45,
@@ -10,6 +12,7 @@
   },
   "l1Fail": {
     "injuryBranchChance": 0.5,
+    "injuryHpLoss": 12,
     "allHpLoss": 8
   },
   "combatEnduranceP": 1.0,
@@ -72,6 +75,7 @@
     "crushIntervalGameDays": 0.01,
     "crushBodyHpLoss": 4
   },
+  "formationMaxSlots": 8,
   "layerRouting": {
     "stopMaxCountL1": 5
   },
@@ -88,7 +92,8 @@
     "negotiateFailProgressE": 0.15,
     "bypassFailHpLoss": 15,
     "bypassFailRestrictChance": 0.2,
-    "lootStealOnBypassFail": 0.5
+    "lootStealOnBypassFail": 0.5,
+    "negotiateMoodBonus": 1.0
   },
   "traumaFormula": {
     "cap": 0.4,
@@ -111,12 +116,14 @@
       "hospital": 0.35,
       "factory": 0.3,
       "residential": 0.22,
-      "gas_station": 0.2
+      "gas_station": 0.2,
+      "horde": 1.0
     },
     "templateByPointType": {
       "default": "shambler",
       "hospital": "shambler",
-      "scrapyard": "shambler"
+      "scrapyard": "shambler",
+      "horde": "shambler"
     }
   }
 }

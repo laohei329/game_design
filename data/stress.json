@@ -1,0 +1,20 @@
+{
+  "configVersion": 30,
+  "authority": "modules/06-incident-migration.md · event_draw_rules 权重语义对齐",
+  "notes": "应力快照输入；谓词 id 被 incidents.types.*.triggers* 引用。",
+  "predicates": {
+    "food_below_need": { "signal": "food", "compare": "lt", "ref": "food_need" },
+    "water_below_need": { "signal": "water", "compare": "lt", "ref": "water_need" },
+    "beds_full": { "signal": "onboard", "compare": "gte", "ref": "beds", "minBeds": 1 },
+    "has_beds": { "signal": "onboard", "compare": "lt", "ref": "beds" },
+    "low_food_recruit": { "signal": "onboard", "compare": "lt", "ref": "beds", "extra": "onboard_lt_beds" },
+    "unclaimed_loot": { "signal": "unclaimed_loot", "compare": "eq", "value": true },
+    "guard_on_duty": { "signal": "guard_on_duty", "compare": "eq", "value": true },
+    "forced_low_content": { "signal": "forced_low_content", "compare": "eq", "value": true },
+    "fuel_fill_below": { "signal": "fuel_fill", "compare": "lt", "value": 0.35 },
+    "day_end_recruit_eligible": { "signal": "day_end_recruit", "compare": "eq", "value": true }
+  },
+  "defaultSnapshot": {
+    "scenario_event_rate": 1.0
+  }
+}

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Event cards ↔ localization CSV (08 五语). Buckets: general · season (year 待扩)."""
+"""Event cards ↔ localization CSV (08 五语). Buckets: general · season · year."""
 from __future__ import annotations
 
 import argparse

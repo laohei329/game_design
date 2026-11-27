@@ -1,5 +1,5 @@
 {
-  "configVersion": 26,
+  "configVersion": 30,
   "authority": "modules/06-region-events.md §1.2",
   "regions": {
     "plague": {

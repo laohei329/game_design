@@ -67,6 +67,12 @@ hud.btn.tech,Tech,科技,Technik,Техника,Tecnología
 hud.btn.combat_dev,Encounter (dev),遭遇（调试）,Begegnung (Dev),Столкновение (отладка),Encuentro (dev)
 event.modal.chrome,Segment event,区段事件,Ereignis im Abschnitt,Событие сегмента,Evento de tramo
 event.modal.title,{0} · {1},{0} · {1},{0} · {1},{0} · {1},{0} · {1}
+incident.modal.chrome,Segment situation,区段事态,Lage im Abschnitt,Ситуация сегмента,Situación en tramo
+incident.modal.title,{0} · {1},{0} · {1},{0} · {1},{0} · {1},{0} · {1}
+incident.recruit_segment.title,Refugee signal,路边有人求助,Flüchtlingssignal,Сигнал беженца,Señal de refugiado
+incident.recruit_segment.body,You have spare bunks. They ask to board.,车上还有空床；有人请求上车。,Es gibt freie Betten. Jemand bittet um Aufnahme.,Есть свободные койки. Просят подобрать.,Hay camas libres. Piden subir.
+incident.recruit_segment.action.accept,Take them in,收留,Aufnehmen,Взять,Acoger
+incident.recruit_segment.action.decline,Send away,婉拒,Abweisen,Отказать,Rechazar
 carriage.power,Locomotive,动力,Lok,Тепловоз,Locomotora
 carriage.living,Living,休息,Wohn,Жилой,Vivienda
 carriage.cargo,Cargo,货舱,Fracht,Груз,Carga

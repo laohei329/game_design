@@ -1,6 +1,6 @@
 # 本地化 CSV
 
-首发五语列：`en` · `zh` · `de` · `ru` · `es`（与 [08 §1](../modules/08-presentation.md) 一致）。
+首发五语列：`en` · `zh` · `de` · `ru` · `es`（与 [08 §1](modules/08-presentation.md) 一致）。
 
 | 文件 | 用途 | 写入方 |
 |---|---|---|

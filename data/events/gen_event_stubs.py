@@ -10,6 +10,12 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
+REPO_DATA = ROOT.parent
+
+
+def manifest_config_version() -> int:
+    raw = json.loads((REPO_DATA / "manifest.json").read_text(encoding="utf-8"))
+    return int(raw["configVersion"])
 
 GENERAL_HOOKS = [
     ("路边信号", "有人在废轨旁举起手电。", "supply", 1.1),
@@ -232,8 +238,9 @@ def make_card(
     else:
         tags = [tag]
         option_tag = tag
+    cv = manifest_config_version()
     return {
-        "configVersion": 25,
+        "configVersion": cv,
         "id": event_id,
         "status": status,
         "bucket": bucket,
@@ -297,8 +304,9 @@ def main() -> None:
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(card, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
+    cv = manifest_config_version()
     index = {
-        "configVersion": 25,
+        "configVersion": cv,
         "authority": "modules/06-region-events.md §2.1 · modules/09-data-platform.md",
         "status": index_status,
         "targetTotal": 120,

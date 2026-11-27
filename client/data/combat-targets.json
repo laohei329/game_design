@@ -1,5 +1,5 @@
 {
-  "configVersion": 26,
+  "configVersion": 30,
   "authority": "modules/05-combat.md §7",
   "defaultEnemyBoost": 1.0,
   "targets": [

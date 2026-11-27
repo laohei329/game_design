@@ -1,5 +1,5 @@
 {
-  "configVersion": 26,
+  "configVersion": 30,
   "authority": "modules/05-combat.md §4",
   "inventoryKeys": [
     "ranged",

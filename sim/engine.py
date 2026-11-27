@@ -3,7 +3,7 @@
 
 Time model: season/year → weather (per segment) → cold/heat → climate mults;
 yearProd on F05/F32; seasonal region pick + autumn stockpile AI.
-Loads data/balance.json when present (freeze configVersion 25).
+Loads data/balance.json when present (configVersion from file).
 """
 from __future__ import annotations
 
@@ -80,6 +80,32 @@ ABANDON_SCRAP_RATIO: float = 0.35
 ABANDON_FUEL_COST_PCT: float = 0.01
 ABANDON_AI_FUEL_MAX: float = 0.35
 ABANDON_AI_MIN_CARS: int = 12
+MAX_SEARCH_PER_POINT: int = 3
+FUEL_TANK_BASE: float = 60.0
+FUEL_TANK_PER_CARGO: float = 10.0
+SEASON_BASE_TEMP: Dict[str, float] = {
+    "spring": 0.0,
+    "summer": 1.0,
+    "autumn": 0.0,
+    "winter": -1.0,
+}
+CLIMATE_COLD_FOOD_FUEL: Dict[str, Dict[str, float]] = {}
+CLIMATE_HEAT_WATER: Dict[str, float] = {}
+
+SEARCH_YIELD_MULT_BASE = 0.90
+SEARCH_YIELD_MULT_PER_TEAM = 0.08
+SEARCH_YIELD_MULT_CAP = 1.25
+SCAVENGE_SKILL_DIVISOR = 0.85
+SEARCH_YIELD_JITTER_MIN = 0.55
+SEARCH_YIELD_JITTER_SPAN = 0.5
+
+FUEL_BASE = 3.0
+FUEL_EXTRA_LOCO = 0.5
+FUEL_TRACTION_PER_LOCO = 0.08
+FUEL_TRACTION_PER_TECH = 0.08
+FUEL_TRACTION_FLOOR = 0.4
+FUEL_CRAFT_PER_DAY = 0.5
+REPAIR_PARTS: Dict[str, int] = {"living": 3, "cargo": 3, "default": 5, "tutorialLiving": 1}
 
 
 def _apply_balance_json() -> None:
@@ -91,6 +117,12 @@ def _apply_balance_json() -> None:
     global START_FOOD, START_WATER, START_FUEL, START_PARTS, START_MED, START_SEED, START_PRECISION
     global ABANDON_PARTS_COST, ABANDON_SCRAP_RATIO, ABANDON_FUEL_COST_PCT
     global ABANDON_AI_FUEL_MAX, ABANDON_AI_MIN_CARS
+    global SEASON_BASE_TEMP, MAX_SEARCH_PER_POINT, FUEL_TANK_BASE, FUEL_TANK_PER_CARGO
+    global CLIMATE_COLD_FOOD_FUEL, CLIMATE_HEAT_WATER
+    global SEARCH_YIELD_MULT_BASE, SEARCH_YIELD_MULT_PER_TEAM, SEARCH_YIELD_MULT_CAP
+    global SCAVENGE_SKILL_DIVISOR, SEARCH_YIELD_JITTER_MIN, SEARCH_YIELD_JITTER_SPAN
+    global FUEL_BASE, FUEL_EXTRA_LOCO, FUEL_TRACTION_PER_LOCO, FUEL_TRACTION_PER_TECH
+    global FUEL_TRACTION_FLOOR, FUEL_CRAFT_PER_DAY, REPAIR_PARTS
     root = Path(__file__).resolve().parents[1]
     path = root / "data" / "balance.json"
     if not path.is_file():
@@ -141,6 +173,59 @@ def _apply_balance_json() -> None:
         ABANDON_FUEL_COST_PCT = float(tr.get("abandonFuelCostPct", ABANDON_FUEL_COST_PCT))
         ABANDON_AI_FUEL_MAX = float(tr.get("abandonAiFuelFillMax", ABANDON_AI_FUEL_MAX))
         ABANDON_AI_MIN_CARS = int(tr.get("abandonAiMinCars", ABANDON_AI_MIN_CARS))
+    sbt = t.get("seasonBaseTemp")
+    if isinstance(sbt, dict):
+        SEASON_BASE_TEMP = {str(k): float(v) for k, v in sbt.items()}
+    search = data.get("search", {})
+    MAX_SEARCH_PER_POINT = int(search.get("maxAssignPerPointPerDay", MAX_SEARCH_PER_POINT))
+    SEARCH_YIELD_MULT_BASE = float(search.get("yieldMultBase", SEARCH_YIELD_MULT_BASE))
+    SEARCH_YIELD_MULT_PER_TEAM = float(search.get("yieldMultPerTeamEff", SEARCH_YIELD_MULT_PER_TEAM))
+    SEARCH_YIELD_MULT_CAP = float(search.get("yieldMultCap", SEARCH_YIELD_MULT_CAP))
+    SCAVENGE_SKILL_DIVISOR = float(search.get("scavengeSkillDivisor", SCAVENGE_SKILL_DIVISOR))
+    SEARCH_YIELD_JITTER_MIN = float(search.get("yieldJitterMin", SEARCH_YIELD_JITTER_MIN))
+    SEARCH_YIELD_JITTER_SPAN = float(search.get("yieldJitterSpan", SEARCH_YIELD_JITTER_SPAN))
+    ft = data.get("fuelTank", {})
+    FUEL_TANK_BASE = float(ft.get("baseAmount", FUEL_TANK_BASE))
+    FUEL_TANK_PER_CARGO = float(ft.get("perCargoSize", FUEL_TANK_PER_CARGO))
+    cold_tbl = data.get("climateColdFoodFuel")
+    if isinstance(cold_tbl, dict):
+        CLIMATE_COLD_FOOD_FUEL = {
+            str(k): {str(fk): float(fv) for fk, fv in (v or {}).items() if isinstance(v, dict)}
+            for k, v in cold_tbl.items()
+        }
+    heat_w = data.get("climateHeatWater")
+    if isinstance(heat_w, dict):
+        CLIMATE_HEAT_WATER = {str(k): float(v) for k, v in heat_w.items()}
+    fuel_cfg = data.get("fuel", {})
+    if fuel_cfg:
+        FUEL_BASE = float(fuel_cfg.get("base", FUEL_BASE))
+        FUEL_EXTRA_LOCO = float(fuel_cfg.get("extraLocoAdd", FUEL_EXTRA_LOCO))
+        FUEL_TRACTION_PER_LOCO = float(fuel_cfg.get("tractionPerLoco", FUEL_TRACTION_PER_LOCO))
+        FUEL_TRACTION_PER_TECH = float(fuel_cfg.get("tractionPerPowerTech", FUEL_TRACTION_PER_TECH))
+        FUEL_TRACTION_FLOOR = float(fuel_cfg.get("tractionFloor", FUEL_TRACTION_FLOOR))
+        FUEL_CRAFT_PER_DAY = float(fuel_cfg.get("craftFuelPerDay", FUEL_CRAFT_PER_DAY))
+    carriages_path = root / "data" / "carriages.json"
+    if carriages_path.is_file():
+        cdata = json.loads(carriages_path.read_text(encoding="utf-8"))
+        rp = cdata.get("repairParts", {})
+        if isinstance(rp, dict):
+            REPAIR_PARTS = {str(k): int(v) for k, v in rp.items()}
+
+
+def _cold_climate(cold: float, field: str, defaults: Tuple[float, float, float]) -> float:
+    if cold >= 2:
+        tier = "cold2"
+        d = defaults[0]
+    elif cold >= 1:
+        tier = "cold1"
+        d = defaults[1]
+    elif cold >= 0.5:
+        tier = "cold0_5"
+        d = defaults[2]
+    else:
+        return 1.0
+    row = CLIMATE_COLD_FOOD_FUEL.get(tier, {})
+    return float(row.get(field, d))
 
 
 _apply_balance_json()
@@ -149,8 +234,6 @@ _apply_balance_json()
 REGIONS = load_regions()
 REGION_IDS = region_ids()
 
-# 01 §6
-SEASON_BASE_TEMP = {"spring": 0.0, "summer": 1.0, "autumn": 0.0, "winter": -1.0}
 SEASON_PRESSURE = load_season_pressure()
 STATIONS_CFG = load_stations_config()
 GUARANTEE_AFTER = int(STATIONS_CFG.get("guaranteeAfter", 4))
@@ -163,13 +246,8 @@ WEATHER = load_weather_engine()
 
 def season_of(day: int) -> str:
     d = (day - 1) % YEAR_LEN
-    if d < 30:
-        return "spring"
-    if d < 60:
-        return "summer"
-    if d < 90:
-        return "autumn"
-    return "winter"
+    idx = min(3, d // max(1, SEASON_LEN))
+    return ("spring", "summer", "autumn", "winter")[idx]
 
 
 def year_of(day: int) -> int:
@@ -326,6 +404,7 @@ class RunState:
     # 昨日行驶档（日结 F04）；开局按停靠
     last_spd_coef: float = 0.3
     last_drive_h: float = 0.0
+    segment_fuel_surcharge: float = 0.0  # bypass 等非战附加，对齐 balance.fuel × (1+surcharge)
 
     def onboard(self) -> int:
         return sum(1 for m in self.members if m.alive)
@@ -338,7 +417,7 @@ class RunState:
         return min(3, sum(1 for c in self.cars if c.is_locomotive))
 
     def fuel_cap(self) -> float:
-        return 100.0 + sum(c.size * 6 for c in self.cars if c.template_id == "cargo")
+        return FUEL_TANK_BASE + sum(c.size * FUEL_TANK_PER_CARGO for c in self.cars if c.template_id == "cargo")
 
     def stock_cap_food(self) -> float:
         base = 60 + sum(c.size * 10 for c in self.cars if c.template_id == "cargo")
@@ -349,15 +428,15 @@ class RunState:
 
     def stock_cap_parts(self) -> float:
         base = 20 + sum(round(c.size * 10 / 3) for c in self.cars if c.template_id == "cargo")
-        return base * (1 + 0.10 * self.living_tech)
+        return base  # S1a：与 client InventoryService.life_mult=1.0 对齐
 
     def stock_cap_med(self) -> float:
         base = 15 + sum(round(c.size * 5 / 3) for c in self.cars if c.template_id == "cargo")
-        return base * (1 + 0.10 * self.living_tech)
+        return base
 
     def stock_cap_seed(self) -> float:
         base = 20 + sum(c.size * 4 for c in self.cars if c.template_id == "cargo")
-        return base * (1 + 0.10 * self.living_tech)
+        return base
 
     def car_count(self) -> int:
         return len(self.cars)
@@ -368,19 +447,24 @@ class RunState:
 
 
 def traction(state: RunState) -> float:
-    return max(0.40, 1 - 0.08 * state.loco_count() - 0.08 * state.power_tech)
+    n = state.loco_count()
+    return max(
+        FUEL_TRACTION_FLOOR,
+        1.0 - FUEL_TRACTION_PER_LOCO * min(3, n) - FUEL_TRACTION_PER_TECH * float(state.power_tech),
+    )
 
 
 def fuel_day(state: RunState, speed_coef: float = 1.0, craft: bool = False) -> float:
-    """02 §4：全日折合耗油率（%）；造零件日 +0.5（有 crafter 工位时）。"""
+    """02 §4：全日折合耗油率（%）；读 balance.fuel + 区段附加（对齐 FuelF04）。"""
     add = sum(c.fuel_per_day for c in state.cars)
-    add += 0.5 * max(0, state.loco_count() - 1)
-    craft_add = 0.5 if craft else 0.0
+    add += FUEL_EXTRA_LOCO * max(0, state.loco_count() - 1)
+    craft_add = FUEL_CRAFT_PER_DAY if craft else 0.0
+    surcharge = max(0.0, float(state.segment_fuel_surcharge))
     mult = min(
-        speed_coef * state.climate.fuel * state.region_fuel_mult,
+        speed_coef * state.climate.fuel * state.region_fuel_mult * (1.0 + surcharge),
         3.0,
     )
-    return (3.0 + add) * traction(state) * mult + craft_add
+    return (FUEL_BASE + add) * traction(state) * mult + craft_add
 
 
 def armor_cars(state: RunState) -> int:
@@ -441,18 +525,12 @@ def recompute_climate(state: RunState) -> None:
     eff = max(-2.0, min(2.0, base + temp_mod + state.region_temp))
     cold = max(0.0, -eff)
     heat = max(0.0, eff)
-    if cold >= 2:
-        food_c, fuel_c = 1.40, 1.56
-    elif cold >= 1:
-        food_c, fuel_c = 1.25, 1.43
-    elif cold >= 0.5:
-        food_c, fuel_c = 1.10, 1.15
-    else:
-        food_c, fuel_c = 1.0, 1.0
+    food_c = _cold_climate(cold, "food", (1.40, 1.25, 1.10))
+    fuel_c = _cold_climate(cold, "fuel", (1.56, 1.43, 1.15))
     if heat >= 1:
-        water_temp = 1.5
+        water_temp = CLIMATE_HEAT_WATER.get("heat1", 1.5)
     elif heat >= 0.5:
-        water_temp = 1.2
+        water_temp = CLIMATE_HEAT_WATER.get("heat0_5", 1.2)
     else:
         water_temp = 1.0
     # 冷侧温室默认未供暖；供暖在日结 3b 改写
@@ -1502,11 +1580,15 @@ def _scavenge(state: RunState, rng: random.Random) -> None:
     party = pick_search_party(state, rng)
     if not party:
         return
-    team_eff = sum((1.0 / 0.85) if m.has_scavenge else 1.0 for m in party)
+    div = max(0.001, SCAVENGE_SKILL_DIVISOR)
+    team_eff = sum((1.0 / div) if m.has_scavenge else 1.0 for m in party)
     hours = party_search_hours(len(party), team_eff)
     # 效率高 → 同预算内更多点搜；封顶 3（避免日清空跳过进站窗）
-    actions = max(1, min(3, int(SEARCH_HOURS_BUDGET / hours + 1e-6)))
-    yield_mult = min(1.25, 0.90 + 0.08 * team_eff)
+    actions = max(1, min(MAX_SEARCH_PER_POINT, int(SEARCH_HOURS_BUDGET / hours + 1e-6)))
+    yield_mult = min(
+        SEARCH_YIELD_MULT_CAP,
+        SEARCH_YIELD_MULT_BASE + SEARCH_YIELD_MULT_PER_TEAM * team_eff,
+    )
     has_hauler = count_job(state, "labor") >= 1 or any(
         m.job == "labor" for m in party
     )
@@ -1534,7 +1616,8 @@ def _scavenge(state: RunState, rng: random.Random) -> None:
                 node = rng.choice(avail)
             else:
                 node = rng.choice([n for n in avail if need.get(n.res, 0.0) == best])
-        take = min(node.pool, node.median * rng.uniform(0.6, 1.4) * yield_mult)
+        jitter = SEARCH_YIELD_JITTER_MIN + rng.random() * SEARCH_YIELD_JITTER_SPAN
+        take = min(node.pool, node.median * jitter * yield_mult)
         node.pool -= take
         if has_hauler:
             _add(state, node.res, take)
@@ -1544,7 +1627,7 @@ def _scavenge(state: RunState, rng: random.Random) -> None:
 
 
 def _car_repair_cost(car: Car) -> int:
-    return 3 if car.template_id in ("living", "cargo") else 5
+    return int(REPAIR_PARTS.get(car.template_id, REPAIR_PARTS.get("default", 5)))
 
 
 def _can_abandon_car(state: RunState, index: int) -> bool:
