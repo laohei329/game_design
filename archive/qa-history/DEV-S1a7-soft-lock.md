@@ -1,6 +1,6 @@
 # DEV-S1a.7 — 软锁自检联调（§12.7）
 
-在 Godot 运行 `run_main`，F3 查看 `§12.7` / `SoftLockProbe` 输出。
+在 Godot 运行 `run_main`，F3 查看 `§12.7` / `SoftLockProbe` 输出（`client/scripts/debug/soft_lock_probe.gd`）。
 
 ## 手工步骤
 
