@@ -39,7 +39,6 @@ SKIP_DIRS = {
 # 含已删 runner 字面量但保留作证据，不报错
 SKIP_REMOVED_CHECK = {
     "开发计划.md",
-    "qa/整体审计报告-第四轮.md",
     "qa/doc-consistency-report.md",
     "modules/10-validation.md",
     "qa/RF-11.md",
@@ -48,10 +47,8 @@ SKIP_REMOVED_CHECK = {
     "qa/DEV-day-clock-manual-2026-11-26.md",
     "archive/qa-history/README.md",
     "tools/README.md",
-    "qa/清理候选清单.md",
-    "qa/整体审计报告-第四轮.md",
-    "qa/整体审计报告-第五轮.md",
     "qa/整体审计报告-第六轮.md",
+    "archive/qa-history/CLEANUP-CANDIDATES-2026-11-27.md",
 }
 
 HEADER_CV_RE = re.compile(

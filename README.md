@@ -40,7 +40,7 @@
 | [开发计划](开发计划.md) | **项目排期 + Godot 单人实施 §12**（服务/界面/勾选） |
 | [MILESTONES](modules/MILESTONES.md) | **排期与验收索引** |
 | [GODOT_ARCH](modules/GODOT_ARCH.md) | **Godot/GDScript** · 分层 · S0–S3 |
-| [整体审计报告（第五轮）](qa/整体审计报告-第五轮.md) | **现行**全面审计索引 |
+| [整体审计报告（第六轮）](qa/整体审计报告-第六轮.md) | **现行**缺陷复核 |
 | [OPEN_LOOPS](modules/OPEN_LOOPS.md) | L 缺口 · 剩余风险 |
 | [data/](data/) | 配置权威 |
 
