@@ -1,5 +1,5 @@
 {
-  "configVersion": 25,
+  "configVersion": 26,
   "authority": "modules/02-resources.md §7.1 · modules/06-region-events.md §3",
   "poolMultiplier": 2.5,
   "notes": "Segment.points[].type 与 regions.pointTypeWeightMods 键必须用上表 id；simYield 仅零 A 冒烟收窄入库键。",

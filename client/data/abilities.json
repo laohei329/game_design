@@ -1,5 +1,5 @@
 {
-  "configVersion": 25,
+  "configVersion": 26,
   "authority": "modules/04-population.md §8.3",
   "maxAwakenedPerRun": 3,
   "maxLv": 2,

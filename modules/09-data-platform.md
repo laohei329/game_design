@@ -25,14 +25,14 @@
 `hud_hints.json`：**已落** [`data/hud_hints.json`](../data/hud_hints.json)；TIPS/进站 defer 阈值（不改 balance）。  
 `climate_influences.json`：**已落** [`data/climate_influences.json`](../data/climate_influences.json)；区域预设 `presets["region.*"]`（`tempMod`、`weatherBias`、`waterMod`、`speedMult`、`pressureAdd`；见 01 §4）。  
 `difficulty.json`：**已落** [`data/difficulty.json`](../data/difficulty.json)；首发仅 `normal` 一档（见下表）。  
-`time` 日历键：`secondsPerDay=180`，`daysPerSeason=30`，`seasonsPerYear=4`。  
+`time` 日历键：`secondsPerDay=180`，`daysPerSeason=30`，`seasonsPerYear=4`，`driveHoursPerDayCap`，`metabolismMultByIntent.{stop|forward|reverse}`，`outdoorWorkRequiresIntent`（日钟见 [01 §2.3](01-time-season.md)）。  
 `balance` / 库存：核心六元 + `scrap`/`seed`/`chem`/`cloth` + `potion.awaken`/`upgrade`/`catalyst`；转换式见 [02](02-resources.md)。  
 `abilities.json`：`costCatalyst` / `costMedicine`（不再用 raw crystal 字段）。  
 `archetypes.json`：成员原型含 `specialties[]`（0–2）与默认 `job` 倾向。  
 岗位枚举：`grower|crafter|purifier|pharmacist|radar_op|engineer|guard|labor|none`（[04 §4.2](04-population.md)；无 `medic`）。  
 专长枚举：`scavenge|repair|medicine|pharmacy|farming|haul|combat_drill`。  
 `balance.power.unattendedFaultChance=0.10`。  
-`manifest.json`：当前 `configVersion: 25`（见仓库 [`data/manifest.json`](../data/manifest.json)）。改配置必须递增；`dataHash` 由构建生成。  
+`manifest.json`：当前 `configVersion: 26`（见仓库 [`data/manifest.json`](../data/manifest.json)）。改配置必须递增；`dataHash` 由构建生成。  
 `balance.json`：**已落** [`data/balance.json`](../data/balance.json)，与 [10 §1.1](10-validation.md) 对齐。  
 **P1 包（S1b）已落**：[`combat.json`](../data/combat.json)、[`gear.json`](../data/gear.json)、[`abilities.json`](../data/abilities.json)、[`archetypes.json`](../data/archetypes.json)、[`disease.json`](../data/disease.json)、[`items.json`](../data/items.json)、`combat-*.json`、`localization/*.csv`、`migrations/manifest.json` — 清单见 [`data/P1_README.md`](../data/P1_README.md)。  
 存档迁移 **实现**仍在 Godot `client/scripts/data/migrations/`（见 [GODOT_ARCH](GODOT_ARCH.md)）；禁止一次交全空壳以外的未文档化表。  
@@ -43,13 +43,15 @@
 存档须含（交叉闭环最小集）：
 - 日历：`year` / `season` / `dayInSeason` / `dayTotal`
 - 气候：`weatherId`、`climateInfluences[]`、派生倍率缓存可重算但建议存
-- `RegionRun` 全量：`segmentIndex`/`segmentCount`/`regionFuelMult`/`pointTypeWeightMods`/`segments[]`（每段含 `progressKm`、`stations[]`（含 offer）、`points[{id,type,remainingYield,depleted}]`、`eventId`、`built`、`segmentFuelSurcharge`、`raidWeightDelta`、`pressureClass`）
+- `RegionRun` 全量：`segmentIndex`/`segmentCount`/`regionFuelMult`/`pointTypeWeightMods`/`segments[]`（每段含 `progressKm`、`stations[]`（含 offer）、`points[{id,type,remainingYield,depleted,lootPile?}]`、`eventId`、`eventResolved`、`eventOptionId`、`built`、`segmentFuelSurcharge`、`raidWeightDelta`、`eventTagWeights`（tag→delta；`raid` 须与 `raidWeightDelta` 镜像）、`pressureClass`）
 - `world.pressureHistory[2]`（跨跨度保留）
 - 日结：`foodZeroStreak`/`waterZeroStreak`/`fuelZeroStreak`/`moraleZeroStreak`
+- 日钟（`runtime`）：`dayClockFraction`、`simDayFractionToday`、`outdoorEligibleFractionToday`、`outdoorTickFractionToday`、`foodAppliedToday`/`waterAppliedToday`、`breakdownStopHoursRemaining`（缺键旧档按 0；完整写盘经 `SaveService.write_state`）
 - 行驶：`driveHoursToday`/`reverseHoursToday`；`driveIntent`；`train.breakdownCounter`
 - 编队：`formations[]`（≤4）、`activeFormationId`
 - 科技资格：`train.blueprints.{power,armor,radar,living}`（布尔；Lv4/5 只读；与 `upgrades.json` `lines` 一致）
 - 收留：`world.lastRecruitSuccessDay`
+- 成员：`members[]` 须含 `hunger`/`thirst`（float 0–100；缺键读档 `patch_members` 补 0）及 §4 其余字段
 - 失护：`unattendedFault[]`（含 `carId`、`startedAtDayTotal`、解除截止）
 - 种植供暖：`world.heatingEnabled`（默认 `false`，见 01 §8.1.1；入冬提示开关）
 - 战斗中：`combatSession?`（结构见 [05 §6.2](05-combat.md)；无会话则禁止残留 `in_combat`）
@@ -72,6 +74,10 @@
 | `ability.proficiencyPerSuccess` | balance.json | 20 | 04 §8.1 |
 | `ability.proficiencyPerFail` | balance.json | 5 | 04 §8.1 |
 | `ability.proficiencyThreshold` | balance.json | 60 | 04 §8.1 |
+| `population.injuredHpThreshold` / `mood*` / `morale*` | balance.json | 30 / 0–100 / −60·±13·16 | 04 §9 · DaySettle · EventOps |
+| `population.jobAssignLaborKeepMin` | balance.json | 2 | 日末 `MemberRoster.assign_daily_jobs` |
+| `population.moodDaily*` | balance.json | 见 sim `morale_settle` | `MemberMorale.settle_daily_moods`（`DaySettle` 7b） |
+| `fuelTank.baseAmount` / `perCargoSize` | balance.json | 60 / 10 | `RunState.fuel_cap` |
 | `stations.segmentLengthMin/Max` | stations.json | 40 / 60 | 06 §0 |
 | `stations.guaranteeAfter` | stations.json | 4 | 03 §5 |
 | `stations.emptyChance` | stations.json | 0.10 | 06 §1.1 |
@@ -102,9 +108,14 @@
 | `regions.*.pointTypeWeightMods` | regions.json | 见 06 §1.2 | 06 §1.2 |
 | `climate_influences.presets` | climate_influences.json | 见 01 §4.4 | 01 §4 |
 | `difficulty.defaultId` | difficulty.json | `normal` | 本节 |
-| `difficulty.tiers.normal` | difficulty.json | 乘子全 1.0 | 本节 |
+| `difficulty.tiers.normal` | difficulty.json | 乘子全 1.0；`eventDrawRate` × `balance.eventDraw.scenarioEventRate` | 本节 |
 | `balance.seasonPressure` | balance.json | 春1/夏1.2/秋0.8/冬1.5 | 01 §6 |
 | `balance.yearThreatPerYear` | balance.json | 0.15 | 01 §6 |
+| `balance.inventory.*` | balance.json | S1a 库存上限基线 + 货舱增量 | 02 §6 |
+| `balance.fuelTank.*` | balance.json | S1a 油库绝对容量 | 02 §6 / 客户端薄模型 |
+| `balance.travel.*` | balance.json | 走廊速度 `corridorMult`× tactical | 03 §6.2 |
+| `balance.eventDraw.scenarioEventRate` | balance.json | 段事件加权全局乘子（难度档未接前 1.0） | 06 §2.3 |
+| `combat.threatTemplateAliases` | combat.json | 卡内/遭遇模板 id → `combat-targets` | 05 §6 |
 | `stations.*` | **stations.json**（权威） | sim 进站/区段 | 06 §1 / 03 §5 |
 | `balance.stations.*` | balance.json | **仅镜像** `guaranteeAfter` 等；须与 stations.json 一致 | 交叉校验 |
 | `stations.poolOfferChance` | stations.json | 0.9（零 A sim） | 03 §5 |
@@ -148,9 +159,17 @@
 | 车站发现 | 每站 `entered`、当前车厢要约 offer、`guaranteeFailStreak` |
 | 成员 | `hp/loyalty/mood/disease/antibodies/traits` + job/task/injuries/abilities(`id,lv,proficiency,cooldownUntilDay`)/loadout/combatRoster |
 | 任务 | `taskState` + payload（pointId、进度 0–1、returningEta 游戏小时）；搬运单（物资快照） |
-| 世界 | `lootPiles[]`、`regionRun`（含 `regionFuelMult`/`pointTypeWeightMods`/每段 `points`/`raidWeightDelta`/`pressureClass`/`segmentFuelSurcharge`）、`pressureHistory[2]`、`weatherId`、`climateInfluences[]`、`lastRecruitSuccessDay`、`heatingEnabled`、日历、行驶小时、各 ZeroStreak、`moraleOffset` |
-| 战斗 | `combatSession?`（[05 §6.2](05-combat.md)） |
-| 其它 | RNG；`eventFlags`；`delayedEvents`（步骤 −1）；动力失护（起止日） |
+| 世界 | `lootPiles[]`（扁平 `[{pointId, inventoryKey, amount}]`；**空数组表示清堆**）、`regionRun`（见 [§1 交叉闭环](#1-配置目录) 段字段）、`pressureHistory[2]`、`weatherId`、`climateInfluences[]`、`lastRecruitSuccessDay`（**−1**=从未）、`pendingThreat`（见下）、`heatingEnabled`、日历、行驶小时、各 ZeroStreak、`moraleOffset`、`eventWeightHistory[]`、`lastEventPrimaryTag` |
+
+#### 3.0.1 `world.pendingThreat` · 段 `eventTagWeights`
+
+| 字段 | 语义 | 读写 |
+|---|---|---|
+| `world.pendingThreat` | 延迟开战：`{ threatTemplateId, source?, eventId?, pointId? }`；由 `spawn_threat`（前进）或事件 immediate 写入 | **入盘**；`SET_DRIVE_INTENT stop` / 日结前 `CombatL1.try_open_pending_threat` **消费**（清空并入战斗 encounter）；与 `pendingCombat`、面板旗标**不入盘** |
+| `segment.eventTagWeights` | `eventTag` → 累加 delta（`weight_mod` op）；驱动 `EventDraw` 按卡 `tags` 加权 | **入盘**于 `regionRun.segments[]` |
+| `segment.raidWeightDelta` | **镜像**：`eventTag=raid` 的累加结果；旧档仅 `raidWeightDelta` 时读档补 `eventTagWeights.raid` | 写盘时**双写**；`EventOps.weight_mod` 须同步（见上表 `weight_mod` 行） |
+| 战斗 | `combatSession?`（[05 §6.2](05-combat.md)）；**不入盘**：`pendingCombat`、面板旗标 |
+| 其它 | RNG；`eventFlags`；`delayedEvents[]`（步骤 −1；payload 见下表）；动力失护（起止日） |
 
 `delayedEvents.payload` 最小字段：`{ targetType: member\|party\|point\|segment\|global, targetId?, op, args, capture: snapshot\|live }`。  
 - `op` = 延迟动作代号（下表）；≠ 运算符。  
@@ -166,7 +185,7 @@
 | `mood_delta` / `loyalty_delta` | member / **party** | member：对人结算，死人跳过；party：对**全体存活成员**各应用 delta | member 失效 → 跳过 |
 | `injury_add` / `disease_roll` | member | 死人跳过 | 同左 |
 | `spawn_threat` | segment / global | `args:{ threatTemplateId }`；段已离开本跨度 → 对已卸载 segment 跳过 | 段不在当前 RegionRun → 跳过 |
-| `weight_mod` | segment | `args:{ eventTag, delta }`；改**本段事件权重缓存**（非日结重抽）；段已卸载 → 跳过 | 同左 |
+| `weight_mod` | segment | `args:{ eventTag, delta }`；累加 `segment.eventTagWeights[eventTag]`；`eventTag=raid` 时同步 `raidWeightDelta`；段已卸载 → 跳过 | 同左 |
 | `loot_steal` / `loot_halve` | **point**（`targetId`=点位 id）或 segment（`loot_halve` 扫本段点位） | 点位堆已空 → 无操作成功；**不**凭 snapshot 变出新堆 | 堆不存在 → 跳过 |
 | `grant_influence` / `clear_influence` | global | 按快照 id 写入/清除后 `recomputeClimate` | influence 已过期且 live → 跳过 |
 | `flag_set` | global | 总是可写 | 同左 |

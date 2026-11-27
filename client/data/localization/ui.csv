@@ -9,6 +9,7 @@ job.guard,Guard,守卫,Wache,Охранник,Guardia
 job.labor,Laborer,杂工,Arbeiter,Разнорабочий,Obrero
 job.none,Unassigned,无岗,Ohne Aufgabe,Без должности,Sin puesto
 spec.scavenge,Scavenger,搜刮,Klaue,Собиратель,Saqueo
+spec.scavenge.badge,★ Scavenge,★搜刮,★ Klaue,★ Сбор,Saqueo ★
 spec.repair,Repair,维修,Reparatur,Ремонт,Reparación
 spec.medicine,Medicine,医疗,Medizin,Медицина,Medicina
 spec.pharmacy,Pharmacy,配药,Pharmazie,Фармация,Farmacia
@@ -23,3 +24,159 @@ combat.tactic.negotiate,Negotiate,谈判,Verhandeln,Переговоры,Negocia
 combat.tactic.bypass,Bypass,绕行,Umgehen,Обход,Evitar
 combat.tactic.horn,Horn,鸣笛,Hupe,Гудок,Claxon
 combat.tactic.evacuate,Evacuate,徒步撤离,Evakuieren,Эвакуация,Evacuar
+combat.btn.l1_check,L1 assault check,L1 强攻检定,L1 Sturm-Test,L1 штурм,L1 asalto
+combat.btn.retreat,Retreat,撤离,Rückzug,Отступ,Retirada
+combat.btn.escalate,Escalate (stub),升级（占位）,Eskalation,Eskalacja,Escalar
+combat.btn.close,Close,关闭,Schließen,Закрыть,Cerrar
+combat.title.l1,Encounter · L1 ({0}),遭遇 · L1 小股（{0} 人）,Begegnung L1 ({0}),Столкновение L1 ({0}),Encuentro L1 ({0})
+combat.hint.non_combat_ok,Non-combat paths need no formation,非战斗路径不强制编成,Keine Formation nötig,Без построения,Sin formación
+combat.err.no_encounter,No encounter,无遭遇,Keine Begegnung,Нет столкновения,Sin encuentro
+combat.err.no_formation,No active formation,无上场编队,Keine Formation,Нет построения,Sin formación
+combat.err.must_stop,Must be stopped,须先停靠,Anhalten nötig,Нужна остановка,Debe parar
+combat.err.outdoor_busy,Outdoor tasks in progress,车外任务进行中,Außenaufgaben laufen,Задачи снаружи,Tareas fuera
+combat.err.fuel,Not enough fuel,燃料不足,Kraftstoff fehlt,Мало топлива,Sin combustible
+combat.err.not_evacuable,Evacuate only when stores empty,仅六元全空时可选徒步,Evakuierung nur leer,Эвакуация при пустых запасах,Evacuar solo vacío
+combat.err.invalid_path,Invalid path,无效路径,Ungültig,Неверный путь,Ruta inválida
+combat.preview.line1,L1 skirmish · {0} enemies,L1 小股 · 敌 {0} 人,L1 · {0} Feinde,L1 · {0} врагов,L1 · {0} enemigos
+combat.preview.stats,P={0} E={1} D={2},P={0} E={1} D={2},P={0} E={1} D={2},P={0} E={1} D={2},P={0} E={1} D={2}
+combat.preview.chance,Check success {0}%,检定成功率 {0}%,Erfolg {0}%,Успех {0}%,Éxito {0}%
+combat.preview.no_formation,(No formation: assault blocked),(无编队：不可 L1 强攻，可走非战斗路径),(Keine Formation),(Нет построения),(Sin formación)
+season.spring,Spring,春,Frühling,Весна,Primavera
+season.summer,Summer,夏,Sommer,Лето,Verano
+season.autumn,Autumn,秋,Herbst,Осень,Otoño
+season.winter,Winter,冬,Winter,Зима,Invierno
+drive.forward,Forward,前进,Vorwärts,Вперёд,Adelante
+drive.reverse,Reverse,返程,Rückwärts,Назад,Reversa
+drive.stop,Stop,停靠,Stopp,Стоянка,Parar
+drive.exhaust_suffix, · quota spent, · 额度用尽, · Kontingent, · лимит, · cupo agotado
+hud.calendar,{0} day {1} Y{2} · dayTotal={3} · {4}%,{0} {1}日 Y{2} · dayTotal={3} · 今日{4}%,{0} Tag {1} J{2} · Tag {4}%,{0} день {1} Г{2} · {4}%,{0} día {1} A{2} · {4}%
+hud.food,Food {0},粮 {0},Nahrung {0},Еда {0},Comida {0}
+hud.water,Water {0},水 {0},Wasser {0},Вода {0},Agua {0}
+hud.fuel,Fuel {0} ({1}%),油 {0} ({1}%),Kraftstoff {0} ({1}%),Топливо {0} ({1}%),Combustible {0} ({1}%)
+hud.parts,Parts {0},件 {0},Teile {0},Детали {0},Piezas {0}
+hud.drive_status,Intent {0} · fwd {1}/{2}h · rev {3}h · {4}/{5} km{6},意图 {0} · 前进 {1}/{2}h · 返程 {3}h · {4}/{5} km{6},Fahrt {0} · {1}/{2}h · {3}h · {4}/{5} km{6},Режим {0} · {1}/{2}ч · {3}ч · {4}/{5} км{6},Modo {0} · {1}/{2}h · {3}h · {4}/{5} km{6}
+hud.btn.end_day,End day,结束一天,Tag beenden,Конец дня,Fin del día
+hud.btn.time_pause,Pause,暂停,Pause,Пауза,Pausa
+hud.btn.time_resume,Resume,继续,Weiter,Продолжить,Continuar
+hud.time.speed,{0}× speed,{0}× 倍速,{0}× Tempo,{0}× скорость,{0}× velocidad
+hud.btn.heating,Greenhouse heating,种植供暖,Gewächshausheizung,Отопление теплицы,Calefacción invernadero
+hud.btn.enter_station,Enter station,进站,Einfahren,Войти на станцию,Entrar estación
+hud.btn.search,Search,搜索,Suchen,Поиск,Buscar
+hud.btn.abandon,Abandon car,遗弃,Waggon abwerfen,Сброс вагона,Abandonar vagón
+hud.btn.tech,Tech,科技,Technik,Техника,Tecnología
+hud.btn.combat_dev,Encounter (dev),遭遇（调试）,Begegnung (Dev),Столкновение (отладка),Encuentro (dev)
+event.modal.chrome,Segment event,区段事件,Ereignis im Abschnitt,Событие сегмента,Evento de tramo
+event.modal.title,{0} · {1},{0} · {1},{0} · {1},{0} · {1},{0} · {1}
+carriage.power,Locomotive,动力,Lok,Тепловоз,Locomotora
+carriage.living,Living,休息,Wohn,Жилой,Vivienda
+carriage.cargo,Cargo,货舱,Fracht,Груз,Carga
+carriage.greenhouse,Greenhouse,种植,Gewächshaus,Теплица,Invernadero
+carriage.water,Water treatment,净水,Wasser,Вода,Agua
+carriage.workshop,Workshop,工坊,Werkstatt,Мастерская,Taller
+carriage.medical,Medical,医疗,Medizin,Медблок,Médico
+carriage.radar,Radar,雷达,Radar,Радар,Radar
+carriage.armor,Armor car,装甲,Panzerwagen,Броня,Blindado
+carriage.shell,Empty shell,空壳,Hülle,Пустой,Vacío
+station.condition.intact,Intact,完好,Intakt,Целый,Intacto
+station.condition.damaged,Damaged,受损,Beschädigt,Повреждён,Dañado
+station.condition.wreck,Wreck,残骸,Wrack,Обломки,Restos
+station.miss.no_pool,No car pool,无车厢池,Kein Pool,Нет пула,Sin pool
+station.miss.empty_roll,Empty stop,空站,Leer,Пустая,Sin oferta
+station.miss.no_offer,No car found,未发现车厢,Nicht gefunden,Не найдено,No hallado
+station.title.miss,Stop · no car,进站 · 无可挂车厢,Halt · kein Waggon,Стоянка · нет вагона,Parada · sin vagón
+station.title.empty,Stop,进站,Halt,Стоянка,Parada
+station.title.found,Discovery,进站发现,Fund,Находка,Hallazgo
+station.body.miss,Reason: {0} · streak {1},原因：{0} · 保底计数 {1},Grund: {0} · Serie {1},Причина: {0} · серия {1},Motivo: {0} · racha {1}
+station.body.no_offer,No offer yet,暂无要约,Kein Angebot,Нет предложения,Sin oferta
+station.body.offer,{0} ({1}) · repair {2} parts · +{3} fuel/day,{0}（{1}）· 修复 {2} 件 · 日耗油 +{3},{0} ({1}) · {2} Teile · +{3} Öl/Tag,{0} ({1}) · {2} дет. · +{3} нефть/день,{0} ({1}) · {2} piezas · +{3} combustible/día
+station.btn.accept,Accept,接受,Annehmen,Принять,Aceptar
+station.btn.leave,Leave,离开,Verlassen,Уйти,Salir
+station.btn.hook,Hook car (-{0} parts),挂车（-{0} 件）,Anhängen (-{0}),Прицепить (-{0}),Acoplar (-{0})
+station.btn.defer,Not now,暂不挂,Später,Позже,Ahora no
+station.hint.guarantee_prefix,Guarantee offer · ,保底要约 · ,Garantie · ,Гарантия · ,Garantía · 
+station.hint.guarantee_only,Guarantee offer (affordable),保底要约（可负担价）,Garantie (bezahlbar),Гарантированное,Oferta garantizada
+station.hint.tutorial,Tutorial: hook living car,教程首站 · 休息车厢挂钩,Tutorial: Wohnwaggon,Tutorial: жилой,Tutorial: vivienda
+train.abandon.must_stop,Must be stopped,须先停靠,Anhalten,Стоянка,Parar
+train.abandon.not_found,Carriage not found,车厢不存在,Nicht gefunden,Не найден,No encontrado
+train.abandon.last_locomotive,Keep at least one locomotive,最少须保留一节动力（本节前不可遗弃）,Mindestens eine Lok,Нужна локомотив,Sin última locomotora
+train.abandon.parts,Not enough parts,零件不足,Teile fehlen,Мало деталей,Sin piezas
+train.abandon.outdoor_tasks,Finish outdoor tasks,车外搜索/搬运未完成,Außenarbeiten,Задачи снаружи,Tareas fuera
+train.abandon.drive_hours,Not enough drive hours today,当日行驶额度不足 0.5 日,Tageskontingent,Недостаточно часов,Sin horas hoy
+train.abandon.beds,Not enough beds after drop,遗弃后床位不足,Nicht genug Betten,Мало коек,Sin camas
+train.abandon.no_other_car,No car to relocate crew,无其它车厢可安置乘员,Kein Umzugswagen,Нет вагона,Sin otro vagón
+tech.line.power,Power tech,动力,Antrieb,Силовая,Potencia
+tech.line.armor,Armor tech,装甲,Panzerung,Броня,Blindaje
+tech.line.radar,Radar tech,雷达,Radar,Радар,Radar
+tech.line.living,Living tech,生活,Wohnen,Быт,Convivencia
+tech.err.invalid_line,Invalid line,无效科技线,Ungültig,Неверная линия,Línea inválida
+tech.err.max_level,Max level,已达等级上限,Maximal,Максимум,Máximo
+tech.err.no_row,Missing config,配置缺失,Fehlende Config,Нет конфига,Sin config
+tech.err.precision,Workshop precision too low,工坊精度不足,Präzision zu niedrig,Низкая точность,Baja precisión
+tech.err.parts,Not enough parts,零件不足,Teile fehlen,Мало деталей,Sin piezas
+tech.err.medicine,Not enough medicine,药品不足,Medizin fehlt,Мало медикаментов,Sin medicina
+tech.err.catalyst,Not enough catalyst,催化药剂不足,Katalysator fehlt,Мало катализатора,Sin catalizador
+tech.err.fuel,Not enough fuel,燃料不足,Kraftstoff fehlt,Мало топлива,Sin combustible
+tech.err.must_stop,Must be stopped,须先停靠,Anhalten,Стоянка,Parar
+tech.err.blueprint,Blueprint required,需要图纸,Bauplan nötig,Нужен чертёж,Plano requerido
+tech.title,Tech · precision {0},科技 · 精度 {0},Tech · Präzision {0},Тех · точность {0},Tec · precisión {0}
+tech.row,{0} Lv{1}{2} (precision≥{3}),{0} Lv{1}{2}（精度≥{3}）,{0} St.{1}{2} (≥{3}),{0} ур.{1}{2} (≥{3}),{0} Nv{1}{2} (≥{3})
+tech.cost.parts, →{0}: {1} parts, →{0}: {1}件, →{0}: {1} Teile, →{0}: {1} дет., →{0}: {1} pzas
+tech.cost.medicine, {0} med, {0}药, {0} Med, {0} мед, {0} med
+tech.cost.catalyst, {0} cat, {0}催化, {0} Kat, {0} кат, {0} cat
+tech.cost.fuel, fuel {0}%, 油{0}%, Öl {0}%, топливо {0}%, comb. {0}%
+tech.btn.upgrade,Upgrade,升级,Upgrade,Улучшить,Mejorar
+search.err.pick_members,Pick 1–4 members,请勾选 1–4 名搜刮队员,Wähle 1–4,Выберите 1–4,Elige 1–4
+search.err.too_many,Max 4 searchers,搜索最多 4 人,Maximal 4,Не больше 4,Máximo 4
+search.err.member_busy,Member unavailable,队员不可派出,Nicht verfügbar,Занят,Ocupado
+search.err.cap_exceeded,Daily cap for this point,本日该点搜索次数已满,Tageslimit,Лимит дня,Límite diario
+search.point.supermarket,Abandoned supermarket,废弃超市,Supermarkt,Супермаркет,Supermercado
+search.point.water_plant,Water plant,水厂,Wasserwerk,Водоочистка,Planta de agua
+search.point.farm,Farm field,农田,Feld,Ферма,Granja
+search.point.gas_station,Gas station,加油站,Tankstelle,Заправка,Gasolinera
+search.point.factory,Factory,机械厂,Fabrik,Завод,Fábrica
+search.point.scrapyard,Scrap heap,残骸堆,Schrott,Металлолом,Chatarrera
+search.point.hospital,Hospital,医院,Krankenhaus,Больница,Hospital
+search.point.lab,Laboratory,实验室,Labor,Лаборатория,Laboratorio
+search.point.residential,Residential,民居,Wohngebiet,Жилой,Residencial
+search.point.military_depot,Military depot,军需库,Depot,Склад,Depósito
+search.point.armory_boss,Armory boss,军械首领,Waffenlager,Оружейный,Jefe arsenal
+search.point.horde,Horde,尸群,Horde,Орда,Horda
+search.caps,Food {0}/{1} · Water {2}/{3} · cap {4}/point/day,粮 {0}/{1} · 水 {2}/{3} · 搜索上限 {4}/点/日,Verpflegung {0}/{1} · Wasser {2}/{3} · Limit {4},Запасы {0}/{1} · вода {2}/{3} · лимит {4},Comida {0}/{1} · agua {2}/{3} · tope {4}
+search.crew.jobs,Assign jobs (crew),岗位指派（乘员）,Stellen besetzen,Назначение должностей,Asignar puestos
+search.point.title,{0} · remain {1}{2},{0} · 余量 {1}{2},{0} · Rest {1}{2},{0} · остаток {1}{2},{0} · resto {1}{2}
+search.point.depleted, (depleted),（已尽）,(leer),(исчерпано),(agotado)
+search.task.none,No active search,无进行中任务,Keine Suche,Нет задач,Sin búsqueda
+search.task.progress,Progress ,进度 ,Fortschritt ,Прогресс ,Progreso 
+search.haul.none,Haul none,搬运 无,Transport keiner,Переноска нет,Sin transporte
+search.haul.prefix,Haul ,搬运 ,Transport ,Переноска ,Transporte 
+search.btn.search,Start search,开始搜索,Suche starten,Начать поиск,Buscar
+search.btn.recall,Recall,召回,Zurückrufen,Отозвать,Retirar
+search.btn.haul,Send hauler,派杂工搬,Transport schicken,Отправить грузчика,Enviar peón
+search.btn.haul_recall,Stop haul,停搬,Transport stop,Остановить,Sin transporte
+search.picker.caption,Roster:,点名：,Auswahl:,Состав:,Lista:
+search.picker.auto,No roster (auto assign),（无成员表，自动派人）,(keine Liste),(авто),(auto)
+member.label,{0} ({1}){2},{0}（{1}）{2},{0} ({1}){2},{0} ({1}){2},{0} ({1}){2}
+member.vitals_paren, · H{0}/T{1}, · 饿{0}渴{1}, · H{0}/T{1}, · Г{0}/Ж{1}, · H{0}/S{1}
+member.vitals_roster,{0} H{1}/T{2},{0} 饿{1}渴{2},{0} H{1}/T{2},{0} Г{1}/Ж{2},{0} H{1}/S{2}
+hud.crew.line,{0},{0},{0},{0},{0}
+hud.crew.empty,—,—,—,—,—
+abandon.title,Select car to abandon,选择要遗弃的车厢,Waggon wählen,Выберите вагон,Elegir vagón
+abandon.detail,{0} ({1})\nCost parts {2} · scrap {3} · fuel {4}\nDrive quota {5} day,{0}（{1}）\n消耗 零件 {2} · 返废料 {3} · 扣油 {4}\n占用行驶额度 {5} 日,{0} ({1})\nTeile {2} · Schrott {3} · Öl {4}\nKontingent {5} Tag,{0} ({1})\nДетали {2} · лом {3} · топливо {4}\nКвота {5} дн.,{0} ({1})\nPiezas {2} · chatarra {3} · comb. {4}\nCupo {5} día
+abandon.blocked_suffix,\nCannot: {0},\n不可遗弃：{0},\nNicht möglich: {0},\nНельзя: {0},\nNo: {0}
+abandon.protected_suffix, · keep, · 须保留, · behalten, · оставить, · conservar
+abandon.row,{0} · {1}{2},{0} · {1}{2},{0} · {1}{2},{0} · {1}{2},{0} · {1}{2}
+abandon.hint.t11,Fuel tight: consider dropping cars (T11),提示：油紧时可考虑甩节减负（T11）,Öl knapp: abwerfen,T11: сброс вагонов,T11: soltar vagones
+abandon.hint.default,Keep one power; beds rule applies,最少保留一节动力；其余车厢满足条件均可遗弃（休息节须剩足够床位）,Eine Lok behalten,Одна локомотив,Una locomotora
+abandon.row_head, · lead, · 车头, · Spitze, · голова, · cabeza
+region.pick.title,Next segment · pick 1 of 3,下一段 · 三选一,Nächstes Segment,Следующий сегмент,Siguiente tramo
+region.pick.fuel_mult,Region fuel ×{0},区域油耗 ×{0},Treibstoff ×{0},Топливо ×{0},Combustible ×{0}
+region.pick.confirm,Confirm,确认,Bestätigen,Подтвердить,Confirmar
+hud.defer.FUEL_TIGHT_ARMOR,Fuel tight · high burn note,发现面板主按钮默认可点；旁注「油紧·高耗」+ 一键暂不挂,Öl knapp · hoher Verbrauch,Мало топлива · расход,Combustible bajo
+hud.defer.FUEL_TIGHT_HIGH_BURN,High-burn car badge,高耗车卡片角标,Hoher Verbrauch,Высокий расход,Alto consumo
+hud.defer.LENGTH_WHITELIST,Long train fuel tight whitelist,非白名单车型灰底；悬停「长编组油紧：先货/动力/粮水/冲床」,Langer Zug · Öl,Длинный состав · топливо,Tren largo · combustible
+hud.defer.PARTS_BUFFER,Parts buffer for second loco,零件不足时显示需留足第二动力,Teilepuffer für 2. Lok,Запас деталей,Reserva de piezas
+hud.length_burden,Length is load when fuel tight…,长度即负担：油紧时长编组每多挂一节，过冬都难一点。,Länge = Last bei knappem Öl,Длина = нагрузка,Largo = carga
+debug.no_state,no RunState,no RunState,kein RunState,нет RunState,sin RunState
+ui.btn.close,Close,关闭,Schließen,Закрыть,Cerrar
+loot.pile.empty,Pile empty,临时堆空,Haufen leer,Куча пуста,Pila vacía
+loot.pile.prefix,Haul ,待搬 ,Transport ,Переноска ,Transporte 

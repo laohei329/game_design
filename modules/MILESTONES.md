@@ -34,8 +34,8 @@ flowchart LR
 | 里程碑 | 含义 | 当前状态（2026-11-26） |
 |---|---|---|
 | **M0** | 规则闭环 + 数值冻结 + sim 闸 | **过**（主闸 #2/#6/#8；#5/#7 **~**） |
-| **M1** | Godot 可跑、ConfigDb、Autoload | **部分**（`client/` boot OK） |
-| **M2** | S1a 可录屏闭环 | **未过** |
+| **M1** | Godot 可跑、ConfigDb、Autoload | **部分**（S0.1–2 **过**；S0.3–5 / `run_main` **部分**；证据 [qa/DEV-code-audit-2026-11-26.md](../qa/DEV-code-audit-2026-11-26.md)） |
+| **M2** | S1a 可录屏闭环 | **部分**（S1a.1–7 代码 **部分**；无头 15 日 **过**；§12.6 录屏未签） |
 | **M3** | S1b 关 L8「30 日无阻断」 | **未过** |
 | **M4** | 零 B 真人灰盒 | **包就绪 · 场次搁置** |
 | **M5** | 120 事件 + spur + 战斗加厚 | **数据就绪 · 工程 S2** |
@@ -87,14 +87,15 @@ flowchart LR
 |---|---|---|---|
 | S0.1 | Autoload：`ConfigDb` / `IntentBus` / `GameSession` / `RngService` / `SaveService` / `TelemetryService` | F5 无报错 | **过** |
 | S0.2 | manifest 全表加载（JSON + CSV 本地化） | 删 `weather.json` 必失败；`validate_config_db.py` 0 error | **过** |
-| S0.3 | 教程跨度 / `dayTotal` 可增 | boot 或日推 `day=1` | 部分（`END_DAY` + 日历字段；无顶栏/RegionRun） |
-| S0.4 | 开局读 `balance.start.*` | 改 json 可见 | 部分（`NEW_RUN` + 教程 RegionRun 第 0 段骨架） |
-| S0.5 | `recomputeClimate` 后倍率随区域 | 调试可见 | **未过** |
+| S0.3 | 教程跨度 / `dayTotal` 可增 | HUD 季日 + 无头 15 日 | **部分**（`GameCalendar` + `hud_top` + `RegionRun`；§12.5 #3 人工签） |
+| S0.4 | 开局读 `balance.start.*` | 改 json 可见 | **部分**（含 `precision`/`start`；§12.5 人工） |
+| S0.5 | `recomputeClimate` 后倍率随区域 | F3 + `weather_draw` + dev mult | **部分**（F3/F04 可见；§12.5 #4 人工签） |
+| M1 出口 | `run_main` 可进局 | `main_scene=run_main` | **部分**（场景 load 冒烟 **过**；§12.5 #1–6 未全签） |
 
-**工程交付**：[`client/`](../client/) · 数据链 [`tools/link_client_data.ps1`](../tools/link_client_data.ps1)  
-**权威明细**：[GODOT_ARCH §10 S0](GODOT_ARCH.md)
+**工程交付**：[`client/`](../client/) · 数据链 [`tools/link_client_data.ps1`](../tools/link_client_data.ps1) · 测试 `powershell tools/run_all_smoke.ps1`  
+**权威明细**：[GODOT_ARCH §10 S0](GODOT_ARCH.md) · 与 [开发计划 §14.2.1](../开发计划.md#142-验收标注总表) 同步
 
-**出口标准（M1 完成）**：S0.1–S0.5 **全部过** + `run_main` 可进局（非仅 boot 文案）。
+**出口标准（M1 完成）**：S0.1–S0.2 **过** + S0.3–S0.5 **过** + M1 出口 **过**（对齐 §14.2.1）。
 
 ---
 
@@ -110,21 +111,23 @@ flowchart LR
 4. 搜索 / 召回；单点搜索 cap（遥测 `search_assign`）  
 5. 日结粮水燃料可见（F04 等读 balance）  
 6. 供暖开关  
-7. **可选**：停靠 `ABANDON_CARRIAGE`（[03 §4.1](03-train.md)）；Intent 已接线，UI 待做  
+7. 停靠 `ABANDON_CARRIAGE`（[03 §4.1](03-train.md)）；最少 1 节动力 + UI 确认  
 
 | ID | 验收标准 | 过线 | 状态 |
 |---|---|---|---|
-| S1a.1 | 行驶额度来自 `time.driveHoursPerDayCap` | 额度满→停靠油耗系数 | 未过 |
-| S1a.2 | 进站闭环 + 教程休息车 | 首次有池站可挂 living | 未过 |
-| S1a.3 | `stations.guaranteeAfter` | 连 miss 后必出可修 offer | 未过 |
-| S1a.4 | 搜索入库 | `point_types` 结算可见 | 未过 |
-| S1a.5 | 日结顺序 | 与 [02 §8](02-resources.md) 一致 | 部分（`day_settle` 0–3c；无 HUD 改 `fuel.base` 验收） |
-| S1a.6 | `SET_HEATING` | 粮/油变化符合 01 §8.1.1 | 部分（意图 + 3b；无种植车/HUD） |
-| S1a.7 | 连续 **15 游戏日** 无软锁 | QA 签字 | 未过 |
+| S1a.1 | 行驶额度来自 `time.driveHoursPerDayCap` | 额度满→停靠油耗系数 | **部分**（`drive_service` + HUD km；§12.6 录屏） |
+| S1a.2 | 进站闭环 + 教程休息车 | 首次有池站可挂 living | **部分**（`station_service` + 面板；人工录屏） |
+| S1a.3 | `stations.guaranteeAfter` | 连 miss 后必出可修 offer | **部分**（无头 `guaranteeForced`；人工拒×4） |
+| S1a.4 | 搜索入库 | `point_types` 结算可见 | **部分**（点名/堆/搬 + cap 冒烟；[DEV-functional-checklist D](../qa/DEV-functional-checklist.md)） |
+| S1a.5 | 日结顺序 | 与 [02 §8](02-resources.md) 一致 | **部分**（0–8 薄接线；工位/收留待加厚） |
+| S1a.6 | `SET_HEATING` | 粮/油变化符合 01 §8.1.1 | **部分**（HUD + 3b；无种植车正式场景） |
+| S1a.7 | 连续 **15 游戏日** 无软锁 | QA 签字 | **部分**（无头 15 日 + probe；[DEV-S1a7-soft-lock](../qa/DEV-S1a7-soft-lock.md) 未签） |
+| E3 | 遗弃确认流 | 最少 1 动力；0.5 日；telemetry | **部分**（UI + 服务；E3–E5 人工） |
+| ZA-7 | 单点搜索 cap ≤3 | 均值/sim | **部分**（`SearchRules.cap()`；无 sim 导出） |
 
 **不要求**：L3 战斗、120 事件 UI、L6 全量 TIPS、多语言 UI 齐。
 
-**出口标准（M2 完成）**：S1a.1–S1a.7 **全部过**；可对外演示「进站—挂车—搜点—过冬感知」。
+**出口标准（M2 完成）**：S1a.1–S1a.7 **全部过** + E3 **过**；可对外演示「进站—挂车—搜点—过冬感知」。与 [开发计划 §14.2.2](../开发计划.md#142-验收标注总表) 同步。
 
 ---
 
@@ -135,10 +138,10 @@ flowchart LR
 | ID | 交付 / 验收 | 过线 | 状态 |
 |---|---|---|---|
 | S1b.1 | S1a 稳定 | 无已知软锁 | 未过 |
-| S1b.2 | 区域三选一 | ≥3 词条、雪原可感 | 未过 |
-| S1b.3 | 四线科技 Lv1 | `upgrades.json` 真实扣费 | 未过 |
-| S1b.4 | 战斗 L1 | 非「跳过即胜」 | 未过 |
-| S1b.5 | 本地存档 save **12** | 杀进程不漂；`abandonCount` 缺省 | 部分（缺省逻辑有；磁盘 IO 未过） |
+| S1b.2 | 区域三选一 | ≥3 词条、雪原可感 | **部分**（冒烟 + [DEV-functional-checklist G](../qa/DEV-functional-checklist.md)） |
+| S1b.3 | 四线科技 Lv1 | `upgrades.json` 真实扣费 | **部分**（`tech_service` 四线 Lv1 薄；冒烟动力） |
+| S1b.4 | 战斗 L1 | 非「跳过即胜」 | **部分**（`combat_l1` + 四非战路径；L2 未实装） |
+| S1b.5 | 本地存档 save **12** | 杀进程不漂；`abandonCount` 缺省 | **部分**（`run_save_kill_smoke` **过**；F3 槽 0 人工） |
 | S1b.6 | data P0+P1 | manifest 全表 | **过** |
 | S1b.7 | 08 §4 提示 | 可后置 | 搁置 |
 | S1b.8 | **30 日 ×3 人** | 无阻断 | 未过 |
@@ -333,8 +336,8 @@ flowchart LR
 | 周 | 焦点 | 里程碑出口 |
 |---|---|---|
 | W0 | 已完成：冻结 + sim + client boot | M0 / M1 部分 |
-| W1 | S0 补齐 + `run_main` | M1 |
-| W2–3 | S1a.1–S1a.7 | M2 |
+| W1 | S0 补齐 + `run_main` | M1 **部分**（待 §12.5 人工签） |
+| W2–3 | S1a.1–S1a.7 + 录屏 | M2 **部分**（`run_all_smoke` **过**） |
 | W4 | S1b + 30 日 | M3 |
 | W5+ | 零 B 场次 → S2 | M4 / M5 |
 | W* | Demo 包 + 商店 | **M-D** |

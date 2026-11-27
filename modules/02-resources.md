@@ -301,6 +301,7 @@ Point {
 
 - 点位本体挂在 `Segment.points[]` 并存档（[09](09-data-platform.md)）；**临时堆** `lootPiles[]` 是已搜出未搬物资，与 `remainingYield` 分列  
 - **搜索/搬运派人**权威在 [04 §5](04-population.md)：点名可派人 → 扣 `remainingYield` → 点位临时堆 → `labor` 搬运入库（无搜刮员岗位）  
+- **工时与日钟（S1b 客户端）**：`hoursDone` 随 `day_delta` 在停靠意图下增长；日末 `outdoorEligible−outdoorTick` 补课（`sim≈0` 时无头补全日）；行车日历走完不白给工日（[01 §2.3](01-time-season.md)）  
 - 临时堆**不超时蒸发**；仅杂工搬走或被掠夺者等单位夺走（04 §5.4）  
 - 重复搜索：受伤概率 +0.05/次（上限 0.95）；有 `scavenge` 专长者该权重 ×0.8；伤员不可再派  
 - **点位权重合成（权威）**：`06 §3 基权` × `RegionRun.pointTypeWeightMods[type]`（[06 §1.2](06-region-events.md)）× `01` 季节乘子 × 天气 `nodeWeightMods` ×（适用时）雷达威胁减免 → 归一化  
@@ -334,6 +335,8 @@ onDayStart:
   0. 用当前 driveHoursToday / reverseHoursToday（尚未清零 = 昨日累计）结算 F04（§4）；再二者 = 0
   1. recomputeClimate()
   2. 扣 food / water（车上人口 × 气候）
+     → **日内**：`PopulationConsumption.tick` 按 `day_delta` 改 `members[].hunger`/`thirst`（0–100）并从全车库存取食；`metabolismMultByIntent` 调制节奏（[01 §2.3](01-time-season.md)）
+     → **日末**：`reconcile_day_end` 补缺口至 **当日总口径** `pop×foodPerCapitaDay×foodClimate`（与 sim/本表一致；日内代谢不影响日总）
      → 当日标志 foodWentZero / waterWentZero = (扣后该资源 == 0)
      → 若 foodWentZero：foodZeroStreak++；否则 foodZeroStreak = 0
      → 若 waterWentZero：waterZeroStreak++；否则 waterZeroStreak = 0
@@ -355,6 +358,8 @@ onDayStart:
 
 步骤 0 必须在清零前进/返程小时 **之前**读昨日累计（[03 §6.2](03-train.md)）。  
 步骤 0 的 F04 使用**当前已维护**的 `fuelClimate`（事件改因子须已即时重算，见 [01 §4.3](01-time-season.md)）；步骤 1 的重算服务当日粮水/UI。
+
+**S1b 客户端时间接线（权威）**：步骤 **0–3c**（F04·粮水·燃料）+ 步骤 **2 日内 tick**、户外搜索/搬运，已接 **`day_delta`**（[01 §2.3](01-time-season.md)）。步骤 **4–8 / 8b** 仍为 **日界一次批量**（种植/净水/工坊/士气/pressure/收留/抛锚）；未 claim 连续 tick，零 A sim 亦按日总粮水结算。
 
 扣费后所有核心库存 **clamp 到 [0, 该资源上限]**，再判 `*WentZero` / `fuel==0`（禁止出现负库存）。
 

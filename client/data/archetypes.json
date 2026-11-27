@@ -1,5 +1,5 @@
 {
-  "configVersion": 25,
+  "configVersion": 26,
   "authority": "modules/04-population.md §4 · 08-presentation.md §3",
   "specialtyIds": [
     "scavenge",
@@ -341,29 +341,29 @@
     }
   },
   "startPartyTemplate": {
-    "note": "04 §4.3.1 authoritative jobs; names filled at runtime",
+    "note": "04 §4.3.1 开局全员无岗，岗位由玩家在搜索面板指派；专长/combatRoster 仍权威",
     "members": [
       {
-        "job": "engineer",
+        "job": "none",
         "combatRoster": false,
         "specialties": []
       },
       {
-        "job": "guard",
+        "job": "none",
         "combatRoster": true,
         "specialties": [
           "combat_drill"
         ]
       },
       {
-        "job": "labor",
+        "job": "none",
         "combatRoster": false,
         "specialties": [
           "haul"
         ]
       },
       {
-        "job": "labor",
+        "job": "none",
         "combatRoster": false,
         "specialties": [
           "scavenge"

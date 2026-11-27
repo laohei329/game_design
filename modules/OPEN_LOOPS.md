@@ -59,7 +59,7 @@
 
 ## 5. 重新审计追加（2026-11-26）
 
-基线：设计 v1.3.33 / 执行规格 v1.52 / 配置版本（`configVersion`）**25** / 存档结构版本（`version.save`）**12**。  
+基线：设计 v1.3.33 / 执行规格 v1.52 / 配置 **`configVersion` 26**（零 A 闸口径仍记 config25）/ 存档 **`version.save` 12**。  
 口径：先查设计与规则逻辑闭环，再登记配置、内容、工程补充项。以下是**新增发现**，不覆盖上文缺口编号。
 
 ### 5.1 设计与规则逻辑（优先处理）
@@ -190,3 +190,41 @@
 | 2 | 遥测 `carriage_abandon` / `search_assign` | **已落** 09 §4.2 + TelemetryService |
 | 3 | save 12 `abandonCount` 缺省 | **已落** SaveService + patch |
 | 4 | D10 历史燃料闸 · A7 引用扫尾 | **已关** |
+
+### 5.9 日钟多轮审计（2026-11-26 · 闭环债）
+
+基线：**`configVersion=26`**（sim 冻结阈仍称 config25 见 [10 §1](10-validation.md)）。
+
+| 序 | ID | 处理 | 状态 |
+|---|---|---|---|
+| 1 | S1 | 冒烟 `errors_runtime_day_clock_save_roundtrip`（槽 93） | **已关** |
+| 2 | T3 | `_process` → `sim_time_frozen()` | **已关** |
+| 3 | T1 | `END_DAY` → `_force_end_game_day` 补 tick 再日界 | **已关** |
+| 4 | E1 | 抛锚 `breakdownStopHoursRemaining` + `DriveService.tick_breakdown_stop` | **已关（薄）** |
+| 5 | T4 | 饥渴 `state_changed` 0.25s 节流 | **已关** |
+| 6 | U1 | 本表 + [qa/DEV-code-audit](qa/DEV-code-audit-2026-11-26.md) §7 | **已关** |
+| 7 | T2/S3 | `restore` 认 `simDayFractionToday`；SaveSchema 注释写盘路径 | **已关** |
+
+### 5.10 多入口收敛（M1–M7 · 2026-11-26）
+
+| ID | 处理 |
+|---|---|
+| M1 | 饥渴扣减 → `InventoryService.remove`（food/water） |
+| M2 | F04/供暖/科技/遗弃/鸣笛 → `remove(fuel)` |
+| M3 | `SaveService.load_into_game_session` + `GameSession.apply_loaded_run` |
+| M4 | `sim_time_frozen` = 暂停 + `get_tree().paused` 仅 |
+| M5 | `state_changed` vs 搜索 `_process` 注释约定 |
+| M6 | 对外 `ClimateService.refresh()`；`recompute` 仅内部 |
+| M7 | 冒烟 `_intent_drive` / `_intent_assign_search`（cap 测仍直连 `assign_search`） |
+
+### 5.11 续审 R2（2026-11-26 · Intent 拆分后）
+
+| ID | 状态 | 项 |
+|---|---|---|
+| R2-A | **已关** | §8 过时：`lastRecruitSuccessDay` 入盘 · 空 `lootPiles` 清堆 · 玩法层六元无直减 · `ClimateService.recompute` 无外呼 |
+| R2-B | **已关** | `SessionIntentRouter` + 冒烟分文件 + GODOT_ARCH §4.4–4.5 |
+| R2-C | **已关** | 走廊速度 · 士气/轻伤/车身 · `fuel_cap` → `PopulationRules` / `balance.population` |
+| R2-G | **已关** | `MemberMorale.settle_daily_moods`（sim 床位/无岗/配给/生活线）；`assign_daily_jobs` 日末/加挂 |
+| R2-D | **已关** | 09 §3.0.1 `eventTagWeights` / `pendingThreat` |
+| R2-E | **已关** | `SearchService.localize_err`（Intent 域不再调 `_search_err_zh`） |
+| R2-F | **已关** | `Segment.from_dict` + SaveSchema 去重 |

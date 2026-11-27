@@ -233,12 +233,12 @@ class Member:
 
 
 def starter_members() -> List[Member]:
-    """04 §4.3.1：1 engineer + 1 guard + 2 labor。"""
+    """04 §4.3.1：四人开局 job=none（专长/roster 与 archetypes 同构）。"""
     return [
-        Member(job="engineer"),
-        Member(job="guard", combat_roster=True),
-        Member(job="labor", has_scavenge=True),
-        Member(job="labor"),
+        Member(job="none"),
+        Member(job="none", combat_roster=True),
+        Member(job="none", has_scavenge=True),
+        Member(job="none"),
     ]
 
 

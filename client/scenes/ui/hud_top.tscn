@@ -5,7 +5,7 @@
 [node name="HudTop" type="MarginContainer"]
 anchors_preset = 10
 anchor_right = 1.0
-offset_bottom = 148.0
+offset_bottom = 168.0
 grow_horizontal = 2
 theme_override_constants/margin_left = 12
 theme_override_constants/margin_top = 8
@@ -22,7 +22,7 @@ layout_mode = 2
 
 [node name="Calendar" type="Label" parent="VBox/RowCalendar"]
 layout_mode = 2
-text = "日历 …"
+text = "…"
 
 [node name="RowResources" type="HBoxContainer" parent="VBox"]
 layout_mode = 2
@@ -30,26 +30,33 @@ theme_override_constants/separation = 16
 
 [node name="Food" type="Label" parent="VBox/RowResources"]
 layout_mode = 2
-text = "粮 —"
+text = "…"
 
 [node name="Water" type="Label" parent="VBox/RowResources"]
 layout_mode = 2
-text = "水 —"
+text = "…"
 
 [node name="Fuel" type="Label" parent="VBox/RowResources"]
 layout_mode = 2
-text = "油 —"
+text = "…"
 
 [node name="Parts" type="Label" parent="VBox/RowResources"]
 layout_mode = 2
-text = "件 —"
+text = "…"
 
 [node name="RowDrive" type="HBoxContainer" parent="VBox"]
 layout_mode = 2
 
 [node name="DriveStatus" type="Label" parent="VBox/RowDrive"]
 layout_mode = 2
-text = "驾驶 …"
+text = "…"
+
+[node name="RowCrew" type="HBoxContainer" parent="VBox"]
+layout_mode = 2
+
+[node name="CrewVitals" type="Label" parent="VBox/RowCrew"]
+layout_mode = 2
+text = "…"
 
 [node name="RowActions" type="HBoxContainer" parent="VBox"]
 layout_mode = 2
@@ -57,32 +64,49 @@ theme_override_constants/separation = 12
 
 [node name="DriveForward" type="Button" parent="VBox/RowActions"]
 layout_mode = 2
-text = "前进"
+text = "…"
 
 [node name="DriveReverse" type="Button" parent="VBox/RowActions"]
 layout_mode = 2
-text = "返程"
+text = "…"
+
+[node name="TimePause" type="Button" parent="VBox/RowActions"]
+layout_mode = 2
+text = "…"
+
+[node name="TimeSpeed" type="Button" parent="VBox/RowActions"]
+layout_mode = 2
+text = "…"
 
 [node name="EndDay" type="Button" parent="VBox/RowActions"]
+visible = false
 layout_mode = 2
-text = "结束一天"
+text = "…"
 
 [node name="Heating" type="CheckBox" parent="VBox/RowActions"]
 layout_mode = 2
-text = "种植供暖"
+text = "…"
 
 [node name="DriveStop" type="Button" parent="VBox/RowActions"]
 layout_mode = 2
-text = "停靠"
+text = "…"
 
 [node name="EnterStation" type="Button" parent="VBox/RowActions"]
 layout_mode = 2
-text = "进站"
+text = "…"
 
 [node name="OpenSearch" type="Button" parent="VBox/RowActions"]
 layout_mode = 2
-text = "搜索"
+text = "…"
 
 [node name="OpenAbandon" type="Button" parent="VBox/RowActions"]
 layout_mode = 2
-text = "遗弃"
+text = "…"
+
+[node name="OpenTech" type="Button" parent="VBox/RowActions"]
+layout_mode = 2
+text = "…"
+
+[node name="OpenCombat" type="Button" parent="VBox/RowActions"]
+layout_mode = 2
+text = "…"

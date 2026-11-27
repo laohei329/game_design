@@ -13,7 +13,7 @@
 | 4 | [GODOT_ARCH](modules/GODOT_ARCH.md) | 客户端分层 · Intent · S0–S3 细项 |
 | 5 | [OPEN_LOOPS](modules/OPEN_LOOPS.md) | 缺口与剩余风险 |
 | 6 | [sim/](sim/) | 自动模拟冒烟 |
-| — | [client/](client/) | Godot 4 工程；实施勾选 **[开发计划 §12](开发计划.md#12-godot-单人实施client)** · `tools/link_client_data.ps1` |
+| — | [client/](client/) | Godot 4 工程；实施勾选 **[开发计划 §12](开发计划.md#12-godot-单人实施client)** · 验收 **[qa/](qa/README.md)** · 工具 **[tools/README.md](tools/README.md)** |
 | — | [assets/vfx_portable/](assets/vfx_portable/) | 可移植 VFX 资源包（烘焙产出，可拷到其他 Godot 工程） |
 | 7 | [archive/VERSION.md](archive/VERSION.md) | 版本沿革 |
 

@@ -1,5 +1,5 @@
 {
-  "configVersion": 25,
+  "configVersion": 26,
   "authority": "modules/08-presentation.md §4 · 03-train §4.1 · sim/engine.py",
   "notes": "只读阈值与文案键；不改 balance 乘子。客户端与 TIPS 须与本表 + 08 §4 一致。",
   "fuelFill": {
@@ -26,25 +26,25 @@
       "when": "fuelFill < expansionThrottle && offer.templateId == armor",
       "playerRules": "R2",
       "tipId": "T2",
-      "ui": "发现面板主按钮默认可点；旁注「油紧·高耗」+ 一键暂不挂"
+      "uiKey": "hud.defer.FUEL_TIGHT_ARMOR"
     },
     "FUEL_TIGHT_HIGH_BURN": {
       "when": "fuelFill < highBurnOfferBlock && car.fuelPerDay >= 2",
       "playerRules": "R1",
       "tipId": "T1",
-      "ui": "高耗车卡片角标"
+      "uiKey": "hud.defer.FUEL_TIGHT_HIGH_BURN"
     },
     "LENGTH_WHITELIST": {
       "when": "preferExpansion && fuelFill < expansionThrottle && cars >= lengthBurdenBanner",
       "playerRules": "R2",
       "tipId": "T9",
-      "ui": "非白名单车型灰底；悬停「长编组油紧：先货/动力/粮水/冲床」"
+      "uiKey": "hud.defer.LENGTH_WHITELIST"
     },
     "PARTS_BUFFER": {
       "when": "conservative && parts < repair + buffer + reserve",
       "playerRules": "R5",
       "tipId": "T8",
-      "ui": "零件不足时显示需留足第二动力"
+      "uiKey": "hud.defer.PARTS_BUFFER"
     }
   },
   "whitelistWhenLongTrainTight": [

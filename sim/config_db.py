@@ -307,8 +307,8 @@ def _validate_p1(db: ConfigDb) -> List[str]:
         if len(party) != 4:
             errs.append(f"archetypes.startPartyTemplate must have 4 members, got {len(party)}")
         jobs = [m.get("job") for m in party if isinstance(m, dict)]
-        if jobs.count("engineer") != 1 or jobs.count("guard") != 1:
-            errs.append("startPartyTemplate must include 1 engineer + 1 guard (04 §4.3.1)")
+        if jobs.count("none") != 4:
+            errs.append("startPartyTemplate: all 4 members must have job=none (player assigns)")
     except ConfigLoadError as exc:
         errs.append(str(exc))
 
@@ -378,6 +378,7 @@ def _required_paths_for_stage(stage: str) -> Sequence[str]:
     p1 = [
         "combat.l1Unit",
         "combat.l1Success.min",
+        "combat.searchEncounter",
         "gear.types.ranged.rangedBonus",
         "gear.types.melee.meleeBonus",
         "gear.types.defense.defBonus",
@@ -385,8 +386,19 @@ def _required_paths_for_stage(stage: str) -> Sequence[str]:
         "disease.treatment.defaultDays",
         "items.potions",
         "archetypes.archetypes",
+        "archetypes.startPartyTemplate.members",
         "combat_trauma.tags",
         "migrations_manifest.saveSchemaCurrent",
+        "balance.haul.hoursPerTask",
+        "balance.search.hoursPerTask",
+        "balance.greenhouse.fullOutputPerDay",
+        "balance.water.basicOutputPerDay",
+        "balance.train.abandonScrapRatio",
+        "balance.inventory.base.food",
+        "balance.fuelTank.baseAmount",
+        "balance.travel.corridorMult",
+        "balance.eventDraw.scenarioEventRate",
+        "combat.threatTemplateAliases",
     ]
     if stage == "s0":
         return s0

@@ -28,7 +28,7 @@
 
 | 单位 | 游戏日 | 真实时间（1×） | 说明 |
 |---|---|---|---|
-| 1 日 | 1 | **180 秒** | tick：每 0.1 真实秒推进 `0.1×倍速/180` 日 |
+| 1 日 | 1 | **180 秒** | 日钟：每帧 `day_delta = 真实秒×倍速/180`（[§2.3](#23-日钟分发客户端-s1b--权威)）；禁止另写固定 0.1s 步长 |
 | 1 季 | **30 日** | 90 分钟 | 约 **1 次区域跨度 / 季** → **0.10–0.17 段/日**（中位 ≈0.13）；靠 [03 §6.2](03-train.md) **行驶日额度**对齐，不是按面板时速×24h |
 | 1 年 | **120 日**（4×30） | 6 小时 | 「第一年冬天」= 第 91–120 日（春开局） |
 | 倍速 | — | **暂停 / 1× / 2× / 4×** | 键位见 [08](08-presentation.md)；1× 下季约 90 / 45 / 22.5 分钟 |
@@ -45,7 +45,7 @@
 |---|---|
 | 1 游戏日 | **24 游戏小时** |
 | 1 游戏小时 | `1/24` 日 = **7.5** 真实秒（1×） |
-| 本 tick 游戏小时 | `(本 tick 推进的日数) × 24`（供 [03 §6.2](03-train.md) 里程） |
+| 本 tick 游戏小时 | `(day_delta) × 24`（S1b 连续积分；供 [03 §6.2](03-train.md) 里程） |
 | UI「锁速 5 秒」等 | **真实时间**秒（暂停时冻结）；≈ `5/180` 日 |
 
 搜索/搬运/配制/维修文案中的「游戏小时」一律按本表落到日/tick。禁止另设第二套小时长度。
@@ -70,6 +70,19 @@
 **倍速引导（表现层须遵守，[08](08-presentation.md)）**：站内操作/事件/战斗 → 暂停或 1×；纯巡航且无车外任务 → 推荐 2×/4×；额度用尽提示后宜停车或改意图，避免空转。
 
 **体验时长口径**：`180s×120日=6h/年` 是 **1× 且几乎不暂停** 的墙上时间上界。对外「15–25 小时完整体验」= **含暂停思考 + 常用 2×/4× 后的玩家日历时间**，约落在 2.5–4 年剧情；禁止写成「必须 1× 连打 18h」。
+
+### 2.3 日钟分发（客户端 S1b · 权威）
+
+**`day_delta`**（本帧流逝的游戏日份额 0~1）= `真实秒 × 倍速 / time.secondsPerDay`。由 `GameSession._process` 唯一换算并分发：
+
+| 订阅方 | 行为 |
+|---|---|
+| `DriveService.tick_travel` | 前进/倒车小时与 `progressKm`；日界 `accrue_end_of_day` **只补 tick 未满额度**（与返程对称） |
+| `PopulationConsumption.tick` | 逐人饥渴 + 按帧取食；`metabolismMultByIntent`（停快/行缓） |
+| `SearchService` / `HaulService.tick` | 仅当 `driveIntent == outdoorWorkRequiresIntent`（默认 `stop`）推进工时 |
+| 日界 | `Search/Haul.on_end_day` 补 `outdoorEligible − outdoorTick`；`sim≈0`（无头 `END_DAY`）→ 补 **1** |
+
+`GameClock.accrue_sim_day_fraction`（日历已流逝）与 `accrue_outdoor_eligible_fraction`（仅停靠份额）并行；户外 `tick` 累加 `accrue_outdoor_tick_fraction`。日历 UI 用 `day_clock_fraction`。**存档**：`runtime.dayClockFraction` + 三份额 + `foodAppliedToday`（[09 §1](09-data-platform.md)）读档续同一游戏日。**单帧跨日**：`_process` 按 `chunk` 切分 `day_delta`，每满 1 日各调一次 `_advance_one_day`。**`END_DAY`**（无头/调试）：若 `day_clock_fraction>0` 先补满本日 tick 再日界；若已为 0 则只日结（不与 `reconcile` 双扣粮）。`sim` 在日结后 `reset_sim_day_fraction`。**决策弹窗** `get_tree().paused` 停表；**搜索面板不关表**。配置：`time.metabolismMultByIntent`、`time.outdoorWorkRequiresIntent`。
 
 ---
 

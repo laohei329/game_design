@@ -1,38 +1,58 @@
 class_name StationService
 extends RefCounted
-## 03 §5 · 06 §1.1 进站要约与 guaranteeFailStreak（S1a.2–3）
+## 进站发现车厢：生成要约（offer）、接受挂车、拒绝累计保底 streak（S1a.2–3）。
+##
+## 数据落在 `Segment.stations[]` 字典里，UI 读 `RunState.pending_station` 快照。
+##
+## 保底（guarantee）：
+##   - `guarantee_fail_streak` 连续拒绝/落空时 +1（教程站 `tutorialHook` 不计入）。
+##   - 达到 `stations.guaranteeAfter`（balance）后下次 `generate_offer` **必出**可负担要约（`guaranteeForced`）。
+##
+## 日结钩子：`after_day_travel` 在停靠且列车位于车站里程时预生成 offer（不必点「进站」）。
+## 手动：`ENTER_STATION` → `manual_enter`；接受/拒绝 → `resolve_offer`。
 
 
-const TEMPLATE_ZH := {
-	"power": "动力",
-	"living": "休息",
-	"cargo": "货舱",
-	"greenhouse": "种植",
-	"water": "净水",
-	"workshop": "工坊",
-	"medical": "医疗",
-	"radar": "雷达",
-	"armor": "装甲",
-	"shell": "空壳",
-}
-
-const CONDITION_ZH := {
-	"intact": "完好",
-	"damaged": "受损",
-	"wreck": "残骸",
-}
+## 车厢模板展示名（`carriage.*` in ui.csv）。
+##
+## 公开 API：UI 经 `IntentBus` → `GameSession`，勿在 presentation 改 state。
+## @param template_id 车厢/威胁模板 id
+## @return 空串=成功；非空=机器错误码。
+static func template_label(template_id: String) -> String:
+	return LocaleApi.tr_code("carriage", template_id, template_id)
 
 
+## 车况展示名（`station.condition.*`）。
+##
+## 公开 API：UI 经 `IntentBus` → `GameSession`，勿在 presentation 改 state。
+## @param condition_id 车况 intact/damaged/wreck
+## @return 空串=成功；非空=机器错误码。
+static func condition_label(condition_id: String) -> String:
+	return LocaleApi.tr_code("station.condition", condition_id, condition_id)
+
+
+## stations.json 根表（池子、权重、tutorial 键）。
+##
+## 公开 API：UI 经 `IntentBus` → `GameSession`，勿在 presentation 改 state。
+## @return 结果字典；缺失语义键时可能为空 {}。
 static func stations_cfg() -> Dictionary:
 	return ConfigDb.get_table("stations")
 
 
+## 连续拒绝/落空多少次后触发 guaranteeForced（balance.stations.guaranteeAfter）。
+##
+## 公开 API：UI 经 `IntentBus` → `GameSession`，勿在 presentation 改 state。
+## @return 整数结果（计数/下标/容量）。
 static func guarantee_after() -> int:
 	return int(
 		stations_cfg().get("guaranteeAfter", ConfigDb.require("balance.stations.guaranteeAfter"))
 	)
 
 
+## carriages.templates 单行；缺则 {}。
+##
+## 公开 API：UI 经 `IntentBus` → `GameSession`，勿在 presentation 改 state。
+## @param template_id 车厢/威胁模板 id
+## @return 结果字典；缺失语义键时可能为空 {}。
 static func carriage_template(template_id: String) -> Dictionary:
 	var root: Dictionary = ConfigDb.get_table("carriages")
 	var templates: Variant = root.get("templates", {})
@@ -43,15 +63,31 @@ static func carriage_template(template_id: String) -> Dictionary:
 	return {}
 
 
+## 挂车后日耗贡献（写入 offer.fuelPerDay，供搁置提示）。
+##
+## 公开 API：UI 经 `IntentBus` → `GameSession`，勿在 presentation 改 state。
+## @param template_id 车厢/威胁模板 id
+## @return 浮点结果（量/比率/工时）。
 static func fuel_per_day_add(template_id: String) -> float:
 	return float(carriage_template(template_id).get("fuelPerDayAdd", 1.0))
 
 
+## 列车逻辑位置 `progress_km` 是否已到达该站（±0.05 km 容差）。
+##
+## 公开 API：UI 经 `IntentBus` → `GameSession`，勿在 presentation 改 state。
+## @param seg 当前区段 `Segment`
+## @param station 段内车站字典 stations[] 元素
+## @return 是否成功或条件成立。
 static func at_station(seg: Segment, station: Dictionary) -> bool:
 	var target := float(station.get("progressKm", station.get("progress_km", 0.0)))
 	return seg.progress_km >= target - 0.05
 
 
+## 当前活跃段内、列车已到达且未收车的第一个站；含 segmentIndex/stationIndex。
+##
+## 公开 API：UI 经 `IntentBus` → `GameSession`，勿在 presentation 改 state。
+## @param state 当前局 `RunState`（就地修改字段）
+## @return 结果字典；缺失语义键时可能为空 {}。
 static func find_station_at_progress(state: RunState) -> Dictionary:
 	if state.region_run == null:
 		return {}
@@ -68,12 +104,21 @@ static func find_station_at_progress(state: RunState) -> Dictionary:
 	return {}
 
 
+## HUD「进站」按钮：停靠且在站里程内。
+##
+## 公开 API：UI 经 `IntentBus` → `GameSession`，勿在 presentation 改 state。
+## @param state 当前局 `RunState`（就地修改字段）
+## @return 是否成功或条件成立。
 static func can_manual_enter(state: RunState) -> bool:
 	if state.drive_intent != "stop":
 		return false
 	return not find_station_at_progress(state).is_empty()
 
 
+## END_DAY 链中、日结前：若停靠在车站上且未关闭弹窗，生成 offer 并写入 pending。
+##
+## 公开 API：UI 经 `IntentBus` → `GameSession`，勿在 presentation 改 state。
+## @param state 当前局 `RunState`（就地修改字段）
 static func after_day_travel(state: RunState) -> void:
 	if state.drive_intent != "stop":
 		return
@@ -90,6 +135,10 @@ static func after_day_travel(state: RunState) -> void:
 	state.pending_station = _pack_pending(hit)
 
 
+## Intent ENTER_STATION：同 after_day_travel 的 offer 生成逻辑，强制打开 pending。
+##
+## 公开 API：UI 经 `IntentBus` → `GameSession`，勿在 presentation 改 state。
+## @param state 当前局 `RunState`（就地修改字段）
 static func manual_enter(state: RunState) -> void:
 	var hit := find_station_at_progress(state)
 	if hit.is_empty():
@@ -101,6 +150,13 @@ static func manual_enter(state: RunState) -> void:
 	state.pending_station = _pack_pending(hit)
 
 
+## 随机池 + emptyChance + 零件可负担性；`forceLivingOffer` 为教程强制休息车。
+##
+## 公开 API：UI 经 `IntentBus` → `GameSession`，勿在 presentation 改 state。
+## @param state 当前局 `RunState`（就地修改字段）
+## @param _seg（Segment）
+## @param station 段内车站字典 stations[] 元素
+## @return 结果字典；缺失语义键时可能为空 {}。
 static func generate_offer(state: RunState, _seg: Segment, station: Dictionary) -> Dictionary:
 	if typeof(station.get("offer")) == TYPE_DICTIONARY and not station.offer.is_empty():
 		return station.offer
@@ -142,6 +198,12 @@ static func generate_offer(state: RunState, _seg: Segment, station: Dictionary) 
 	return station.offer
 
 
+## Intent RESOLVE_OFFER。accept：扣零件 append 车厢、清零 streak、tutorial_hook→tutorial_done。
+##
+## 公开 API：UI 经 `IntentBus` → `GameSession`，勿在 presentation 改 state。
+## @param state 当前局 `RunState`（就地修改字段）
+## @param accept 是否接受车站要约
+## @return 空串=成功；非空=机器错误码。
 static func resolve_offer(state: RunState, accept: bool) -> String:
 	var pending: Dictionary = state.pending_station
 	if pending.is_empty():
@@ -169,7 +231,7 @@ static func resolve_offer(state: RunState, accept: bool) -> String:
 		if state.parts < cost:
 			return "parts"
 		var tid := str(offer.get("templateId", ""))
-		state.parts -= float(cost)
+		InventoryService.remove(state, "parts", float(cost))
 		var tmpl := carriage_template(tid)
 		var car_id := "car_%s_%d" % [tid, state.carriages.size()]
 		state.carriages.append(
@@ -185,7 +247,8 @@ static func resolve_offer(state: RunState, accept: bool) -> String:
 		state.guarantee_fail_streak = 0
 		if skip_streak:
 			state.tutorial_done = true
-		ClimateService.recompute(state)
+		ClimateService.refresh(state)
+		MemberRoster.assign_daily_jobs(state)
 		TelemetryService.record(
 			"carriage_hung",
 			{
@@ -219,6 +282,12 @@ static func resolve_offer(state: RunState, accept: bool) -> String:
 	return ""
 
 
+## 搁置按钮旁灰字；经 hud_hints.offerDeferCodes 转中文 UI 文案。
+##
+## 公开 API：UI 经 `IntentBus` → `GameSession`，勿在 presentation 改 state。
+## @param state 当前局 `RunState`（就地修改字段）
+## @param offer 车站要约快照（pending_station 形状）
+## @return 空串=成功；非空=机器错误码。
 static func offer_defer_hint(state: RunState, offer: Dictionary) -> String:
 	if offer.is_empty():
 		return ""
@@ -230,11 +299,18 @@ static func offer_defer_hint(state: RunState, offer: Dictionary) -> String:
 	if typeof(codes) == TYPE_DICTIONARY:
 		var row: Variant = codes.get(code, {})
 		if typeof(row) == TYPE_DICTIONARY:
-			var ui: String = str(row.get("ui", code))
-			return ui
+			var ui_key := str(row.get("uiKey", ""))
+			if ui_key != "":
+				return LocaleApi.tr_key(ui_key, code)
+			return str(row.get("ui", code))
 	return code
 
 
+## 进站面板只读快照（索引 + offer 副本），避免 UI 直接改 segment 内 station。
+##
+## 模块内部实现；调用方限于本文件或同层 Service。
+## @param hit find_point 返回 { segment, pointIndex, point }
+## @return 结果字典；缺失语义键时可能为空 {}。
 static func _pack_pending(hit: Dictionary) -> Dictionary:
 	var st: Dictionary = hit.station
 	var offer: Variant = st.get("offer")
@@ -249,6 +325,16 @@ static func _pack_pending(hit: Dictionary) -> Dictionary:
 	}
 
 
+## 写入 station.offer 的标准形状，供 UI 与 resolve_offer 读取。
+##
+## 模块内部实现；调用方限于本文件或同层 Service。
+## @param tid（String）
+## @param condition（String）
+## @param repair（int）
+## @param guarantee_forced（bool）
+## @param affordable（bool）
+## @param tutorial（bool）
+## @return 结果字典；缺失语义键时可能为空 {}。
 static func _make_offer(
 	tid: String,
 	condition: String,
@@ -268,6 +354,13 @@ static func _make_offer(
 	}
 
 
+## visit_missed=true；非 tutorialHook 时 streak+1 并 telemetry carriage_miss。
+##
+## 模块内部实现；调用方限于本文件或同层 Service。
+## @param state 当前局 `RunState`（就地修改字段）
+## @param station 段内车站字典 stations[] 元素
+## @param skip_streak（bool）
+## @param reason（String）
 static func _record_miss(state: RunState, station: Dictionary, skip_streak: bool, reason: String) -> void:
 	station.visit_missed = true
 	station.miss_reason = reason
@@ -280,6 +373,12 @@ static func _record_miss(state: RunState, station: Dictionary, skip_streak: bool
 	)
 
 
+## 按站规模 small/medium/large 从 stations.pools 抽 templateId。
+##
+## 模块内部实现；调用方限于本文件或同层 Service。
+## @param size 车站规模 small/medium/large
+## @param _force（bool）
+## @return 空串=成功；非空=机器错误码。
 static func _pick_from_pool(size: String, _force: bool) -> String:
 	var pools: Variant = stations_cfg().get("pools", {})
 	if typeof(pools) != TYPE_DICTIONARY:
@@ -291,6 +390,10 @@ static func _pick_from_pool(size: String, _force: bool) -> String:
 	return str(pool[idx])
 
 
+## 非保底时加权抽车况 intact/damaged/wreck。
+##
+## 模块内部实现；调用方限于本文件或同层 Service。
+## @return 空串=成功；非空=机器错误码。
 static func _pick_condition() -> String:
 	var weights: Variant = stations_cfg().get("conditionWeights", {"intact": 0.15, "damaged": 0.6, "wreck": 0.25})
 	if typeof(weights) != TYPE_DICTIONARY:

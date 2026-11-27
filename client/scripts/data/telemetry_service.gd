@@ -1,9 +1,12 @@
 extends Node
-## Dev telemetry (09 §4.2). Appends JSON lines to user://telemetry.jsonl.
+## 开发遥测（Autoload TelemetryService）：追加 JSON Lines 到 user://telemetry.jsonl（09 §4.2）。
+##
+## 各 Service 在关键决策点 record(event, payload)；冒烟检查 search_assign / carriage_abandon 等。
+## 不入正式发行包时可整 Autoload 剥离；与 SaveService 独立，不写存档。
 
 const LOG_PATH := "user://telemetry.jsonl"
 
-
+## 追加一行 telemetry.jsonl。
 func record(event_name: String, payload: Dictionary = {}) -> void:
 	var row: Dictionary = {"event": event_name, "ts_ms": Time.get_unix_time_from_system() * 1000}
 	for k in payload.keys():

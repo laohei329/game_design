@@ -1,6 +1,8 @@
 class_name SoftLockProbe
 extends RefCounted
-## §12.7 软锁自检（内存态 · S1a.7 前每周）
+## 软锁审计：DebugOverlay F3 与无头末尾调用 `audit(state)`。
+##
+## 检查：库存非负、failed 闸、末节动力不可遗弃、search cap 配置可读等；返回 { ok, lines }。
 
 
 static func audit(state: RunState) -> Dictionary:
@@ -15,13 +17,20 @@ static func audit(state: RunState) -> Dictionary:
 	else:
 		lines.append("OK 库存非负")
 
+	if state.failed != "":
+		lines.append("FAIL 归零闸门 failed=%s" % state.failed)
+		ok = false
+
 	lines.append("guaranteeFailStreak=%d (拒×4 后期望≥4)" % state.guarantee_fail_streak)
 
+	TrainService.reconcile_outdoor_tasks(state)
+	HaulService.recall_haul(state, {"pointId": ""})
+	TrainService.reconcile_outdoor_tasks(state)
 	var last_loco := _sole_power_id(state)
 	if last_loco != "":
 		var r := TrainService.can_abandon(state, last_loco)
 		if r == "last_locomotive":
-			lines.append("OK 末节动力不可遗弃")
+			lines.append("OK 最少保留一节动力")
 		else:
 			ok = false
 			lines.append("FAIL 末节动力应不可遗弃 got=%s" % r)
@@ -33,7 +42,7 @@ static func audit(state: RunState) -> Dictionary:
 
 	return {"ok": ok, "lines": lines}
 
-
+## 若编组仅一节 `templateId==power`，返回其 `id`；否则空串（软锁规则输入）。
 static func _sole_power_id(state: RunState) -> String:
 	var found := ""
 	var count := 0

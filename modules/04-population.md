@@ -31,8 +31,9 @@
 
 ## 2. 成员字段（必须存档）
 
-`id, name, age, background, specialties, flaw, hp, loyalty, mood, job, jobTrack, carId, relations, desire, deathQuote, injuries, disease, antibodies, traits, combatRoster, loadout, taskState, abilities[{id,lv,proficiency,cooldownUntilDay}]`
+`id, name, age, background, specialties, flaw, hp, loyalty, mood, job, jobTrack, carId, relations, desire, deathQuote, injuries, disease, antibodies, traits, combatRoster, loadout, taskState, abilities[{id,lv,proficiency,cooldownUntilDay}], hunger, thirst`
 
+- `hunger` / `thirst`：**0–100**，S1b 客户端逐人饥渴（Banished 式日内 tick + 日结 `reconcile` 锁日总耗，见 [02 §8 步骤 2](02-resources.md)、[01 §2.3](01-time-season.md)）；从全车粮水池取食（非个人库存）  
 - `job`：闭合枚举，见 §4.2  
 - `jobTrack`：由 `job` 推导：`production | combat | support | labor | none`  
 - `specialties[]`：0–2 个专长标签（§4.5）；旧存档单值 `skill` 迁移为单元素数组  
@@ -103,19 +104,20 @@
 4. `crafter`（有工坊空位）  
 5. `pharmacist`（有医疗车空槽）  
 6. `radar_op`  
-7. 不自动派 `guard` / `labor` / `none`（需玩家或事件；**开局例外**见 §4.3.1）
+7. 不自动派 `guard` / `labor` / `none`（需玩家或事件）
 
 ### 4.3.1 开局四人编制（权威）
 
-开局编组仅动力 + 休息 + 货舱（无种植/净水/医疗/工坊/雷达槽）。四人固定：
+开局编组仅动力 + 休息 + 货舱（无种植/净水/医疗/工坊/雷达槽）。四人固定 **4 人**；`job` 初始均为 `none`，由玩家在搜索面板指派（`SET_MEMBER_JOB`）。专长与 `combatRoster` 仍按 `archetypes.json` 权威：
 
-| 人数 | `job` | 说明 |
-|---|---|---|
-| 1 | `engineer` | 填唯一动力看护槽（否则首日即有失护检定） |
-| 1 | `guard` | `combatRoster=true`；保证默认编队上场 ≥1（[05 §2](05-combat.md)） |
-| 2 | `labor` | 早期搬运为主；亦可点名搜索（教「搜≠岗」） |
+| 槽序 | `job`（开局） | 专长 / 战斗 | 说明 |
+|---|---|---|---|
+| 1 | `none` | — | 玩家可派 `engineer` 等填动力看护 |
+| 2 | `none` | `combat_drill`，`combatRoster=true` | 保证默认编队可上场 ≥1（[05 §2](05-combat.md)） |
+| 3 | `none` | `haul` | 早期搬运/搜索教学 |
+| 4 | `none` | `scavenge` | 搜刮倾向；搜索不占岗（§5.1） |
 
-禁止开局四人全 `none` 或名册为空。收留新人：按 `archetypes.json` 倾向赋 `job`，再跑自动填槽；无倾向则 `none`。
+开局**不**在 `seed` 时跑自动填槽；日末 `assign_daily_jobs` 仍可从 `none`/`labor` 池填功能车空槽。禁止开局名册为空。收留新人：按 `archetypes.json` 倾向赋 `job`，再跑自动填槽；无倾向则 `none`。
 
 ### 4.4 医疗槽：药剂师（合一）
 
@@ -210,6 +212,8 @@
 ```
 
 校验：1 人无专长 → 1.0；1 人有 `scavenge` → ≈0.85；2 人皆无 → 0.85。  
+
+**S1b 客户端工时与日钟（与上式并行，薄实现）**：搜索/搬运进度由 `balance.search.hoursProgressPerDay` / `balance.haul.hoursProgressPerDay` 按 **`day_delta` 积分**；仅 `driveIntent==outdoorWorkRequiresIntent`（默认 `stop`）推进；日末补 `outdoorEligible−outdoorTick`（[01 §2.3](01-time-season.md)）。完整游戏小时公式仍为权威，sim/对表可先走日结补课路径。
 **禁止**把「贡献小时 0.85」直接做分母分子颠倒（会变成专长反而变慢）。  
 下限 0.5 作用在**总时长**。重复搜索受伤见 [02 §7](02-resources.md)。收留见 [06 §2.2](06-region-events.md)。
 

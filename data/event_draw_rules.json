@@ -1,5 +1,5 @@
 {
-  "configVersion": 25,
+  "configVersion": 26,
   "authority": "modules/06-region-events.md §2.3",
   "foodNeedPerCapita": 2.0,
   "waterNeedPerCapita": 1.5,

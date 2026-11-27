@@ -5,7 +5,7 @@
 > **配置权威**：仓库 [`data/`](../data/) · `configVersion` **25** · 存档 `version.save` **12**  
 > 对齐：[architecture](../architecture.md) §3–4 · [09](09-data-platform.md) · [02 §8](02-resources.md) · [08 §4](08-presentation.md)  
 > **本页含**：代码分层 + 阶段一玩法切片 + S2 事件接入  
-> **状态**：`client/` **S0 骨架已落**（ConfigDb · Intent · defer · abandon · telemetry）；**实施勾选**：[开发计划 §12](../开发计划.md#12-godot-单人实施client)；切片见 §9–10
+> **状态**：`client/` **S1a 可玩 + S1b 入口已接**（三选一 · 科技 Lv1 薄 · 日结 6–8 薄 · 杀进程冒烟）；**勾选**：[开发计划 §12](../开发计划.md#12-godot-单人实施client) · **审计**：[qa/DEV-code-audit-2026-11-26.md](../qa/DEV-code-audit-2026-11-26.md)
 
 ---
 
@@ -56,6 +56,7 @@ res://
       migrations/
         v11_to_v12.gd            # … 按 09 链
     domain/                      # 纯 RefCounted / Resource，无 Node
+      population_rules.gd        # balance.population / fuelTank 阈值 API
       run_state.gd
       carriage.gd
       member.gd
@@ -70,6 +71,7 @@ res://
       weather_draw.gd
     economy/
       inventory_service.gd
+      member_morale.gd           # 日结逐人 mood（sim morale_settle 成员环）
       day_settle.gd
       production_service.gd
       fuel_f04.gd
@@ -89,6 +91,18 @@ res://
     app/
       game_session.gd            # Autoload GameSession
       intent_bus.gd              # Autoload IntentBus
+      session_intent_router.gd     # Intent 表驱动分发（Lifecycle→Train→World）
+      session_intents_lifecycle.gd # 局周期 / 时间 / 供暖 / 存读档
+      session_intents_train.gd     # 驾驶 · 搜索/搬运 · 进站 · 遗弃
+      session_intents_world.gd     # 三选一 · 科技 · 战斗 · 事件选项
+    qa/                          # 无头冒烟（不进正式包；仓库 tools/run_all_smoke.ps1 驱动）
+      headless_smoke.gd
+      smoke_assertions.gd          # 薄门面（API 稳定，headless 只调此类名）
+      smoke_assertions_helpers.gd  # Intent 驱动 · 搜索复位 · telemetry 扫描
+      smoke_assertions_core.gd    # 场景 · ConfigDb · 开局 · 日结差分
+      smoke_assertions_world.gd   # 气候 · 车站 · 搜索 cap · 战斗/科技/区域
+      smoke_assertions_outdoor.gd  # 户外日钟 · runtime 存档 roundtrip
+      smoke_assertions_events.gd # 事件链 · EventOps · 读档 · 招募 morale
     presentation/
       hud_top.gd
       rail_view.gd
@@ -128,7 +142,7 @@ domain       → （无服务依赖；可被任意层引用）
 |---|---|---|
 | `ConfigDb` | `config_db.gd` | 启动加载 manifest 与全表；`get_path` / `require` |
 | `RngService` | `rng_service.gd` | 局内 RNG；可序列化种子 |
-| `GameSession` | `game_session.gd` | 持有 `RunState`；新局/读档/日推进入口 |
+| `GameSession` | `game_session.gd` | 持有 `RunState`；订阅 `IntentBus`，意图经 `SessionIntentRouter` 分域处理 |
 | `IntentBus` | `intent_bus.gd` | UI → 玩法意图信号 |
 | `SaveService` | `save_service.gd` | 路径、原子写、迁移、槽位 |
 
@@ -219,6 +233,7 @@ config_version() -> int
 | `SET_DRIVE_INTENT` | `cruise\|slow\|stop` | 写 driveIntent；影响 F04 速度系数 |
 | `ENTER_STATION` | `segmentIndex`, `stationIndex` | 打开发现流程 |
 | `RESOLVE_OFFER` | `accept: bool` | 修挂或放弃；更新保底 streak |
+| `SET_MEMBER_JOB` | `memberId`, `job` | 玩家指派岗位（搜索面板） |
 | `ASSIGN_SEARCH` | `memberIds[]`, `pointId` | 开始搜索任务 |
 | `RECALL_SEARCH` | `memberIds[]?` | 召回 |
 | `END_DAY` | — | 完整日结（02 §8 顺序） |
@@ -232,8 +247,44 @@ config_version() -> int
 | `BUY_UPGRADE` | S1b |
 | `START_COMBAT_L1` / `CHOOSE_TACTIC` | S1b |
 | `SAVE_GAME` / `LOAD_GAME` | S1b |
-| `CHOOSE_EVENT_OPTION` | S2 |
+| `CHOOSE_EVENT_OPTION` | S1b（薄 · `EventOps`） |
 | `ENTER_SPUR` / `SKIP_SPUR` | S2 |
+
+### 4.4 GameSession 意图分发（`SessionIntentRouter`）
+
+**接线**：`presentation` → `IntentBus.emit_intent` → `GameSession._on_intent` → `SessionIntentRouter.dispatch`。
+
+**表驱动顺序**（短路与 §4 目录一致，先生命周期再列车再世界）：
+
+| 模块 | 脚本 | 典型 Intent |
+|---|---|---|
+| Lifecycle | `session_intents_lifecycle.gd` | `NEW_RUN` · `END_DAY`/`ADVANCE_DAY` · `SET_TIME_SPEED` · `TOGGLE_TIME_PAUSE` · `SET_HEATING` · `SAVE_GAME`/`LOAD_GAME` |
+| Train | `session_intents_train.gd` | `SET_DRIVE_INTENT` · `ASSIGN_SEARCH`/`RECALL_SEARCH` · `OPEN_SEARCH`/`CLOSE_SEARCH` · `ASSIGN_HAUL`/`RECALL_HAUL` · `ENTER_STATION` · `RESOLVE_OFFER` · `ABANDON_CARRIAGE` · `OPEN_ABANDON`/`CLOSE_ABANDON` |
+| World | `session_intents_world.gd` | `PICK_REGION` · `CLOSE_REGION_PICK` · `OPEN_TECH`/`CLOSE_TECH` · `BUY_UPGRADE` · `OPEN_COMBAT`/`CLOSE_COMBAT` · `RESOLVE_COMBAT_*` · `CHOOSE_EVENT_OPTION` |
+
+各域实现 `try_handle(session, intent_name, payload) -> int`：
+
+| 返回值 | 含义 |
+|---|---|
+| `-1` | 本域未识别，交给下一域 |
+| `0` | 已处理；**不**自动 `state_changed`（如 `NEW_RUN` 自备刷新） |
+| `1` | 已处理；路由器代发 `GameSession.state_changed` |
+
+新增 Intent：**先**落入上表对应 `match`，**再**在 §4.1–4.3 补一行登记；禁止在 `game_session.gd` 再写巨型 `match`。
+
+实现约定：`session_intent_router.gd` 与 `game_session.gd` 对域模块 **`preload`**；路由器用 `call("try_handle", …)` 调用静态入口，避免全局 `class_name` 未注册时的编译顺序问题。
+
+### 4.5 无头冒烟断言布局（`scripts/qa/`）
+
+| 项 | 约定 |
+|---|---|
+| 入口 | `headless_smoke.gd`（Godot `--headless`）；仓库侧 [`tools/run_all_smoke.ps1`](../tools/run_all_smoke.ps1) |
+| 对外 API | 仅 `SmokeAssertions`（`smoke_assertions.gd`）；**禁止** headless 直接引用 `SmokeAssertionsWorld` 等子模块 |
+| 断言实现 | 按主题拆文件（见 §1.1 `qa/` 树）；子模块可 `preload` `smoke_assertions_helpers.gd` 做 Intent 驱动 |
+| 新增用例 | 逻辑写入最贴切的主题 `.gd`，在门面加一行 `static` 委托；cap/机器码等需直连 Service 的例外在子模块内注释说明 |
+| 再拆分 | 可选跑 [`tools/split_smoke_assertions.py`](../tools/split_smoke_assertions.py)（按 `static func` 名分组；门面需 hand-tune `preload`） |
+
+与 §11：`sim/` Python 沙盒与 `qa/` Godot 冒烟**并列**验收通道；玩家运行时**不** Autoload `SmokeAssertions`。
 
 ---
 
@@ -413,10 +464,11 @@ S0.2 须加载 manifest 全表；缺文件加载器报键名。
 
 ## 11. 与 sim · 排期 · 风险
 
-| | sim | Godot |
+| | sim | Godot `scripts/qa/` |
 |---|---|---|
-| 职责 | 冒烟 | 玩家权威运行时 |
+| 职责 | 配置/表级冒烟 | 无头 `headless_smoke` + `SmokeAssertions` 切片 |
 | 配置 | 同 data/ | 同 data/ |
+| 触发 | sim 脚本 | `tools/run_all_smoke.ps1` |
 
 | 周 | 焦点 | 退出 |
 |---|---|---|

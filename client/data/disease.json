@@ -1,5 +1,5 @@
 {
-  "configVersion": 25,
+  "configVersion": 26,
   "authority": "modules/04-population.md §7",
   "streakThreshold": 3,
   "hungerLatentCheckP": 0.35,

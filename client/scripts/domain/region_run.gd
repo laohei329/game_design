@@ -1,6 +1,9 @@
 class_name RegionRun
 extends RefCounted
-## 06 §0 RegionRun · 一次行程内多段
+## 区域跨度：玩家三选一某 region 后，连续跑 `segment_count` 个 Segment 的容器。
+##
+## `segment_index` 指向当前活跃段；跨段时 index++ 或末段结束弹三选一。
+## `point_type_weight_mods` 影响本跨度内搜索点类型权重（regions.json）。
 
 var region_id: String = "urban"
 var segment_count: int = 3
@@ -10,6 +13,7 @@ var point_type_weight_mods: Dictionary = {}
 var segments: Array = []
 
 
+## segments[segment_index] 若为 Segment 实例则返回，否则 null。
 func active_segment() -> Segment:
 	if segments.is_empty():
 		return null
@@ -18,7 +22,7 @@ func active_segment() -> Segment:
 	var seg: Variant = segments[segment_index]
 	return seg as Segment if seg is Segment else null
 
-
+## 导出存档/调试用 Dictionary。
 func to_dict() -> Dictionary:
 	var seg_out: Array = []
 	for s in segments:

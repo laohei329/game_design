@@ -259,6 +259,8 @@
 面板 0–80+ km/h = **战术瞬时速度**（刹车/碰撞/召回），**不是**「一天按此时速跑满 24h」。  
 战略推进靠 **行驶日额度** `driveHoursPerDayCap`（[01 §2.2](01-time-season.md)）：每日只折合有限有效前进小时，用来锁区域节奏。
 
+**S1b 客户端（Godot）**：日内 `DriveService.tick_travel(state, day_delta)` 按日历份额累加 `driveHoursToday`/`reverseHoursToday` 与 `progressKm`；日界 `_advance_one_day` 开头 `accrue_end_of_day` **仅补** tick 未满额度（前进/倒车对称）。与 [01 §2.3](01-time-season.md) 同一 `day_delta` 源。
+
 **量定义（唯一实现口径）**：
 
 | 符号 | 定义 |

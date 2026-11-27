@@ -1,0 +1,88 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/presentation/combat_panel.gd" id="1_cp"]
+
+[node name="CombatPanel" type="PanelContainer"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -150.0
+offset_right = 300.0
+offset_bottom = 150.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_cp")
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 12
+
+[node name="VBox" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Title" type="Label" parent="Margin/VBox"]
+layout_mode = 2
+text = "遭遇"
+horizontal_alignment = 1
+
+[node name="Body" type="Label" parent="Margin/VBox"]
+layout_mode = 2
+autowrap_mode = 3
+
+[node name="Hint" type="Label" parent="Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.72, 0.65, 1)
+autowrap_mode = 3
+
+[node name="RowFight" type="HBoxContainer" parent="Margin/VBox"]
+layout_mode = 2
+alignment = 1
+
+[node name="L1Check" type="Button" parent="Margin/VBox/RowFight"]
+layout_mode = 2
+text = "L1 强攻检定"
+
+[node name="RowPaths" type="HBoxContainer" parent="Margin/VBox"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 6
+
+[node name="Negotiate" type="Button" parent="Margin/VBox/RowPaths"]
+layout_mode = 2
+text = "谈判"
+
+[node name="Bypass" type="Button" parent="Margin/VBox/RowPaths"]
+layout_mode = 2
+text = "绕行"
+
+[node name="Horn" type="Button" parent="Margin/VBox/RowPaths"]
+layout_mode = 2
+text = "鸣笛"
+
+[node name="Evacuate" type="Button" parent="Margin/VBox/RowPaths"]
+layout_mode = 2
+text = "徒步"
+
+[node name="RowFail" type="HBoxContainer" parent="Margin/VBox"]
+layout_mode = 2
+alignment = 1
+visible = false
+
+[node name="Retreat" type="Button" parent="Margin/VBox/RowFail"]
+layout_mode = 2
+text = "撤离"
+
+[node name="Escalate" type="Button" parent="Margin/VBox/RowFail"]
+layout_mode = 2
+text = "升级 L2（未实装）"
+
+[node name="BtnClose" type="Button" parent="Margin/VBox"]
+layout_mode = 2
+text = "关闭"

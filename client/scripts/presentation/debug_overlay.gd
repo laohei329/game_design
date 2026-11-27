@@ -1,12 +1,11 @@
 extends CanvasLayer
+## F3 调试层：气候倍率、区段/天气、存读档与 dev regionFuelMult（仅开发验收，非玩家向 UI）。
 
 @onready var _panel: PanelContainer = $Panel
 @onready var _body: Label = $Panel/Margin/VBox/Body
 @onready var _btn_save: Button = $Panel/Margin/VBox/DevRow/DevSave
 @onready var _btn_load: Button = $Panel/Margin/VBox/DevRow/DevLoad
 @onready var _btn_mult: Button = $Panel/Margin/VBox/DevRegionMult
-
-
 func _ready() -> void:
 	visible = false
 	_btn_save.pressed.connect(func() -> void: IntentBus.emit_intent("SAVE_GAME", {"slot": 0}))
@@ -15,17 +14,17 @@ func _ready() -> void:
 	GameSession.state_changed.connect(_refresh)
 	_refresh()
 
-
+## 切换 F3 调试 Overlay 显示。
 func toggle() -> void:
 	visible = not visible
 	if visible:
 		_refresh()
 
-
+## F3 Overlay：从 `GameSession.state` 拉取日历/段/资源一行行文本。
 func _refresh() -> void:
 	var st := GameSession.state
 	if st == null:
-		_body.text = "no RunState"
+		_body.text = LocaleApi.tr_key("debug.no_state")
 		return
 	_body.text = (
 		"configVersion=%d\n"
@@ -46,13 +45,18 @@ func _refresh() -> void:
 		+ "beds=%d onboard=%d scrap=%.1f\n"
 		% [TrainService.bed_count(st), TrainService.onboard_count(st), st.scrap]
 		+ _soft_lock_block(st)
-		+ "guaranteeFailStreak=%d cars=%d\n"
-		% [st.guarantee_fail_streak, st.car_count()]
+		+ "tech pwr=%d arm=%d rad=%d liv=%d vision=%d\n"
+		% [st.power_tech, st.armor_tech, st.radar_tech, st.living_tech, TechService.effective_vision(st)]
+		+ "guaranteeFailStreak=%d cars=%d precision=%.0f moraleOff=%.0f\n"
+		% [st.guarantee_fail_streak, st.car_count(), st.precision, st.morale_offset]
+		+ "pressure=%s hist=%s\n"
+		% [st.pressure_display, str(st.pressure_history)]
 		+ "foodZeroStreak=%d waterZeroStreak=%d fuelZeroStreak=%d"
 		% [st.food_zero_streak, st.water_zero_streak, st.fuel_zero_streak]
 	)
 
 
+## 内嵌 §12.7 探针结果，供编辑器 F3 肉眼签 S1a.7。
 func _soft_lock_block(st: RunState) -> String:
 	var rep: Dictionary = SoftLockProbe.audit(st)
 	var lines: Variant = rep.get("lines", [])
@@ -67,7 +71,7 @@ func _soft_lock_block(st: RunState) -> String:
 		out += "probe=CHECK\n"
 	return out
 
-
+## 格式化 `region_run` 段 id、weather、event 态为多行调试字串。
 func _region_run_lines(st: RunState) -> String:
 	if st.region_run == null:
 		return "\nregionRun=(none)"
@@ -85,6 +89,7 @@ func _region_run_lines(st: RunState) -> String:
 	return "\nregionRun=%s seg %d/%d%s" % [rr.region_id, rr.segment_index + 1, rr.segment_count, extra]
 
 
+## S0.5 验收：1.0 ↔ 1.3 切换 regionFuelMult，验证 fuelClimate 非硬编码。
 func _on_dev_region_mult() -> void:
 	var st := GameSession.state
 	if st == null:
@@ -93,5 +98,5 @@ func _on_dev_region_mult() -> void:
 		st.region_fuel_mult = 1.0
 	else:
 		st.region_fuel_mult = 1.3
-	ClimateService.recompute(st)
+	ClimateService.refresh(st)
 	GameSession.state_changed.emit()

@@ -1,6 +1,9 @@
 class_name FuelF04
 extends RefCounted
-## 02 §4 F04 — daily fuel burn (% of cap); step 0 uses **current** fuel_climate (pre–step 1 recompute).
+## 02 §4 F04 — 日油耗占油舱上限的百分比。
+##
+## DaySettle 步骤 0 在步骤 1 `ClimateService.refresh` **之前**调用，
+## 故使用「上一日结束时刻」的 fuel_climate 与 driveHoursToday。
 
 
 static func loco_count(state: RunState) -> int:
@@ -11,6 +14,11 @@ static func loco_count(state: RunState) -> int:
 	return n
 
 
+## 各节 fuelPerDayAdd 之和 + 额外动力节惩罚。
+##
+## F04 子函数：`DaySettle.run` 步骤 0/3 前读 `driveHoursToday` 与气候乘子。
+## @param state 当前局 `RunState`（就地修改字段）
+## @return 浮点结果（量/比率/工时）。
 static func sum_car_fuel_add(state: RunState) -> float:
 	var templates: Dictionary = ConfigDb.get_table("carriages").get("templates", {})
 	var add := 0.0
@@ -23,6 +31,11 @@ static func sum_car_fuel_add(state: RunState) -> float:
 	return add
 
 
+## 多动力/动力科技造成的牵引系数（有 floor）。
+##
+## F04 子函数：`DaySettle.run` 步骤 0/3 前读 `driveHoursToday` 与气候乘子。
+## @param state 当前局 `RunState`（就地修改字段）
+## @return 浮点结果（量/比率/工时）。
 static func traction(state: RunState) -> float:
 	var per_loco := float(ConfigDb.require("balance.fuel.tractionPerLoco"))
 	var per_tech := float(ConfigDb.require("balance.fuel.tractionPerPowerTech"))
@@ -31,6 +44,13 @@ static func traction(state: RunState) -> float:
 	return maxf(floor_v, 1.0 - per_loco * minf(3, n) - per_tech * float(state.power_tech))
 
 
+## 给定速度系数下全日油耗率（再按小时比例折算）；含 region×climate 上限 3。
+##
+## F04 子函数：`DaySettle.run` 步骤 0/3 前读 `driveHoursToday` 与气候乘子。
+## @param state 当前局 `RunState`（就地修改字段）
+## @param speed_coef F04 速度系数（forward 额度折算）
+## @param craft_day 是否工艺日附加油耗分支
+## @return 浮点结果（量/比率/工时）。
 static func daily_rate_at_speed_coef(state: RunState, speed_coef: float, craft_day: bool = false) -> float:
 	var base := float(ConfigDb.require("balance.fuel.base"))
 	var add := sum_car_fuel_add(state)
@@ -38,7 +58,14 @@ static func daily_rate_at_speed_coef(state: RunState, speed_coef: float, craft_d
 	var mult := minf(speed_coef * state.fuel_climate * state.region_fuel_mult, 3.0)
 	return (base + add) * traction(state) * mult + craft
 
-
+## F04：本日小时 → 速度/停靠油耗系数。
+##
+## F04 子函数：`DaySettle.run` 步骤 0/3 前读 `driveHoursToday` 与气候乘子。
+## @param state 当前局 `RunState`（就地修改字段）
+## @param forward_h（float）
+## @param reverse_h（float）
+## @param dock_h（float,）
+## @return 浮点结果（量/比率/工时）。
 static func daily_speed_coef_from_hours(
 	state: RunState,
 	forward_h: float,
@@ -56,6 +83,12 @@ static func daily_speed_coef_from_hours(
 	return (eff_fwd * cruise + reverse_h * slow + dock_h * dock) / 24.0
 
 
+## 返回「占 fuel_cap 的百分比」当日应扣燃油（DaySettle 步骤 3 直接减在 fuel 上）。
+##
+## F04 子函数：`DaySettle.run` 步骤 0/3 前读 `driveHoursToday` 与气候乘子。
+## @param state 当前局 `RunState`（就地修改字段）
+## @param craft_day 是否工艺日附加油耗分支
+## @return 浮点结果（量/比率/工时）。
 static func compute_day_burn_percent(state: RunState, craft_day: bool = false) -> float:
 	var cap := float(ConfigDb.require("balance.time.driveHoursPerDayCap"))
 	var cruise := float(ConfigDb.require("balance.fuel.speedCoefCruise"))

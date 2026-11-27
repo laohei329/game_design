@@ -1,10 +1,16 @@
 {
-  "configVersion": 25,
+  "configVersion": 26,
   "time": {
     "secondsPerDay": 180,
     "daysPerSeason": 30,
     "seasonsPerYear": 4,
-    "driveHoursPerDayCap": 1.0
+    "driveHoursPerDayCap": 1.0,
+    "metabolismMultByIntent": {
+      "stop": 1.35,
+      "forward": 0.55,
+      "reverse": 0.75
+    },
+    "outdoorWorkRequiresIntent": "stop"
   },
   "start": {
     "food": 20,
@@ -15,11 +21,118 @@
     "med": 4,
     "precision": 40
   },
+  "population": {
+    "foodPerCapitaDay": 0.9,
+    "waterPerCapitaDay": 0.8,
+    "hungerRisePerDay": 48.0,
+    "thirstRisePerDay": 52.0,
+    "eatUrgeThreshold": 18.0,
+    "drinkUrgeThreshold": 18.0,
+    "satisfactionHungerPerFullDayRation": 55.0,
+    "satisfactionThirstPerFullDayRation": 50.0,
+    "starvingHungerThreshold": 90.0,
+    "hpLossPerDayAtStarving": 22.0,
+    "injuredHpThreshold": 30,
+    "moodMin": 0,
+    "moodMax": 100,
+    "moodDefault": 70,
+    "moraleOffsetMin": -60,
+    "moraleOffsetMax": 60,
+    "moralePartyDeltaMin": -20,
+    "moralePartyDeltaMax": 20,
+    "moraleFoodZeroPenalty": 13,
+    "moraleWaterZeroPenalty": 16,
+    "moraleOffsetRecoverPerDay": 2,
+    "moraleOffsetDecayPositivePerDay": 1,
+    "moraleZeroStreakFail": 3,
+    "f39HpLoss": 20,
+    "bodyHpBreakdownThreshold": 30,
+    "jobAssignLaborKeepMin": 2,
+    "jobSlotsPerWorkshop": 2,
+    "moodDailyBaseDelta": -1.5,
+    "moodDailyNoJobPenalty": -2.0,
+    "moodDailyBeddedBonus": 1.0,
+    "moodDailyUnbeddedPenalty": -3.0,
+    "moodDailyRationBonus": 0.8,
+    "moodDailyLivingTechPerLevel": 0.2
+  },
   "seasonNodeMult": {
     "winterFuelStation": 1.4,
     "summerWater": 1.4,
     "springSupply": 1.2,
     "autumnSupply": 1.3
+  },
+  "inventory": {
+    "_authority": "modules/02-resources.md §6（S1a 货舱 size 线性增量）",
+    "base": {
+      "food": 60,
+      "water": 60,
+      "parts": 20,
+      "scrap": 30,
+      "medicine": 15,
+      "seed": 20,
+      "chem": 15,
+      "cloth": 20
+    },
+    "cargoPerSize": {
+      "foodWater": 10,
+      "partsMedicineChemTenth": 10,
+      "scrap": 8,
+      "seed": 4,
+      "cloth": 5
+    },
+    "unknownResourceCap": 9999
+  },
+  "fuelTank": {
+    "_note": "S1a 绝对油库容量；正式百分比口径见 02 §6",
+    "baseAmount": 60,
+    "perCargoSize": 10
+  },
+  "travel": {
+    "_authority": "modules/03-train.md §6.2 走廊速度",
+    "corridorMult": 2.5,
+    "tacticalBaseKmh": 60,
+    "tacticalDivisor": 30
+  },
+  "eventDraw": {
+    "scenarioEventRate": 1.0,
+    "_note": "难度档 event 乘子延后；接 difficulty 前固定 1.0"
+  },
+  "inventory": {
+    "_authority": "modules/02-resources.md §6（S1a 货舱 size 线性增量）",
+    "base": {
+      "food": 60,
+      "water": 60,
+      "parts": 20,
+      "scrap": 30,
+      "medicine": 15,
+      "seed": 20,
+      "chem": 15,
+      "cloth": 20
+    },
+    "cargoPerSize": {
+      "foodWater": 10,
+      "partsMedicineChemTenth": 10,
+      "scrap": 8,
+      "seed": 4,
+      "cloth": 5
+    },
+    "unknownResourceCap": 9999
+  },
+  "fuelTank": {
+    "_note": "S1a 绝对油库容量；正式百分比口径见 02 §6",
+    "baseAmount": 60,
+    "perCargoSize": 10
+  },
+  "travel": {
+    "_authority": "modules/03-train.md §6.2 走廊速度",
+    "corridorMult": 2.5,
+    "tacticalBaseKmh": 60,
+    "tacticalDivisor": 30
+  },
+  "eventDraw": {
+    "scenarioEventRate": 1.0,
+    "_note": "难度档 event 乘子延后；接 difficulty 前固定 1.0"
   },
   "fuel": {
     "base": 3.0,

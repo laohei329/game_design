@@ -1,5 +1,5 @@
 {
-  "configVersion": 25,
+  "configVersion": 26,
   "authority": "AUDIT D7 · launch scope",
   "defaultId": "normal",
   "launchTiers": [
@@ -16,6 +16,7 @@
       "multipliers": {
         "nodeYield": 1.0,
         "threatPressure": 1.0,
+        "eventDrawRate": 1.0,
         "repairCost": 1.0,
         "diseaseSpread": 1.0
       },

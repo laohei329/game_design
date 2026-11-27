@@ -4,7 +4,25 @@
 
 | 文件 | 用途 | 写入方 |
 |---|---|---|
-| `ui.csv` | 岗位 / 战斗入口 | 手改 |
+| `ui.csv` | 岗位 / 战斗入口 / HUD / 面板模板句 | 手改；运行时由 Autoload `LocaleDb` 加载 |
+
+**Mod / 调试**
+
+- 覆盖键：把同格式 CSV 放进 `user://mods/locale/`，启动时合并（后文件覆盖）。
+- 语言：`project.godot` → `[game] locale` = `zh|en|de|ru|es`（与 `[internationalization] locale` 同步由 `LocaleDb.set_locale`）。
+- 查键：`locale_debug_keys=true` 时 UI 显示 `[key]` 便于对表。
+
+**Godot TranslationServer / csv_translation**
+
+1. `ui.csv` 使用首列 `key`，后续列 `en,zh,de,ru,es`（与 `ui.csv.import` 的 `csv_translation` 一致）。
+2. 在 Godot 编辑器中打开 `client/` 工程一次，会生成 `ui.*.translation` 并写入 `project.godot` `[internationalization] translations`（已预置路径）。
+3. 运行时 `LocaleDb.reload_locale()` **总是**根据合并后的 CSV（含 Mod）重建 `Translation` 并 `TranslationServer.add_translation`；编辑器产物可作无 Mod 时的冷启动补充。
+4. 代码中取词：**`LocaleApi.tr_key("hud.btn.search")`**（`class_name` 的 `static func` 必须用 `LocaleApi`，勿写 `LocaleDb.xxx`）；内部走 `TranslationServer.translate`。场景节点也可设 `text = "hud.btn.search"` + `auto_translate = true`（本工程暂用手动 `_sync` 赋值）。
+5. 热重载：`LocaleDb.reload_locale()`（改 CSV / Mod 后）。
+
+**HUD 键（节选）**：`hud.btn.end_day` · `hud.btn.heating` · `hud.btn.enter_station` · `hud.btn.search` · `hud.btn.abandon` · `hud.btn.tech` · `hud.btn.combat_dev`；驾驶用既有 `drive.forward|reverse|stop`。
+
+**事件弹窗**：壳 `event.modal.chrome` + 模板 `event.modal.title`（`{0}` 壳、`{1}` 卡标题）；正文/选项仍读事件 JSON。
 | `combat.csv` | 战斗目标、异能名 | 手改 |
 | `abilities.csv` | 药剂与异能短述 | 手改 |
 | **`events_general.csv`** | **通用事件 gen_001–060** | **管线** `--bucket general` |

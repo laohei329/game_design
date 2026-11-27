@@ -1,17 +1,24 @@
 extends Node
-## Loads manifest + JSON/CSV tables from res://data (align sim/config_db.py).
+## 配置表加载（Autoload ConfigDb）：`res://data` ↔ 仓库 `data/`。
+##
+## 玩法数值只许 `require("表.键.…")` 读取；缺键 push_error，禁止玩法脚本写死乘子。
 
 var tables: Dictionary = {}
 var load_errors: PackedStringArray = []
 var config_version: int = 0
 
 const MANIFEST := "res://data/manifest.json"
-
-
+## _ready
+##
+## Autoload ConfigDb；玩法只读 require/get_table，禁止硬编码常数。
+## 无返回值。
 func _ready() -> void:
 	load_all()
 
-
+## 按 manifest 加载 JSON 表；CSV 交 LocaleDb。
+##
+## Autoload ConfigDb；玩法只读 require/get_table，禁止硬编码常数。
+## @return 是否成功或条件成立。
 func load_all() -> bool:
 	tables.clear()
 	load_errors.clear()
@@ -27,82 +34,36 @@ func load_all() -> bool:
 	var files: Dictionary = manifest.get("files", {})
 	for table_name in files.keys():
 		var rel := str(files[table_name]).replace("\\", "/")
+		if rel.ends_with(".csv"):
+			# 文案表由 Autoload LocaleDb 专载；此处占位避免误当 JSON 解析。
+			tables[table_name] = {"_localeCsv": rel}
+			continue
 		var path := "res://data/" + rel
 		if not FileAccess.file_exists(path):
 			load_errors.append("missing table %s at %s" % [table_name, path])
 			continue
-		if rel.to_lower().ends_with(".csv"):
-			if not _load_csv_table(table_name, path):
-				continue
-		else:
-			var payload: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
-			if typeof(payload) != TYPE_DICTIONARY:
-				load_errors.append("table %s root must be object" % table_name)
-				continue
-			tables[table_name] = payload
+		var payload: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+		if typeof(payload) != TYPE_DICTIONARY:
+			load_errors.append("table %s root must be object" % table_name)
+			continue
+		tables[table_name] = payload
 	return load_errors.is_empty()
 
-
-func _load_csv_table(table_name: String, path: String) -> bool:
-	var text := FileAccess.get_file_as_string(path)
-	var lines := text.split("\n", false)
-	if lines.is_empty():
-		load_errors.append("table %s: empty csv" % table_name)
-		return false
-	var header := _parse_csv_line(lines[0].strip_edges())
-	if header.find("key") < 0:
-		load_errors.append("table %s: CSV must have 'key' column" % table_name)
-		return false
-	var rows: Array = []
-	for i in range(1, lines.size()):
-		var line := lines[i].strip_edges()
-		if line.is_empty():
-			continue
-		var cols := _parse_csv_line(line)
-		var row := {}
-		for j in header.size():
-			if j < cols.size():
-				row[header[j]] = cols[j]
-		rows.append(row)
-	tables[table_name] = {"_csv": true, "rows": rows, "path": path.get_file()}
-	return true
-
-
-func _parse_csv_line(line: String) -> PackedStringArray:
-	var out: PackedStringArray = []
-	var i := 0
-	var field := ""
-	var in_quotes := false
-	while i < line.length():
-		var c: String = line[i]
-		if in_quotes:
-			if c == "\"":
-				if i + 1 < line.length() and line[i + 1] == "\"":
-					field += "\""
-					i += 2
-					continue
-				in_quotes = false
-			else:
-				field += c
-		else:
-			if c == "\"":
-				in_quotes = true
-			elif c == ",":
-				out.append(field)
-				field = ""
-			else:
-				field += c
-		i += 1
-	out.append(field)
-	return out
-
-
+## 已加载根表；无则 `{}`。
+##
+## Autoload ConfigDb；玩法只读 require/get_table，禁止硬编码常数。
+## @param table_name Config manifest 表名
+## @return 结果字典；缺失语义键时可能为空 {}。
 func get_table(table_name: String) -> Dictionary:
-	var t: Variant = tables.get(table_name, {})
-	return t if typeof(t) == TYPE_DICTIONARY else {}
+	return tables.get(table_name, {})
 
-
+## 点分路径取值；缺失 push_error。
+##
+## Autoload ConfigDb；玩法只读 require/get_table，禁止硬编码常数。
+## @param path 点分配置路径
+## @return `Variant`。
 func require(path: String) -> Variant:
+	# path like "balance.start" or "hud_hints.fuelFill"
 	var parts := path.split(".")
 	if parts.is_empty():
 		return null

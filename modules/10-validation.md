@@ -11,6 +11,8 @@
 
 ## 1. 自动模拟（阶段零 A）
 
+**与 Godot S1b 分工**：`sim/run_zero_a.py` 按 **日总** `food`/`water` 扣减与 streak 验收（十项 #2/#6/#9/#10 等）；**不建模** `members[].hunger/thirst` 曲线。客户端日内饥渴 + `reconcile_day_end` 须 **日总耗与 sim 口径一致**，不要求逐人条与 sim 对表。
+
 > 「零 A」= 阶段零·自动模拟；**不是**战斗战力式字母 `A`。
 - 2 策略（保守 / 扩张）× 各 ≥200 局 × 240 游戏日（原「定居」策略随定居点延后）  
 - 共用固定种子集  
@@ -97,6 +99,15 @@
 **解冻**：写明改因与 `--runs 500` 前后表 → `configVersion` +1 → `archive/VERSION.md` 一行 → 更新本文件冒烟句。零 B 进行中原则上不解冻季节 ×1.40 与 F04 骨架。
 
 **状态**：已冻结；零 B **包就绪 · 场次搁置**；优先提示/AI，不解冻乘子 / F04。
+
+### 1.1.1 Godot 无头冒烟（S1b · 客户端）
+
+| 命令 | 闸 |
+|---|---|
+| `powershell tools/run_all_smoke.ps1` | 配置镜像 + §12.7 + 15 日 + 存档 kill |
+| `SmokeAssertions.errors_outdoor_day_clock_p0_a` | 户外日钟：forward 全日无补课、无日钟补满工日、停 0.5+行 0.5≈半工日、haul forward |
+
+手工清单：[qa/DEV-day-clock-manual-2026-11-26.md](../qa/DEV-day-clock-manual-2026-11-26.md)。
 
 ---
 

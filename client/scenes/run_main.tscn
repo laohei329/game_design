@@ -1,13 +1,17 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene format=3 uid="uid://bcveo1dtv0q6m"]
 
-[ext_resource type="Script" path="res://scripts/presentation/run_main.gd" id="1_main"]
+[ext_resource type="Script" uid="uid://bwug2d0s6cg5i" path="res://scripts/presentation/run_main.gd" id="1_main"]
 [ext_resource type="PackedScene" path="res://scenes/ui/hud_top.tscn" id="2_hud"]
 [ext_resource type="PackedScene" path="res://scenes/ui/debug_overlay.tscn" id="3_dbg"]
 [ext_resource type="PackedScene" path="res://scenes/ui/station_panel.tscn" id="4_st"]
 [ext_resource type="PackedScene" path="res://scenes/ui/search_panel.tscn" id="5_sp"]
 [ext_resource type="PackedScene" path="res://scenes/ui/abandon_confirm.tscn" id="6_ab"]
+[ext_resource type="PackedScene" path="res://scenes/ui/region_pick.tscn" id="7_rp"]
+[ext_resource type="PackedScene" path="res://scenes/ui/tech_panel.tscn" id="8_tp"]
+[ext_resource type="PackedScene" path="res://scenes/ui/combat_panel.tscn" id="9_cp"]
+[ext_resource type="PackedScene" path="res://scenes/ui/event_modal.tscn" id="10_ev"]
 
-[node name="RunMain" type="Control"]
+[node name="RunMain" type="Control" unique_id=223065799]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -16,7 +20,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_main")
 
-[node name="WorldPlaceholder" type="ColorRect" parent="."]
+[node name="WorldPlaceholder" type="ColorRect" parent="." unique_id=807970606]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -25,7 +29,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.12, 0.11, 0.14, 1)
 
-[node name="WorldHint" type="Label" parent="WorldPlaceholder"]
+[node name="WorldHint" type="Label" parent="WorldPlaceholder" unique_id=994018049]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -41,26 +45,44 @@ grow_vertical = 2
 text = "灰盒世界 · F3 调试"
 horizontal_alignment = 1
 
-[node name="HudTop" parent="." instance=ExtResource("2_hud")]
+[node name="HudTop" parent="." unique_id=132996522 instance=ExtResource("2_hud")]
 layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
 offset_bottom = 120.0
-grow_horizontal = 2
 
-[node name="DebugOverlay" parent="." instance=ExtResource("3_dbg")]
+[node name="DebugOverlay" parent="." unique_id=101762909 instance=ExtResource("3_dbg")]
 
-[node name="StationLayer" type="CanvasLayer" parent="."]
+[node name="StationLayer" type="CanvasLayer" parent="." unique_id=1714941470]
 layer = 20
 
-[node name="StationPanel" parent="StationLayer" instance=ExtResource("4_st")]
+[node name="StationPanel" parent="StationLayer" unique_id=1480292020 instance=ExtResource("4_st")]
 
-[node name="SearchLayer" type="CanvasLayer" parent="."]
+[node name="SearchLayer" type="CanvasLayer" parent="." unique_id=1725375601]
 layer = 19
 
-[node name="SearchPanel" parent="SearchLayer" instance=ExtResource("5_sp")]
+[node name="SearchPanel" parent="SearchLayer" unique_id=2042216064 instance=ExtResource("5_sp")]
 
-[node name="AbandonLayer" type="CanvasLayer" parent="."]
+[node name="AbandonLayer" type="CanvasLayer" parent="." unique_id=1868054093]
 layer = 21
 
-[node name="AbandonConfirm" parent="AbandonLayer" instance=ExtResource("6_ab")]
+[node name="AbandonConfirm" parent="AbandonLayer" unique_id=1434909676 instance=ExtResource("6_ab")]
+anchors_preset = 8
+
+[node name="RegionLayer" type="CanvasLayer" parent="." unique_id=728737118]
+layer = 22
+
+[node name="RegionPick" parent="RegionLayer" unique_id=946729092 instance=ExtResource("7_rp")]
+
+[node name="TechLayer" type="CanvasLayer" parent="."]
+layer = 18
+
+[node name="TechPanel" parent="TechLayer" instance=ExtResource("8_tp")]
+
+[node name="CombatLayer" type="CanvasLayer" parent="."]
+layer = 17
+
+[node name="CombatPanel" parent="CombatLayer" instance=ExtResource("9_cp")]
+
+[node name="EventLayer" type="CanvasLayer" parent="."]
+layer = 23
+
+[node name="EventModal" parent="EventLayer" instance=ExtResource("10_ev")]

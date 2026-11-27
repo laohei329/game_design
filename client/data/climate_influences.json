@@ -1,5 +1,5 @@
 {
-  "configVersion": 25,
+  "configVersion": 26,
   "authority": "modules/01-time-season.md §4.1 / §4.4",
   "presets": {
     "region.tundra": {
