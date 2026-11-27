@@ -55,8 +55,7 @@
       "targetType": "party",
       "args": {
         "delta": -2
-      },
-      "capture": "snapshot"
+      }
     },
     {
       "id": "hoard",

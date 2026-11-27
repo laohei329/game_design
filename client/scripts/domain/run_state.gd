@@ -96,6 +96,8 @@ var guarantee_fail_streak: int = 0
 var tutorial_done: bool = false
 var pending_station: Dictionary = {}  # 进站面板用：当前要约/车站，薄字段
 var search_tasks: Array = []
+## 离跨度未匹配到点位的待搬堆（扁平行，与存档 `world.orphanLootPiles` 对齐）。
+var orphan_loot_piles: Array = []
 
 # --- 面板开关（多数仅运行时，存档子集见 SaveSchema）---
 var search_panel_open: bool = false

@@ -83,7 +83,7 @@ func _refresh_detail(st: RunState) -> void:
 	else:
 		_hint.text = LocaleApi.tr_key("abandon.hint.default")
 
-## 确认遗弃：`ABANDON_CAR` intent + 关闭面板。
+## 确认遗弃：`ABANDON_CARRIAGE` intent + 关闭面板。
 func _on_confirm() -> void:
 	var st := GameSession.state
 	if st == null:

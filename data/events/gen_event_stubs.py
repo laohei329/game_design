@@ -99,7 +99,6 @@ def _options(event_id: str, tag: str) -> list:
                 "op": "mood_delta",
                 "targetType": "party",
                 "args": {"delta": -2},
-                "capture": "snapshot",
             },
             {
                 "id": "hoard",
@@ -162,7 +161,6 @@ def _options(event_id: str, tag: str) -> list:
                 "op": "mood_delta",
                 "targetType": "party",
                 "args": {"delta": -3},
-                "capture": "snapshot",
             },
         ]
     if tag == "loot":
@@ -211,7 +209,6 @@ def _options(event_id: str, tag: str) -> list:
             "op": "mood_delta",
             "targetType": "party",
             "args": {"delta": -4},
-            "capture": "snapshot",
         },
     ]
 

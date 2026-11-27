@@ -63,7 +63,7 @@ tools/split_smoke_assertions.py
 tools/validate_data_ci.py
 ```
 
-**风险提示**：这些脚本已删，但 `modules/10-validation.md`、`开发计划.md`、`qa/README.md` 之外的多处文档仍引用旧命令。这是文档债，不是删除候选；见 `qa/doc-consistency-report.md` 的 16 项问题。
+**风险提示**：这些脚本已删；`开发计划.md` §8 已改为 `tools/smoke_config.py` 等现行命令。`check_doc_consistency.py` 当前 **0 issue**；`qa/doc-consistency-report.md` 为本地快照（可重跑覆盖）。
 
 ### 0.2 已归档的过期文档
 
@@ -96,7 +96,7 @@ archive/qa-history/README.md
 | 路径 | 再生命令 | 风险 | 置信度 |
 |---|---|---|---|
 | `C:\Users\Administrator\Desktop\game_design\qa\locale-key-audit.md` | `python tools/audit_locale_keys.py --write` | 删除后 `qa/README.md:16` 与 `tools/README.md:8` 的链接暂时失效；重跑即恢复 | 高 |
-| `C:\Users\Administrator\Desktop\game_design\qa\doc-consistency-report.md` | `python tools/check_doc_consistency.py` | 删除后 `qa/README.md:15` 链接暂时失效；重跑即恢复。当前报告含 16 项死链/脚本引用，是唯一汇总表 | 高 |
+| `C:\Users\Administrator\Desktop\game_design\qa\doc-consistency-report.md` | `python tools/check_doc_consistency.py` | 删除后 `qa/README.md:15` 链接暂时失效；重跑即恢复。报告为快照，重跑后以最新 0 issue 覆盖 | 高 |
 
 **建议**：这两份文件本质是快照，删除收益很低；更稳妥的做法是覆盖重跑。若你确认清理，我会在备份后移入回收站，然后立即重跑生成，保证索引不悬空。
 
@@ -139,7 +139,7 @@ C:\Users\Administrator\Desktop\game_design\data\localization\events_year.es.tran
 
 | 路径 | 问题 | 风险 | 建议 |
 |---|---|---|---|
-| `C:\Users\Administrator\Desktop\game_design\qa\CONFIG_TABLE_WIRING.md` | 头部仍写 `configVersion` 25，实体已 29；内容是 manifest ↔ Service 接线总表 | 中：删除会丢失目前唯一的接线概览；没有现成生成器可恢复 | 优先改为 29 并保留；如果你确认「不要这份文档」，再删除 |
+| ~~`qa/CONFIG_TABLE_WIRING.md`~~ | **已删**（C 组 2026-11-27 清理）；接线见 `data/P1_README.md` 与 `config_db` 表清单 | — | 勿再列为现存候选 |
 
 ---
 
@@ -147,7 +147,7 @@ C:\Users\Administrator\Desktop\game_design\data\localization\events_year.es.tran
 
 - `archive/qa-history/**`：已归档且有索引，删掉会断审计链。
 - `archive/settlement-deferred.md`：被 `architecture.md`、`modules/01-time-season.md`、`modules/04-population.md` 引用。
-- `data/events/gen_event_stubs.py`：虽然把配置版本写死为 25（`qa/整体审计报告-第四轮.md` OA-H3），但它是 120 张事件卡的灾难重建脚本，被 `data/events/README.md:8` 引用。应修复，不能删除。
+- `data/events/gen_event_stubs.py`：已用 `manifest_config_version()` 动态写卡（第四轮 OA-H3 已闭）；仍是 120 卡重建脚本，不能删除。
 - `qa/RF-11.md`、`qa/DEV-hardcode-audit-2026-11-27.md`、`qa/整体审计报告-第四轮.md`：现行审计入口。
 - `sim/config_db.py`、`sim/engine.py`、`sim/event_loader.py`、`sim/point_types.py`：模拟器核心，仍被引用。
 - `tools/sync_config_version.py`、`tools/check_doc_consistency.py`、`tools/audit_locale_keys.py` 等：现行工具链。

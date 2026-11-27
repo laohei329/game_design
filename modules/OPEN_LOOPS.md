@@ -92,7 +92,7 @@
 | **C1** | **已关** | T9 / T10 | [08 §4](08-presentation.md) P1 表 | |
 | **C2** | **已关** | **事件五语 120** | `events_{general,season,year}.csv` + `sync_event_locale.py --bucket` | 细调走 CSV；机制仍手改 JSON |
 | **C3** | **已关** | 事件 sweep 报告 | 历史报告已删；按需重跑 sweep | |
-| **C4** | 低 | 「壳」文案统一 | 03 §1 已用 `templateId`；全库扫尾可后置 | |
+| **C4** | 低 | 「壳」文案统一 | **主文档已闭**（architecture/README/03）；`shell` 模板 id 保留 | |
 | **C5** | **已关** | GODOT_ARCH 排版 | 反斜杠已清 | |
 | **C6** | **已关** | `seasonWeightMods` | `point_types.json` + 01 §6 注 | |
 
@@ -195,7 +195,7 @@
 
 ### 5.9 日钟多轮审计（2026-11-26 · 闭环债）
 
-基线：**`configVersion=27`**（十项 AUDIT K / Item 规则仍称 config25 见 [10 §1.1](10-validation.md)）。
+基线：**实体 `configVersion` 30**（十项 AUDIT K / 验收阈仍冻结在 **config25**，见 [10 §1.1](10-validation.md)）。
 
 | 序 | ID | 处理 | 状态 |
 |---|---|---|---|

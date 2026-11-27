@@ -58,18 +58,16 @@ static func traction(state: RunState) -> float:
 ## F04 子函数：`DaySettle.run` 步骤 0/3 前读 `driveHoursToday` 与气候乘子。
 ## @param state 当前局 `RunState`（就地修改字段）
 ## @param speed_coef F04 速度系数（forward 额度折算）
-## @param craft_day 是否工艺日附加油耗分支
 ## @return 浮点结果（量/比率/工时）。
-static func daily_rate_at_speed_coef(state: RunState, speed_coef: float, craft_day: bool = false) -> float:
+static func daily_rate_at_speed_coef(state: RunState, speed_coef: float) -> float:
 	var base := float(ConfigDb.require("balance.fuel.base"))
 	var add := sum_car_fuel_add(state)
-	var craft := float(ConfigDb.require("balance.fuel.craftFuelPerDay")) if craft_day else 0.0
 	var surcharge := _segment_fuel_surcharge(state)
 	var mult := minf(
 		speed_coef * state.fuel_climate * state.region_fuel_mult_active() * (1.0 + surcharge),
 		3.0
 	)
-	return (base + add) * traction(state) * mult + craft
+	return (base + add) * traction(state) * mult
 
 ## F04：本日小时 → 速度/停靠油耗系数。
 ##
@@ -90,9 +88,6 @@ static func daily_speed_coef_from_hours(
 	var slow := float(ConfigDb.require("balance.fuel.speedCoefSlow"))
 	var dock := float(ConfigDb.require("balance.fuel.speedCoefDock"))
 	var eff_fwd := minf(forward_h, cap)
-	var total := maxf(24.0, eff_fwd + reverse_h + dock_h)
-	if total <= 0.0:
-		return dock
 	return (eff_fwd * cruise + reverse_h * slow + dock_h * dock) / 24.0
 
 
@@ -112,12 +107,14 @@ static func compute_day_burn_percent(state: RunState, craft_day: bool = false) -
 	var dock_h := maxf(0.0, 24.0 - fwd - rev)
 	var burn := 0.0
 	if fwd > 0.0:
-		burn += daily_rate_at_speed_coef(state, cruise, craft_day) * (fwd / 24.0)
+		burn += daily_rate_at_speed_coef(state, cruise) * (fwd / 24.0)
 	if rev > 0.0:
-		burn += daily_rate_at_speed_coef(state, slow, craft_day) * (rev / 24.0)
+		burn += daily_rate_at_speed_coef(state, slow) * (rev / 24.0)
 	if dock_h > 0.0:
-		burn += daily_rate_at_speed_coef(state, dock, craft_day) * (dock_h / 24.0)
+		burn += daily_rate_at_speed_coef(state, dock) * (dock_h / 24.0)
 	# 昨日无行驶记录时默认全日停靠（教程开局）
 	if fwd <= 0.0 and rev <= 0.0:
-		burn = daily_rate_at_speed_coef(state, dock, craft_day)
+		burn = daily_rate_at_speed_coef(state, dock)
+	if craft_day:
+		burn += float(ConfigDb.require("balance.fuel.craftFuelPerDay"))
 	return burn

@@ -13,8 +13,8 @@ SCRIPTS = ROOT / "client" / "scripts"
 LOCALE_DIR = ROOT / "data" / "localization"
 QA_OUT = ROOT / "qa" / "locale-key-audit.md"
 
-TR_KEY = re.compile(r'LocaleDb\.(?:tr_key|trf?)\(\s*"([^"]+)"')
-TR_CODE = re.compile(r'LocaleDb\.tr_code\(\s*"([^"]+)"\s*,\s*([^,\)]+)')
+TR_KEY = re.compile(r'Locale(?:Db|Api)\.(?:tr_key|trf?|tr)\(\s*"([^"]+)"')
+TR_CODE = re.compile(r'Locale(?:Db|Api)\.tr_code\(\s*"([^"]+)"\s*,\s*([^,\)]+)')
 
 KNOWN_TR_CODE_PREFIXES: dict[str, list[str]] = {
 	"season": ["spring", "summer", "autumn", "winter"],
@@ -31,7 +31,10 @@ KNOWN_TR_CODE_PREFIXES: dict[str, list[str]] = {
 	"station.miss": ["no_pool", "empty_roll", "no_offer"],
 	"combat.tactic": ["assault", "negotiate", "bypass", "horn", "evacuate"],
 	"combat.err": [],
-	"search.err": [],
+	"search.err": [
+		"pick_members", "too_many", "member_busy", "cap_exceeded",
+		"no_point", "depleted", "no_members", "not_found",
+	],
 	"tech.err": [],
 	"train.abandon": [],
 	"region.pick": [],
@@ -116,7 +119,7 @@ def main() -> int:
 	if missing_exact:
 		print(f"\nFAIL: {len(missing_exact)} static key(s) missing from CSV", file=sys.stderr)
 	else:
-		print("\nOK: all static LocaleDb keys exist in CSV")
+		print("\nOK: all static Locale keys exist in CSV")
 
 	if args.write:
 		QA_OUT.parent.mkdir(parents=True, exist_ok=True)

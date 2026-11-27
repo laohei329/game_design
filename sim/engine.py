@@ -19,6 +19,7 @@ try:
         load_point_types,
         load_regions,
         load_weather_engine,
+        load_weather_raw,
         load_season_pressure,
         load_stations_config,
         normalized_weights,
@@ -33,6 +34,7 @@ except ImportError:
         load_point_types,
         load_regions,
         load_weather_engine,
+        load_weather_raw,
         load_season_pressure,
         load_stations_config,
         normalized_weights,
@@ -106,6 +108,7 @@ FUEL_TRACTION_PER_TECH = 0.08
 FUEL_TRACTION_FLOOR = 0.4
 FUEL_CRAFT_PER_DAY = 0.5
 REPAIR_PARTS: Dict[str, int] = {"living": 3, "cargo": 3, "default": 5, "tutorialLiving": 1}
+CRYSTAL_HIDDEN_CHANCE: float = 0.09
 
 
 def _apply_balance_json() -> None:
@@ -122,7 +125,7 @@ def _apply_balance_json() -> None:
     global SEARCH_YIELD_MULT_BASE, SEARCH_YIELD_MULT_PER_TEAM, SEARCH_YIELD_MULT_CAP
     global SCAVENGE_SKILL_DIVISOR, SEARCH_YIELD_JITTER_MIN, SEARCH_YIELD_JITTER_SPAN
     global FUEL_BASE, FUEL_EXTRA_LOCO, FUEL_TRACTION_PER_LOCO, FUEL_TRACTION_PER_TECH
-    global FUEL_TRACTION_FLOOR, FUEL_CRAFT_PER_DAY, REPAIR_PARTS
+    global FUEL_TRACTION_FLOOR, FUEL_CRAFT_PER_DAY, REPAIR_PARTS, CRYSTAL_HIDDEN_CHANCE
     root = Path(__file__).resolve().parents[1]
     path = root / "data" / "balance.json"
     if not path.is_file():
@@ -210,6 +213,7 @@ def _apply_balance_json() -> None:
         rp = cdata.get("repairParts", {})
         if isinstance(rp, dict):
             REPAIR_PARTS = {str(k): int(v) for k, v in rp.items()}
+    CRYSTAL_HIDDEN_CHANCE = float(data.get("crystalHiddenChance", CRYSTAL_HIDDEN_CHANCE))
 
 
 def _cold_climate(cold: float, field: str, defaults: Tuple[float, float, float]) -> float:
@@ -419,24 +423,27 @@ class RunState:
     def fuel_cap(self) -> float:
         return FUEL_TANK_BASE + sum(c.size * FUEL_TANK_PER_CARGO for c in self.cars if c.template_id == "cargo")
 
+    def life_mult(self) -> float:
+        return 1.0 + 0.10 * self.living_tech
+
     def stock_cap_food(self) -> float:
         base = 60 + sum(c.size * 10 for c in self.cars if c.template_id == "cargo")
-        return base * (1 + 0.10 * self.living_tech)
+        return base * self.life_mult()
 
     def stock_cap_water(self) -> float:
         return self.stock_cap_food()
 
     def stock_cap_parts(self) -> float:
         base = 20 + sum(round(c.size * 10 / 3) for c in self.cars if c.template_id == "cargo")
-        return base  # S1a：与 client InventoryService.life_mult=1.0 对齐
+        return base * self.life_mult()
 
     def stock_cap_med(self) -> float:
         base = 15 + sum(round(c.size * 5 / 3) for c in self.cars if c.template_id == "cargo")
-        return base
+        return base * self.life_mult()
 
     def stock_cap_seed(self) -> float:
         base = 20 + sum(c.size * 4 for c in self.cars if c.template_id == "cargo")
-        return base
+        return base * self.life_mult()
 
     def car_count(self) -> int:
         return len(self.cars)
@@ -1066,10 +1073,19 @@ def apply_disease_tick(state: RunState, rng: random.Random) -> None:
                 m.hp = min(100, m.hp + 10)
 
 
+def combat_pressure(state: RunState) -> float:
+    """01 §7：season × yearThreat + weatherPressure + region pressureAdd."""
+    season = season_of(state.day)
+    p = SEASON_PRESSURE[season] * year_threat_multiplier(year_of(state.day))
+    wrow = load_weather_raw().get(state.climate.weather_id, {})
+    p += float(wrow.get("weatherPressure", 0.0))
+    p += float(REGIONS.get(state.region_id, {}).get("pressure", 0.0))
+    return p
+
+
 def resolve_combat_day(state: RunState, rng: random.Random, strat: Strategy) -> None:
     """05 §6：L1 检定；敌众/高压 → L2 薄多回合（丰富战斗死因）。"""
-    season = season_of(state.day)
-    pressure = SEASON_PRESSURE[season] * year_threat_multiplier(year_of(state.day))
+    pressure = combat_pressure(state)
     encounter = 0.055 * strat.risk * min(1.7, 0.7 + 0.35 * pressure)
     # 冲人口窗口：少开战，保人
     pop_push = state.beds() >= 20 and state.onboard() < 20 and year_of(state.day) >= 2
@@ -1110,7 +1126,7 @@ def resolve_combat_day(state: RunState, rng: random.Random, strat: Strategy) -> 
             n_enemy = rng.randint(6, 9)
             use_l2 = True
 
-    e_force = n_enemy * L1_UNIT
+    e_force = n_enemy * L1_UNIT * year_threat_multiplier(year_of(state.day))
     d = p_force / (p_force + e_force)
 
     if not use_l2:
@@ -1490,6 +1506,8 @@ def _build_segment(state: RunState, rng: random.Random) -> None:
     state.segment_start_day = state.day
     if not state.tutorial_done:
         state.stations_left = 1
+    if rng.random() < CRYSTAL_HIDDEN_CHANCE:
+        state.crystal += 1
 
 
 def _needs(state: RunState) -> dict:
@@ -1596,7 +1614,7 @@ def _scavenge(state: RunState, rng: random.Random) -> None:
     food_days_sc = state.food / max(0.1, max(1, state.onboard()) * 0.9 * state.climate.food)
     # 雪原油紧且粮尚可：多榨一轮，并偏燃料点
     if state.region_id == "tundra" and fuel_fill_sc < 0.72 and food_days_sc >= 3.0:
-        actions = min(4, actions + 1)
+        actions = min(MAX_SEARCH_PER_POINT, actions + 1)
     for _ in range(actions):
         avail = [n for n in state.nodes if n.pool > 0]
         if not avail:
@@ -1710,8 +1728,6 @@ def _miss_carriage(state: RunState, kind: str) -> None:
 def _station(state: RunState, rng: random.Random, strat: Strategy) -> None:
     state.stations_visited += 1
 
-    if rng.random() < 0.08:
-        state.crystal += 1
     if state.crystal >= 1 and any(
         c.function == "medical" or c.template_id == "medical" for c in state.cars
     ):
@@ -1730,16 +1746,21 @@ def _station(state: RunState, rng: random.Random, strat: Strategy) -> None:
         state.no_carriage_miss_raw = 0
         return
 
-    found = rng.random() < POOL_OFFER_CHANCE
+    rolled_offer = rng.random() < POOL_OFFER_CHANCE
+    guarantee_forced = False
+    found = rolled_offer
     if not found:
         if state.no_carriage_stations >= GUARANTEE_AFTER:
             found = True
+            guarantee_forced = True
         else:
             _miss_carriage(state, "no_offer")
             return
 
     car = _pick_car(state, rng, strat)
-    repair = 3 if car.template_id in ("living", "cargo") else 5
+    repair = _car_repair_cost(car)
+    if guarantee_forced:
+        repair = min(repair, max(1, int(state.parts)))
     # 保守留零件缓冲；扩张油紧时也对高耗车加缓冲
     buffer = 0 if strat.prefer_carriage else 2
     if car.function in ("greenhouse", "water") or state.starve_food_days > 0:
@@ -1920,7 +1941,7 @@ def run_one(seed: int, strat: Strategy, max_day: int = 240) -> RunState:
     rng = random.Random(seed)
     state = RunState()
     start_region_run(state, rng, force_id="urban")
-    state.climate.weather_id = draw_weather(state, rng)
+    _build_segment(state, rng)
     recompute_climate(state)
     while state.day <= max_day and not state.failed:
         apply_day(state, rng, strat)

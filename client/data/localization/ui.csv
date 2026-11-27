@@ -135,6 +135,10 @@ search.err.pick_members,Pick 1–4 members,请勾选 1–4 名搜刮队员,Wähl
 search.err.too_many,Max 4 searchers,搜索最多 4 人,Maximal 4,Не больше 4,Máximo 4
 search.err.member_busy,Member unavailable,队员不可派出,Nicht verfügbar,Занят,Ocupado
 search.err.cap_exceeded,Daily cap for this point,本日该点搜索次数已满,Tageslimit,Лимит дня,Límite diario
+search.err.no_point,No search point here,此处不可搜索,Kein Punkt,Нет точки,Sin punto
+search.err.depleted,Point depleted,该点已搜空,Erschöpft,Истощено,Agotado
+search.err.no_members,No one to send,无人可派,Niemand disponibel,Некого, Nadie disponible
+search.err.not_found,Member not found,未找到该乘员,Nicht gefunden,Не найден,No encontrado
 search.point.supermarket,Abandoned supermarket,废弃超市,Supermarkt,Супермаркет,Supermercado
 search.point.water_plant,Water plant,水厂,Wasserwerk,Водоочистка,Planta de agua
 search.point.farm,Farm field,农田,Feld,Ферма,Granja

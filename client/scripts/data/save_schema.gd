@@ -60,6 +60,7 @@ static func to_save_dict(state: RunState, runtime_extra: Dictionary = {}) -> Dic
 			"guaranteeFailStreak": state.guarantee_fail_streak,
 			"tutorialDone": state.tutorial_done,
 			"lootPiles": LootPileService.export_piles(state),
+			"orphanLootPiles": state.orphan_loot_piles.duplicate(true),
 			"climateInfluences": state.climate_influences.duplicate(true),
 			"delayedEvents": state.delayed_events.duplicate(true),
 			"eventWeightHistory": state.event_weight_history.duplicate(),
@@ -168,7 +169,14 @@ static func from_save_dict(save: Dictionary, already_patched: bool = false) -> R
 	state.pending_threat = pt.duplicate(true) if typeof(pt) == TYPE_DICTIONARY else {}
 	state.morale_offset = float(world.get("moraleOffset", 0.0))
 	var ph: Variant = world.get("pressureHistory", ["", ""])
-	state.pressure_history = ph.duplicate() if typeof(ph) == TYPE_ARRAY else ["", ""]
+	if typeof(ph) == TYPE_ARRAY and ph.size() >= 1:
+		var a := "" if ph[0] == null else str(ph[0])
+		var b := ""
+		if ph.size() >= 2:
+			b = "" if ph[1] == null else str(ph[1])
+		state.pressure_history = [a, b]
+	else:
+		state.pressure_history = ["", ""]
 	state.pressure_display = str(world.get("pressureDisplay", ""))
 
 	state.members = save.get("members", []).duplicate(true)
@@ -191,8 +199,11 @@ static func from_save_dict(save: Dictionary, already_patched: bool = false) -> R
 	state.breakdown_stop_hours_remaining = float(rt.get("breakdownStopHoursRemaining", 0))
 
 	state.region_run = _region_run_from_dict(save.get("regionRun", {}))
+	var orphan: Variant = world.get("orphanLootPiles", [])
+	state.orphan_loot_piles = orphan.duplicate() if typeof(orphan) == TYPE_ARRAY else []
 	var piles: Variant = world.get("lootPiles", [])
 	LootPileService.apply_world_list(state, piles if typeof(piles) == TYPE_ARRAY else [])
+	LootPileService.apply_orphan_piles(state)
 	_ensure_points_loot_on_segments(state)
 	_sync_region_fuel_mult_from_run(state)
 

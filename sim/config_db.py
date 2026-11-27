@@ -217,12 +217,9 @@ def _validate_cross_tables(db: ConfigDb) -> List[str]:
         errs.append(str(exc))
 
     try:
-        st_g = int(db.require("stations.guaranteeAfter"))
-        bal_g = int(db.require("balance.stations.guaranteeAfter"))
-        if st_g != bal_g:
-            errs.append(f"stations.guaranteeAfter ({st_g}) != balance.stations mirror ({bal_g})")
-    except ConfigLoadError:
-        pass
+        int(db.require("stations.guaranteeAfter"))
+    except ConfigLoadError as exc:
+        errs.append(str(exc))
 
     try:
         forced = db.require("stations.tutorialForcePointTypes")

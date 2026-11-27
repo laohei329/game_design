@@ -38,14 +38,12 @@ static func stations_cfg() -> Dictionary:
 	return ConfigDb.get_table("stations")
 
 
-## 连续拒绝/落空多少次后触发 guaranteeForced（balance.stations.guaranteeAfter）。
+## 连续拒绝/落空多少次后触发 guaranteeForced（权威：`data/stations.json` · `guaranteeAfter`）。
 ##
 ## 公开 API：UI 经 `IntentBus` → `GameSession`，勿在 presentation 改 state。
 ## @return 整数结果（计数/下标/容量）。
 static func guarantee_after() -> int:
-	return int(
-		stations_cfg().get("guaranteeAfter", ConfigDb.require("balance.stations.guaranteeAfter"))
-	)
+	return int(stations_cfg().get("guaranteeAfter", 4))
 
 
 ## carriages.templates 单行；缺则 {}。

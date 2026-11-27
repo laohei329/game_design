@@ -23,7 +23,7 @@
 |---|---|
 | [01 时间·季节·天气·温度](modules/01-time-season.md) | 日历、天气、气候消耗 |
 | [02 资源](modules/02-resources.md) | 六元、日结、转换 |
-| [03 列车](modules/03-train.md) | 壳设备、发现、驾驶、科技 |
+| [03 列车](modules/03-train.md) | 车厢模板与设备、发现、驾驶、科技 |
 | [04 人口](modules/04-population.md) | 岗位、任务、异能、疾病 |
 | [05 战斗](modules/05-combat.md) | 编队、L1–L3 |
 | [06 区域与事件](modules/06-region-events.md) | 区段、三选一、收留 |

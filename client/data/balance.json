@@ -258,8 +258,7 @@
   },
   "stations": {
     "_authority": "data/stations.json",
-    "_note": "Sim/客户端只读 stations.json；下列键仅作交叉校验镜像，须与 stations.json 一致",
-    "guaranteeAfter": 4,
+    "_note": "Sim/客户端只读 stations.json；guaranteeAfter 等以 stations.json 为唯一权威（本块不再镜像）",
     "emptyChance": 0.1,
     "nonePoolChance": 0.08,
     "tutorialRegion": "urban"

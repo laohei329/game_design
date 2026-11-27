@@ -71,8 +71,7 @@
       "targetType": "party",
       "args": {
         "delta": -4
-      },
-      "capture": "snapshot"
+      }
     }
   ]
 }

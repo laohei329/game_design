@@ -7,6 +7,7 @@
 | 文件 | 用途 |
 |------|------|
 | [整体审计报告-第六轮.md](整体审计报告-第六轮.md) | **现行缺陷复核**（2026-11-27） |
+| [DEV-a6-batch0-signoff.md](DEV-a6-batch0-signoff.md) | 第六轮 H1–H4 自动探针签字 |
 | [DEV-hardcode-audit-2026-11-27.md](DEV-hardcode-audit-2026-11-27.md) | 硬编码专项（U2 · R1–R7） |
 | [DEV-incident-30d-signoff.md](DEV-incident-30d-signoff.md) | Incident-only 30 日手签 |
 | [DEV-functional-checklist.md](DEV-functional-checklist.md) | 功能手工清单 |
@@ -23,6 +24,7 @@ python tools/check_doc_consistency.py
 python tools/smoke_config.py
 python tools/stress_sweep.py
 python tools/scan_hardcode_gd.py
+python tools/probe_a6_signoff.py
 ```
 
 ```powershell

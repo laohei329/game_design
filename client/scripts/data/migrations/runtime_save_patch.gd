@@ -21,5 +21,5 @@ static func ensure_abandon_fields(save: Dictionary) -> void:
 	if not world.has("moraleOffset"):
 		world["moraleOffset"] = 0.0
 	if not world.has("pressureHistory"):
-		world["pressureHistory"] = [null, null]
+		world["pressureHistory"] = ["", ""]
 	save["world"] = world

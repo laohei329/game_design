@@ -94,6 +94,35 @@ static func take(state: RunState, point_id: String, inv_key: String, amount: flo
 ## 公开 API：UI 经 `IntentBus` → `GameSession`，勿在 presentation 改 state。
 ## @param state 当前局 `RunState`（就地修改字段）
 ## @return 数组结果（列表/选项）。
+## 换跨度前：把当前段内堆并入 `orphan_loot_piles`（不丢货）。
+static func archive_piles_before_new_run(state: RunState) -> void:
+	var rows := export_piles(state)
+	if rows.is_empty():
+		return
+	state.orphan_loot_piles.append_array(rows)
+	_clear_all_piles(state)
+
+
+## 新跨度段建成后：把 orphan 里能 `find_point` 的行灌回点位堆。
+static func apply_orphan_piles(state: RunState) -> void:
+	if state.orphan_loot_piles.is_empty():
+		return
+	var kept: Array = []
+	for row in state.orphan_loot_piles:
+		if typeof(row) != TYPE_DICTIONARY:
+			continue
+		var pid := str(row.get("pointId", ""))
+		var key := str(row.get("inventoryKey", row.get("key", "food")))
+		var amt := float(row.get("amount", 0.0))
+		if pid == "" or amt <= 0.001:
+			continue
+		if find_point(state, pid).is_empty():
+			kept.append(row)
+		else:
+			add(state, pid, key, amt)
+	state.orphan_loot_piles = kept
+
+
 static func export_piles(state: RunState) -> Array:
 	var out: Array = []
 	if state.region_run == null:

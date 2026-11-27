@@ -137,7 +137,9 @@ static func pick_region(state: RunState, region_id: String) -> String:
 		return "unknown_region"
 	_close_region_pick(state)
 	_clear_station_offers(state)
+	LootPileService.archive_piles_before_new_run(state)
 	begin_region_run(state, region_id)
+	LootPileService.apply_orphan_piles(state)
 	return ""
 
 
@@ -190,9 +192,10 @@ static func apply_reverse_segment_index(state: RunState, new_index: int) -> void
 		return
 	if rr.segment_index == new_index:
 		return
-	EventOps.expire_segment_influences(state)
 	rr.segment_index = new_index
-	_ensure_segment_built(state, new_index)
+	var seg := _ensure_segment_built(state, new_index)
+	if seg:
+		seg.progress_km = seg.length_km
 
 
 ## 段末分支：末段 open_region_pick，否则 segment_index++ 并重置 progress_km。
