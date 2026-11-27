@@ -119,7 +119,7 @@ static func can_buy(state: RunState, line: String) -> String:
 	if typeof(lines) == TYPE_ARRAY and not (line in lines):
 		return "invalid_line"
 	var cur := tech_level(state, line)
-	var max_lv := int(ConfigDb.get_table("upgrades").get("stageZeroSmokeMaxLv", 5))
+	var max_lv := int(ConfigDb.require("upgrades.stageZeroSmokeMaxLv"))
 	if cur >= max_lv:
 		return "max_level"
 	var target := cur + 1
@@ -195,13 +195,19 @@ static func living_bed_bonus(state: RunState) -> int:
 	return TrainService.living_tech_bed_bonus(state)
 
 
-const BLUEPRINT_LINES: PackedStringArray = ["power", "armor", "radar", "living"]
+static func blueprint_lines() -> PackedStringArray:
+	var lines: Variant = ConfigDb.require("upgrades.lines")
+	var out := PackedStringArray()
+	if typeof(lines) == TYPE_ARRAY:
+		for ln in lines:
+			out.append(str(ln))
+	return out
 
 
 ## 授予单线图纸；重复持有返回 false。
 static func grant_blueprint(state: RunState, line: String) -> bool:
 	var lid := str(line).to_lower()
-	if lid not in BLUEPRINT_LINES:
+	if lid not in blueprint_lines():
 		return false
 	if bool(state.blueprints.get(lid, false)):
 		return false
@@ -226,7 +232,7 @@ static func add_blueprint_loot(state: RunState, amount: float) -> float:
 
 
 static func _next_blueprint_line(state: RunState) -> String:
-	for line in BLUEPRINT_LINES:
+	for line in blueprint_lines():
 		if not bool(state.blueprints.get(line, false)):
 			return line
 	return ""

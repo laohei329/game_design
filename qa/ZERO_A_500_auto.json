@@ -1,0 +1,5 @@
+{
+  "status": "superseded",
+  "reason": "本文件由临时最小 runner 生成；现行权威为 tools/run_zero_a.py --runs 250 --strict。",
+  "use_instead": "tools/run_zero_a.py"
+}

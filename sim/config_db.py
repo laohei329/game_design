@@ -217,6 +217,9 @@ def _validate_cross_tables(db: ConfigDb) -> List[str]:
         errs.append(str(exc))
 
     try:
+        bal = db.get_table("balance")
+        if isinstance(bal, dict) and "stations" in bal:
+            errs.append("balance.stations mirror block must be removed; use stations.json only")
         int(db.require("stations.guaranteeAfter"))
     except ConfigLoadError as exc:
         errs.append(str(exc))
@@ -462,6 +465,15 @@ def _required_paths_for_stage(stage: str) -> Sequence[str]:
         "balance.fuelTank.baseAmount",
         "balance.travel.corridorMult",
         "balance.eventDraw.scenarioEventRate",
+        "event_draw_rules.foodNeedPerCapita",
+        "event_draw_rules.supplyFoodBoost",
+        "event_draw_rules.noRepeatWeightEventId.windowSegmentsInRun",
+        "event_draw_rules.forcedLowPressure.suppressTagMult.raid",
+        "balance.time.yearProdBase",
+        "balance.fuel.climateRegionMultCap",
+        "balance.jobs.pickScore.priorJobLabor",
+        "combat.trainDR.cap",
+        "upgrades.stageZeroSmokeMaxLv",
         "combat.threatTemplateAliases",
     ]
     if stage == "s0":

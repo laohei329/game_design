@@ -103,7 +103,7 @@
 
 ### 1.1.1 Godot 客户端验收（S1b）
 
-固定无头冒烟已移除。现行：**手工清单** [qa/DEV-functional-checklist.md](../qa/DEV-functional-checklist.md)、日钟 [qa/DEV-day-clock-manual-2026-11-26.md](../qa/DEV-day-clock-manual-2026-11-26.md)；文档一致性 `python tools/check_doc_consistency.py`。
+**自动**：`python tools/run_zero_a.py --runs 250`（2 策略 ×250 局；`--strict` 对 config25 可自动项失败即 exit 1）。**手工**： [qa/DEV-functional-checklist.md](../qa/DEV-functional-checklist.md)、日钟 [qa/DEV-day-clock-manual-2026-11-26.md](../qa/DEV-day-clock-manual-2026-11-26.md)；文档 `python tools/check_doc_consistency.py`（见 [tools/AUTOMATION.md](../tools/AUTOMATION.md)）。
 
 ---
 

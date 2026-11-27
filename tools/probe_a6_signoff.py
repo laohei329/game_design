@@ -73,6 +73,36 @@ def check_h4() -> tuple[bool, list[str]]:
     return True, ["OK H4 audit_locale_keys"] + summary
 
 
+def check_m4r() -> tuple[bool, list[str]]:
+    """保底进站：parts=1、连续未挂车达 guaranteeAfter 时必挂一节（无 buffer/ai_skip 架空）。"""
+    import random
+
+    from sim.engine import GUARANTEE_AFTER, STRATS, Car, RunState, _station, starter_train
+
+    class _NoPoolOffer(random.Random):
+        def random(self) -> float:
+            return 1.0
+
+    strat = next(s for s in STRATS if not s.prefer_carriage)
+    state = RunState()
+    state.cars = list(starter_train())
+    state.parts = 1.0
+    state.fuel = 80.0
+    state.day = 30
+    state.tutorial_done = True
+    state.no_carriage_stations = GUARANTEE_AFTER
+    state.no_carriage_miss_raw = GUARANTEE_AFTER
+    n0 = state.car_count()
+    _station(state, _NoPoolOffer(0), strat)
+    if state.car_count() <= n0:
+        return False, [
+            f"FAIL M4R car_count stuck={state.car_count()} miss_streak={state.no_carriage_stations}"
+        ]
+    if state.no_carriage_stations != 0:
+        return False, [f"FAIL M4R streak not reset stations={state.no_carriage_stations}"]
+    return True, ["OK M4R guarantee hang with parts=1"]
+
+
 def check_godot_h1_h2() -> tuple[bool, list[str]]:
     exe = _godot_bin()
     if exe is None:

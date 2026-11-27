@@ -104,17 +104,23 @@ static func _carriage_template_row(template_id: String) -> Dictionary:
 
 static func _job_pick_score(member: Dictionary, job: String) -> int:
 	var score := 0
+	var ps: Variant = ConfigDb.require("balance.jobs.pickScore")
+	if typeof(ps) != TYPE_DICTIONARY:
+		return score
+	var prior := int(ps.get("priorJobLabor", 1))
+	var spec_m := int(ps.get("specialtyMatch", 10))
+	var spec_r := int(ps.get("relatedSpecialty", 5))
 	if str(member.get("job", "")) == "labor":
-		score += 1
+		score += prior
 	var specs: Variant = member.get("specialties", [])
 	if typeof(specs) == TYPE_ARRAY:
 		for s in specs:
 			if str(s) == job:
-				score += 10
+				score += spec_m
 			elif job == "crafter" and str(s) == "repair":
-				score += 5
+				score += spec_r
 			elif job == "pharmacist" and str(s) == "medicine":
-				score += 5
+				score += spec_r
 	return score
 
 ## 按 archetypes.startPartyTemplate 生成开局四人。

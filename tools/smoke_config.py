@@ -65,6 +65,45 @@ def _require_combat_l1_fail() -> None:
     assert float(inj) == 12.0, f"injuryHpLoss={inj}"
 
 
+def _negative_s2_event_card() -> None:
+    """篡改一张事件卡（删 weight + 非法 op）→ run_validation(s2) 必须失败。"""
+    import json
+    from config_db import run_validation  # noqa: E402
+
+    gen_dir = ROOT / "data" / "events" / "general"
+    targets = sorted(gen_dir.glob("gen_*.json"))
+    if not targets:
+        raise AssertionError("no gen_*.json for negative s2 test")
+    path = targets[0]
+    raw = path.read_text(encoding="utf-8")
+    card = json.loads(raw)
+    if "weight" not in card:
+        raise AssertionError(f"{path.name}: missing weight for tamper test")
+    backup = raw
+    weight = card.pop("weight")
+    for opt in card.get("options") or []:
+        if isinstance(opt, dict) and isinstance(opt.get("immediate"), dict):
+            opt["immediate"]["op"] = "__tamper_invalid_op__"
+            break
+    path.write_text(json.dumps(card, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    try:
+        import event_loader  # noqa: E402
+
+        event_loader._CATALOG = None
+        code, msgs = run_validation(repo_root=ROOT, stage="s2")
+        if code == 0:
+            raise AssertionError("expected run_validation(s2) FAIL after tampered card")
+        joined = " ".join(msgs)
+        if "missing weight" not in joined and "unknown op" not in joined:
+            card["weight"] = weight
+            raise AssertionError(f"expected missing weight or unknown op in msgs: {msgs[:5]}")
+    finally:
+        path.write_text(backup, encoding="utf-8")
+        import event_loader  # noqa: E402
+
+        event_loader._CATALOG = None
+
+
 def main() -> int:
     errs: list[str] = []
     try:
@@ -76,6 +115,12 @@ def main() -> int:
             cv = int(db.manifests.get("configVersion", 0))
             if cv < 1:
                 errs.append("manifest configVersion missing")
+        from config_db import run_validation  # noqa: E402
+
+        vcode, vmsgs = run_validation(repo_root=ROOT, stage="s2")
+        if vcode != 0:
+            errs.extend(vmsgs[:20] or ["run_validation(s2) failed"])
+        _negative_s2_event_card()
     except Exception as exc:  # noqa: BLE001
         errs.append(f"config_db: {exc}")
 
@@ -84,6 +129,29 @@ def main() -> int:
         _require_combat_l1_fail()
         _require_carriage_beds()
         _require_hardcode_round_keys()
+        from event_loader import (  # noqa: E402
+            EventDrawContext,
+            _event_weight_impl,
+            load_event_catalog,
+            load_event_draw_rules,
+        )
+
+        rules = load_event_draw_rules()
+        sample = next(iter(load_event_catalog().values()))
+        ctx = EventDrawContext.from_population(
+            scenario_event_rate=1.0,
+            food=10.0,
+            water=10.0,
+            onboard=4,
+            beds=4,
+            fuel=50.0,
+            fuel_cap=100.0,
+            raid_weight_delta=0.0,
+            rules=rules,
+        )
+        w = _event_weight_impl(sample, ctx, rules)
+        if w <= 0.0:
+            raise AssertionError("event_weight_impl returned non-positive for sample card")
         from incident_sim import feature_flags, load_incident_types  # noqa: E402
 
         types = load_incident_types(ROOT)

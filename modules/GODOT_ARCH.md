@@ -185,7 +185,7 @@ config_version() -> int
 ### 2.4 允许留在代码
 
 - 与设计对齐的枚举 / id 校验  
-- 日结步骤顺序、迁移函数骨架  
+- 日结步骤顺序；存档迁移链（`migrations/save_migration_*.gd` + `manifest.json`）  
 - 非平衡 UI 像素  
 
 ---

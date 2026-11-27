@@ -8,18 +8,16 @@ var load_errors: PackedStringArray = []
 var _config_version: int = 0
 
 const MANIFEST := "res://data/manifest.json"
-## _ready
-##
-## Autoload ConfigDb；玩法只读 require/get_table，禁止硬编码常数。
-## 无返回值。
-func _ready() -> void:
-	load_all()
 
-## 按 manifest 加载 JSON 表；CSV 交 LocaleDb。
-##
-## Autoload ConfigDb；玩法只读 require/get_table，禁止硬编码常数。
-## @return 是否成功或条件成立。
+
+func _ready() -> void:
+	if not load_all():
+		push_error("ConfigDb autoload failed:\n" + "\n".join(load_errors))
+
+
+## 按 manifest 加载 JSON 表；CSV 交 LocaleDb；legacyFiles 与 Python ConfigDb 对齐。
 func load_all() -> bool:
+	_config_version = 0
 	tables.clear()
 	load_errors.clear()
 	if not FileAccess.file_exists(MANIFEST):
@@ -31,11 +29,15 @@ func load_all() -> bool:
 		load_errors.append("manifest not object")
 		return false
 	_config_version = int(manifest.get("configVersion", 0))
+
 	var files: Dictionary = manifest.get("files", {})
 	for table_name in files.keys():
 		var rel := str(files[table_name]).replace("\\", "/")
 		if rel.ends_with(".csv"):
-			# 文案表由 Autoload LocaleDb 专载；此处占位避免误当 JSON 解析。
+			var csv_path := "res://data/" + rel
+			if not FileAccess.file_exists(csv_path):
+				load_errors.append("missing locale csv %s at %s" % [table_name, csv_path])
+				continue
 			tables[table_name] = {"_localeCsv": rel}
 			continue
 		var path := "res://data/" + rel
@@ -47,7 +49,26 @@ func load_all() -> bool:
 			load_errors.append("table %s root must be object" % table_name)
 			continue
 		tables[table_name] = payload
-	return load_errors.is_empty()
+
+	var legacy: Variant = manifest.get("legacyFiles", {})
+	if typeof(legacy) == TYPE_DICTIONARY:
+		for table_name in legacy.keys():
+			var rel := str(legacy[table_name]).replace("\\", "/")
+			var path := "res://data/" + rel
+			if not FileAccess.file_exists(path):
+				load_errors.append("missing legacy table %s at %s" % [table_name, path])
+				continue
+			var payload: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+			if typeof(payload) != TYPE_DICTIONARY:
+				load_errors.append("legacy table %s root must be object" % table_name)
+				continue
+			tables[table_name] = payload
+
+	if not load_errors.is_empty():
+		tables.clear()
+		_config_version = 0
+		return false
+	return true
 
 
 func reload_all() -> bool:
@@ -74,23 +95,17 @@ func config_version() -> int:
 	return _config_version
 
 
-## 已加载根表；无则 `{}`。
-##
-## Autoload ConfigDb；玩法只读 require/get_table，禁止硬编码常数。
-## @param table_name Config manifest 表名
-## @return 结果字典；缺失语义键时可能为空 {}。
 func get_table(table_name: String) -> Dictionary:
-	return tables.get(table_name, {})
+	if not tables.has(table_name):
+		push_error("ConfigDb.get_table unknown: " + table_name)
+		return {}
+	return tables[table_name]
 
-## 点分路径取值；缺失 push_error。
-##
-## Autoload ConfigDb；玩法只读 require/get_table，禁止硬编码常数。
-## @param path 点分配置路径
-## @return `Variant`。
+
 func require(path: String) -> Variant:
-	# path like "balance.start" or "hud_hints.fuelFill"
 	var parts := path.split(".")
 	if parts.is_empty():
+		push_error("ConfigDb.require empty path")
 		return null
 	var root_name := parts[0]
 	var node: Variant = tables.get(root_name, null)
@@ -99,9 +114,11 @@ func require(path: String) -> Variant:
 		return null
 	for i in range(1, parts.size()):
 		if typeof(node) != TYPE_DICTIONARY:
+			push_error("ConfigDb.require not a dict at: " + ".".join(parts.slice(0, i + 1)))
 			return null
-		node = node.get(parts[i], null)
-		if node == null:
+		var key := parts[i]
+		if not node.has(key):
 			push_error("ConfigDb.require missing: " + path)
 			return null
+		node = node[key]
 	return node

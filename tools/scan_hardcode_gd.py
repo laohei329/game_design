@@ -14,6 +14,7 @@ SCAN_DIRS = [
     ROOT / "client/scripts/content",
     ROOT / "client/scripts/domain",
 ]
+SIM_ENGINE = ROOT / "sim" / "engine.py"
 
 EXCLUDE_FILES = {
     "population_rules.gd",
@@ -31,6 +32,11 @@ NOISE = re.compile(
 )
 
 RULES: list[tuple[str, re.Pattern[str], str]] = [
+    (
+        "HC-get-default",
+        re.compile(r'\.get\s*\(\s*["\'][\w.]+["\']\s*,\s*(?:\d+\.?\d*|\[|true|false)'),
+        "Config 键带字面默认值（优先 require）",
+    ),
     (
         "R1-procedural",
         re.compile(r"randi_range\(\s*\d+\s*,\s*\d+\s*\)"),
@@ -96,6 +102,39 @@ RULES: list[tuple[str, re.Pattern[str], str]] = [
         re.compile(r'lengthKm"\s*,\s*50'),
         "段长读档默认",
     ),
+    (
+        "R8-tech-tutorial",
+        re.compile(r'stageZeroSmokeMaxLv|tutorialRegion|tutorialForce'),
+        "科技/教程键直写（应 require）",
+    ),
+    (
+        "R8-tech-tutorial",
+        re.compile(r"eventRate|scenario_event_rate\s*=\s*0\.\d"),
+        "事件率字面默认",
+    ),
+    (
+        "R8-get-default",
+        re.compile(r'get\("stations\.'),
+        "stations 镜像路径 get",
+    ),
+]
+
+SIM_RULES: list[tuple[str, re.Pattern[str], str]] = [
+    (
+        "S1-sim-literal",
+        re.compile(r"^START_(FOOD|WATER|FUEL)\s*=\s*[\d.]+"),
+        "开局常量（应对齐 balance.start）",
+    ),
+    (
+        "S1-sim-literal",
+        re.compile(r"^GUARANTEE_AFTER\s*=\s*int\("),
+        "OK: 来自 stations 配置",
+    ),
+    (
+        "S1-sim-literal",
+        re.compile(r"^L1_UNIT\s*=\s*[\d.]+"),
+        "战斗 L1 单位（应对齐 combat 表）",
+    ),
 ]
 
 
@@ -116,8 +155,25 @@ def scan_file(path: Path) -> list[tuple[str, str, int, str, str]]:
     return out
 
 
+def scan_sim_engine() -> list[tuple[str, str, int, str, str]]:
+    out: list[tuple[str, str, int, str, str]] = []
+    if not SIM_ENGINE.is_file():
+        return out
+    rel = SIM_ENGINE.relative_to(ROOT).as_posix()
+    for lineno, line in enumerate(SIM_ENGINE.read_text(encoding="utf-8").splitlines(), 1):
+        s = line.strip()
+        if "GUARANTEE_AFTER" in s and "STATIONS_CFG" in s:
+            continue
+        for round_id, pattern, note in SIM_RULES:
+            if pattern.search(s):
+                out.append((rel, round_id, lineno, note, s))
+                break
+    return out
+
+
 def main() -> int:
     all_hits: list[tuple[str, str, int, str, str]] = []
+    all_hits.extend(scan_sim_engine())
     for base in SCAN_DIRS:
         if not base.is_dir():
             continue

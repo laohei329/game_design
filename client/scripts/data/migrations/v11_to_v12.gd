@@ -3,8 +3,6 @@ extends RefCounted
 
 class_name MigrationV11ToV12
 
-const _SearchService := preload("res://scripts/gameplay/search_service.gd")
-
 
 static func apply(save: Dictionary) -> void:
 	if typeof(save) != TYPE_DICTIONARY:
@@ -85,8 +83,7 @@ static func _patch_region_run(save: Dictionary) -> void:
 		return
 	if not rr.has("regionFuelMult"):
 		var rid := str(rr.get("regionId", "urban"))
-		var row: Dictionary = RegionService.region_def(rid)
-		rr["regionFuelMult"] = float(row.get("regionFuelMult", 1.0))
+		rr["regionFuelMult"] = _region_fuel_mult(rid)
 	if not rr.has("pointTypeWeightMods"):
 		rr["pointTypeWeightMods"] = {}
 	var segs: Variant = rr.get("segments", [])
@@ -105,10 +102,41 @@ static func _patch_region_run(save: Dictionary) -> void:
 			if typeof(pt) != TYPE_DICTIONARY:
 				continue
 			if not pt.has("remainingYield"):
-				pt["remainingYield"] = _SearchService.initial_remaining_yield(str(pt.get("type", "")))
+				pt["remainingYield"] = _initial_remaining_yield(str(pt.get("type", "")))
 			if not pt.has("depleted"):
 				pt["depleted"] = false
 			var pile: Variant = pt.get("lootPile", {})
 			if typeof(pile) != TYPE_DICTIONARY:
 				pt["lootPile"] = {}
 	save["regionRun"] = rr
+
+
+static func _region_fuel_mult(region_id: String) -> float:
+	if not SaveMigrationUtil.config_db_ready():
+		return 1.0
+	var regions: Dictionary = SaveMigrationUtil.config_get_table("regions")
+	var bucket: Variant = regions.get("regions", {})
+	if typeof(bucket) != TYPE_DICTIONARY:
+		return 1.0
+	var row: Variant = bucket.get(region_id, {})
+	if typeof(row) != TYPE_DICTIONARY:
+		return 1.0
+	return float(row.get("regionFuelMult", 1.0))
+
+
+static func _initial_remaining_yield(type_id: String) -> float:
+	if not SaveMigrationUtil.config_db_ready():
+		return 10.0
+	var mult := SaveMigrationUtil.config_require_float("point_types.poolMultiplier", 2.5)
+	var types: Dictionary = SaveMigrationUtil.config_get_table("point_types")
+	var rows: Variant = types.get("types", {})
+	if typeof(rows) != TYPE_DICTIONARY or type_id.is_empty():
+		return 10.0
+	var row: Variant = rows.get(type_id, {})
+	if typeof(row) != TYPE_DICTIONARY:
+		return 10.0
+	var pool: Variant = row.get("pool", [])
+	if typeof(pool) != TYPE_ARRAY or pool.is_empty():
+		return 10.0
+	var mid := int(pool.size() / 2)
+	return float(pool[mid]) * mult

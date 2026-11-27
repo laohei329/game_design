@@ -111,7 +111,7 @@
 
 ### 3.4 其它主设备（快照）
 
-| id | 设备 | 壳 | function | 岗位槽（job） |
+| id | 设备 | 车厢模板（`templateId`） | function | 岗位槽（job） |
 |---|---|---|---|---|
 | `workbench` | 工作台 | workshop | workshop | `crafter` ×2 |
 | `workbench_adv` | 高级工作台 | workshop | workshop | 同上（占 2 槽） |
@@ -141,9 +141,9 @@
 | 安装/卸载设备 | 槽位与白名单见 §3；卸载主设备则 `function=null` |
 | 体积拼装 | 两节同 templateId、size=2 → 一节 size=4；**总容积不变，刹车不变**；设备合并不得超新槽位 |
 | 体积拆分 | size≥3 → 按下表拆两节；装甲值平分（各 `⌊armor/2⌋`）后 <70 不再计装甲车；设备按槽位迁入，总 `slotCost` ≤ 两节新槽位之和，放不下的卸库存 |
-| 功能重分配 | **仅同壳主设备变体互换**（下表白名单）；**禁止**改 `templateId`、禁止换出他壳功能；卸主设备 → `function=null` |
+| 功能重分配 | **仅同模板主设备变体互换**（下表白名单）；**禁止**改 `templateId`、禁止换出他模板功能；卸主设备 → `function=null` |
 | 装甲焊接 | armor +10（上限 100）；speedBonus −2 |
-| 动力改装 | **仅 isLocomotive** 且当前 `speedBonus < 20`；+5（上限 +20）；该节油耗 +0.5%/日。开局模板动力多为 **+20 已封顶** → 本动作灰显；主要服务发现的弱动力壳 |
+| 动力改装 | **仅 isLocomotive** 且当前 `speedBonus < 20`；+5（上限 +20）；该节油耗 +0.5%/日。开局模板动力多为 **+20 已封顶** → 本动作灰显；主要服务发现的弱动力车厢模板 |
 | 精度校准 | efficiency +15 |
 | 回收 | 按修复成本 70% 返还 |
 | 造零件 / 精炼 | 日模式互斥二选一（XOR）；见 [02 §3.2/§5.1](02-resources.md) |
@@ -182,7 +182,7 @@
 
 拆后两节继承同一 `templateId`；`speedBonus`/`efficiency`/`trait` 复制到两节（动力资格仍只认 `templateId=power`）。禁止拆出第三种尺寸组合。
 
-**同壳主设备白名单（功能重分配唯一可选对象）**：
+**同模板主设备白名单（功能重分配唯一可选对象）**：
 
 | templateId | 可互换主设备（同列内） | 卸空后 function |
 |---|---|---|
@@ -191,12 +191,12 @@
 | `radar` | `radar_array` | null |
 | `water` | `purifier_unit` / `purifier_unit_adv` | null |
 | `greenhouse` | `grow_rack` / `grow_rack_dual` | null |
-| `living` | `bunk`（可拆腾槽给 `cargo_rack`；床≠主功能） | null（休息壳无 `function` 字段消费） |
+| `living` | `bunk`（可拆腾槽给 `cargo_rack`；床≠主功能） | null（休息车厢模板无 `function` 字段消费） |
 | `cargo` | `cargo_rack` / `cargo_rack_wide` | null |
 | `armor` | `armor_frame` | null |
 | `power` | 引擎组件**不可卸**（卸=失去动力资格，禁止本动作） | — |
 
-禁止把「功能重分配」理解成休息壳↔种植壳等跨功能变种（红线 #13）。
+禁止把「功能重分配」理解成休息车厢↔种植车厢等跨模板变种（红线 #13）。
 
 **工位互斥（权威）**：某 `crafter` 当日若已投入车体维修一 / 失护检修 / 改装动作（占用游戏小时），则**不计入**当日造零件/精炼在岗工位（[02 §3.2](02-resources.md)）。禁止同一人「修车 + 全日产零件」。
 
@@ -360,7 +360,7 @@ EA 后「车厢即战场」只做功能禁用，不另开血条。
 | armorCars | armorTechLv | trainDR | 战力 | 备注 |
 |---|---:|---:|---:|---|
 | 0 | 0 | 0 | 0 | 开局无装甲 |
-| 1 | 0 | 0.30 | 12 | 挂上首节装甲壳 |
+| 1 | 0 | 0.30 | 12 | 挂上首节装甲车厢模板 |
 | 2 | 0 | 0.60 | 24 | |
 | 2 | 2 | 0.72 | 32 | `0.60+0.12` |
 | 3 | 5 | **0.80** | 56 | `0.90+0.30` 触天花板 0.80 |

@@ -107,6 +107,11 @@ FUEL_TRACTION_PER_LOCO = 0.08
 FUEL_TRACTION_PER_TECH = 0.08
 FUEL_TRACTION_FLOOR = 0.4
 FUEL_CRAFT_PER_DAY = 0.5
+FUEL_CLIMATE_REGION_MULT_CAP = 3.0
+YEAR_PROD_BASE = 0.95
+TRAIN_DR_PER_ARMOR = 0.30
+TRAIN_DR_PER_TECH = 0.06
+TRAIN_DR_CAP = 0.80
 REPAIR_PARTS: Dict[str, int] = {"living": 3, "cargo": 3, "default": 5, "tutorialLiving": 1}
 CRYSTAL_HIDDEN_CHANCE: float = 0.09
 
@@ -125,7 +130,9 @@ def _apply_balance_json() -> None:
     global SEARCH_YIELD_MULT_BASE, SEARCH_YIELD_MULT_PER_TEAM, SEARCH_YIELD_MULT_CAP
     global SCAVENGE_SKILL_DIVISOR, SEARCH_YIELD_JITTER_MIN, SEARCH_YIELD_JITTER_SPAN
     global FUEL_BASE, FUEL_EXTRA_LOCO, FUEL_TRACTION_PER_LOCO, FUEL_TRACTION_PER_TECH
-    global FUEL_TRACTION_FLOOR, FUEL_CRAFT_PER_DAY, REPAIR_PARTS, CRYSTAL_HIDDEN_CHANCE
+    global FUEL_TRACTION_FLOOR, FUEL_CRAFT_PER_DAY, FUEL_CLIMATE_REGION_MULT_CAP, YEAR_PROD_BASE
+    global TRAIN_DR_PER_ARMOR, TRAIN_DR_PER_TECH, TRAIN_DR_CAP
+    global REPAIR_PARTS, CRYSTAL_HIDDEN_CHANCE
     root = Path(__file__).resolve().parents[1]
     path = root / "data" / "balance.json"
     if not path.is_file():
@@ -136,6 +143,7 @@ def _apply_balance_json() -> None:
     SEASON_LEN = int(t.get("daysPerSeason", SEASON_LEN))
     YEAR_LEN = int(SEASON_LEN * t.get("seasonsPerYear", 4))
     DRIVE_HOURS_CAP = float(t.get("driveHoursPerDayCap", DRIVE_HOURS_CAP))
+    YEAR_PROD_BASE = float(t.get("yearProdBase", YEAR_PROD_BASE))
     gh = data.get("greenhouse", {})
     HEATING_FUEL_PER_CAR = float(gh.get("heatingFuelPerCarDay", HEATING_FUEL_PER_CAR))
     HEATING_MULT = float(gh.get("heatingMult", HEATING_MULT))
@@ -144,9 +152,15 @@ def _apply_balance_json() -> None:
     SEED_CONSUME_PER_RACK = float(gh.get("seedConsumePerRackDay", SEED_CONSUME_PER_RACK))
     combat_path = root / "data" / "combat.json"
     combat = data.get("combat", {})
+    global TRAIN_DR_PER_ARMOR, TRAIN_DR_PER_TECH, TRAIN_DR_CAP
     if combat_path.is_file():
         combat_data = json.loads(combat_path.read_text(encoding="utf-8"))
         L1_UNIT = float(combat_data.get("l1Unit", combat.get("l1Unit", L1_UNIT)))
+        tdr = combat_data.get("trainDR") or {}
+        if isinstance(tdr, dict):
+            TRAIN_DR_PER_ARMOR = float(tdr.get("perArmorCar", TRAIN_DR_PER_ARMOR))
+            TRAIN_DR_PER_TECH = float(tdr.get("perTechLevel", TRAIN_DR_PER_TECH))
+            TRAIN_DR_CAP = float(tdr.get("cap", TRAIN_DR_CAP))
     else:
         L1_UNIT = float(combat.get("l1Unit", L1_UNIT))
     tech = data.get("tech", {})
@@ -207,6 +221,9 @@ def _apply_balance_json() -> None:
         FUEL_TRACTION_PER_TECH = float(fuel_cfg.get("tractionPerPowerTech", FUEL_TRACTION_PER_TECH))
         FUEL_TRACTION_FLOOR = float(fuel_cfg.get("tractionFloor", FUEL_TRACTION_FLOOR))
         FUEL_CRAFT_PER_DAY = float(fuel_cfg.get("craftFuelPerDay", FUEL_CRAFT_PER_DAY))
+        FUEL_CLIMATE_REGION_MULT_CAP = float(
+            fuel_cfg.get("climateRegionMultCap", FUEL_CLIMATE_REGION_MULT_CAP)
+        )
     carriages_path = root / "data" / "carriages.json"
     if carriages_path.is_file():
         cdata = json.loads(carriages_path.read_text(encoding="utf-8"))
@@ -240,7 +257,7 @@ REGION_IDS = region_ids()
 
 SEASON_PRESSURE = load_season_pressure()
 STATIONS_CFG = load_stations_config()
-GUARANTEE_AFTER = int(STATIONS_CFG.get("guaranteeAfter", 4))
+GUARANTEE_AFTER = int(STATIONS_CFG["guaranteeAfter"])
 POOL_OFFER_CHANCE = float(STATIONS_CFG.get("poolOfferChance", 0.9))
 STATION_COUNT_KEYS, STATION_COUNT_WEIGHTS = station_count_choice_weights()
 
@@ -264,7 +281,7 @@ def day_in_season(day: int) -> int:
 
 def year_prod(day: int) -> float:
     """01 §9：只乘 F05/F32。"""
-    return 0.95 ** (year_of(day) - 1)
+    return YEAR_PROD_BASE ** (year_of(day) - 1)
 
 
 def weather_col(day: int) -> int:
@@ -469,7 +486,7 @@ def fuel_day(state: RunState, speed_coef: float = 1.0, craft: bool = False) -> f
     surcharge = max(0.0, float(state.segment_fuel_surcharge))
     mult = min(
         speed_coef * state.climate.fuel * state.region_fuel_mult * (1.0 + surcharge),
-        3.0,
+        FUEL_CLIMATE_REGION_MULT_CAP,
     )
     return (FUEL_BASE + add) * traction(state) * mult + craft_add
 
@@ -479,8 +496,9 @@ def armor_cars(state: RunState) -> int:
 
 
 def train_dr(state: RunState) -> float:
-    """03 §6.4：0.30×armorCars + 0.06×armorTechLv，封顶 0.80。"""
-    return min(0.30 * armor_cars(state) + 0.06 * state.armor_tech, 0.80)
+    """03 §6.4：perArmorCar×armorCars + perTechLevel×armorTechLv，封顶 cap。"""
+    raw = TRAIN_DR_PER_ARMOR * armor_cars(state) + TRAIN_DR_PER_TECH * state.armor_tech
+    return min(raw, TRAIN_DR_CAP)
 
 
 def count_job(state: RunState, job: str) -> int:
@@ -1761,56 +1779,58 @@ def _station(state: RunState, rng: random.Random, strat: Strategy) -> None:
     repair = _car_repair_cost(car)
     if guarantee_forced:
         repair = min(repair, max(1, int(state.parts)))
-    # 保守留零件缓冲；扩张油紧时也对高耗车加缓冲
-    buffer = 0 if strat.prefer_carriage else 2
-    if car.function in ("greenhouse", "water") or state.starve_food_days > 0:
         buffer = 0
-    elif car.is_locomotive:
-        buffer = 0  # 立刻挂第二动力（燃料墙）
-    elif not strat.prefer_carriage and state.onboard() < 10:
-        buffer = 1
-    fuel_fill = state.fuel / max(1.0, state.fuel_cap())
-    if fuel_fill < 0.28 and car.fuel_per_day >= 2.0:
-        _miss_carriage(state, "ai_skip")
-        return
-    # 扩张挂车节流：油紧拒装甲；≥12 节只放行货/动力/刚需产能与年2冲床
-    if strat.prefer_carriage and fuel_fill < 0.55:
-        if car.template_id == "armor" and state.body >= 48:
+    else:
+        buffer = 0 if strat.prefer_carriage else 2
+        if car.function in ("greenhouse", "water") or state.starve_food_days > 0:
+            buffer = 0
+        elif car.is_locomotive:
+            buffer = 0  # 立刻挂第二动力（燃料墙）
+        elif not strat.prefer_carriage and state.onboard() < 10:
+            buffer = 1
+    if not guarantee_forced:
+        fuel_fill = state.fuel / max(1.0, state.fuel_cap())
+        if fuel_fill < 0.28 and car.fuel_per_day >= 2.0:
             _miss_carriage(state, "ai_skip")
             return
-        if state.car_count() >= 12:
-            y_now = year_of(state.day)
-            need_live = (
-                car.template_id == "living"
-                and y_now >= 2
-                and state.beds() < 20
-            )
-            allow = (
-                car.is_locomotive
-                or car.template_id == "cargo"
-                or car.function in ("greenhouse", "water")
-                or need_live
-            )
-            if not allow:
+        # 扩张挂车节流：油紧拒装甲；≥12 节只放行货/动力/刚需产能与年2冲床
+        if strat.prefer_carriage and fuel_fill < 0.55:
+            if car.template_id == "armor" and state.body >= 48:
                 _miss_carriage(state, "ai_skip")
                 return
-        elif (
-            state.car_count() >= 10
-            and car.template_id in ("radar", "workshop")
-            and state.body >= 55
+            if state.car_count() >= 12:
+                y_now = year_of(state.day)
+                need_live = (
+                    car.template_id == "living"
+                    and y_now >= 2
+                    and state.beds() < 20
+                )
+                allow = (
+                    car.is_locomotive
+                    or car.template_id == "cargo"
+                    or car.function in ("greenhouse", "water")
+                    or need_live
+                )
+                if not allow:
+                    _miss_carriage(state, "ai_skip")
+                    return
+            elif (
+                state.car_count() >= 10
+                and car.template_id in ("radar", "workshop")
+                and state.body >= 55
+            ):
+                _miss_carriage(state, "ai_skip")
+                return
+        # 保守：预留零件给第二动力；扩张靠上面油门槛挡装甲
+        locos = sum(1 for c in state.cars if c.is_locomotive)
+        if (
+            not strat.prefer_carriage
+            and locos < 2
+            and car.template_id in ("armor", "radar", "workshop")
+            and state.parts < repair + buffer + 5
         ):
             _miss_carriage(state, "ai_skip")
             return
-    # 保守：预留零件给第二动力；扩张靠上面油门槛挡装甲
-    locos = sum(1 for c in state.cars if c.is_locomotive)
-    if (
-        not strat.prefer_carriage
-        and locos < 2
-        and car.template_id in ("armor", "radar", "workshop")
-        and state.parts < repair + buffer + 5
-    ):
-        _miss_carriage(state, "ai_skip")
-        return
     if state.parts >= repair + buffer:
         state.parts -= repair
         state.cars.append(car)

@@ -78,7 +78,7 @@ static func H1_reverse_stop() -> Dictionary:
 	}
 
 
-## 与 LootPileService.export_piles + archive_piles_before_new_run 契约一致。
+## 与 LootPileService 换跨度归档 + orphan: 点位取货契约一致（H2R）。
 static func H2_orphan_piles() -> Dictionary:
 	var state := RunState.new()
 	var rr := RegionRun.new()
@@ -96,23 +96,20 @@ static func H2_orphan_piles() -> Dictionary:
 	]
 	rr.segments = [seg]
 	state.region_run = rr
-	var rows: Array = []
-	for pt in seg.points:
-		if typeof(pt) != TYPE_DICTIONARY:
-			continue
-		var pid := str(pt.get("id", ""))
-		var pile: Dictionary = pt.get("lootPile", {})
-		for k in pile.keys():
-			var amt := float(pile[k])
-			if amt > 0.001:
-				rows.append({"pointId": pid, "inventoryKey": str(k), "amount": amt})
-	state.orphan_loot_piles.append_array(rows)
-	for pt in seg.points:
-		if typeof(pt) == TYPE_DICTIONARY:
-			pt.lootPile = {}
+	LootPileService.archive_piles_before_new_run(state)
 	if state.orphan_loot_piles.size() != 1:
 		return {"ok": false, "lines": ["FAIL H2 orphan count=%d" % state.orphan_loot_piles.size()]}
 	var row: Dictionary = state.orphan_loot_piles[0]
+	var pid := str(row.get("pointId", ""))
+	if not LootPileService.is_orphan_point_id(pid):
+		return {"ok": false, "lines": ["FAIL H2 expected orphan: prefix got=%s" % pid]}
 	if float(row.get("amount", 0)) < 3.0:
 		return {"ok": false, "lines": ["FAIL H2 orphan amount"]}
-	return {"ok": true, "lines": ["OK H2 archive_piles_before_new_run retains loot"]}
+	if LootPileService.find_point(state, pid).is_empty():
+		return {"ok": false, "lines": ["FAIL H2 find_point orphan"]}
+	var taken := LootPileService.take(state, pid, "food", 1.5)
+	if taken < 1.4:
+		return {"ok": false, "lines": ["FAIL H2R orphan take got=%s" % taken]}
+	if float(state.orphan_loot_piles[0].get("amount", 0)) > 2.1:
+		return {"ok": false, "lines": ["FAIL H2R orphan row not reduced"]}
+	return {"ok": true, "lines": ["OK H2 orphan archive + take via orphan:"]}

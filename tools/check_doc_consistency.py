@@ -19,7 +19,6 @@ REMOVED_PATTERNS = [
     r"validate_data_ci\.py",
     r"validate_config_db\.py",
     r"compare_rules\.py",
-    r"run_zero_a\.py",
     r"run_time_event_sweep\.py",
     r"scripts/qa/",
     r"headless_smoke",
@@ -48,8 +47,11 @@ SKIP_REMOVED_CHECK = {
     "archive/qa-history/README.md",
     "tools/README.md",
     "qa/整体审计报告-第六轮.md",
+    "qa/一致性与逻辑检查-2026-11-27.md",
     "archive/qa-history/CLEANUP-CANDIDATES-2026-11-27.md",
 }
+
+ORPHAN_SHELL_RE = re.compile(r"(?<![`\w])壳(?![`\w])")
 
 HEADER_CV_RE = re.compile(
     r"configVersion\s*\*?\*?(\d+)\*?\*?|configVersion:\s*(\d+)|当前\s*`configVersion:\s*(\d+)`",
@@ -100,6 +102,9 @@ def main() -> int:
 
         for link_err in _broken_links(text, path):
             issues.append((rel, link_err))
+
+        if "modules/" in rel and ORPHAN_SHELL_RE.search(text) and "「壳」" not in text:
+            issues.append((rel, "正文含裸「壳」字（宜用「空壳」或加反引号）"))
 
         # 权威文档头 configVersion 落后于实体（仅扫前 8 行 + 09 特例行）
         if rel in {

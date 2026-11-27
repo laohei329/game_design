@@ -92,13 +92,13 @@
 | **C1** | **已关** | T9 / T10 | [08 §4](08-presentation.md) P1 表 | |
 | **C2** | **已关** | **事件五语 120** | `events_{general,season,year}.csv` + `sync_event_locale.py --bucket` | 细调走 CSV；机制仍手改 JSON |
 | **C3** | **已关** | 事件 sweep 报告 | 历史报告已删；按需重跑 sweep | |
-| **C4** | 低 | 「壳」文案统一 | **主文档已闭**（architecture/README/03）；`shell` 模板 id 保留 | |
+| **C4** | 低 | 「壳」文案统一 | **主索引已闭**；`03-train` 正文与 RF-12 仍开；`shell` 模板 id 保留 | |
 | **C5** | **已关** | GODOT_ARCH 排版 | 反斜杠已清 | |
 | **C6** | **已关** | `seasonWeightMods` | `point_types.json` + 01 §6 注 | |
 
 ### 5.4 本次结论
 
-- 审计 **16 项**中 **15 项已关**；未关：**C4** 命名扫尾。  
+- 审计 **16 项**中 **15 项已关**；未关：**C4** 命名扫尾（03 正文长尾）。  
 - **config25**：主策接受数字 + [10 §1](10-validation.md) 阈值修订（2026-11-26）。  
 - 工程类旧缺口（客户端、真人测试、手算签字、30 日可玩）沿用上文 L1–L9。
 
@@ -163,14 +163,14 @@
 | D10 | **已关** | 燃料墙 52/55 叙事 | [10 §1](10-validation.md) 标 **历史 v1.3.23**；闸看 config25 |
 | D11 | 低 | architecture §7「数值须经零 A 校准」与 §1.1 **已冻结** 语气并存 | 理解为：冻结后改数走解冻，非持续校准 |
 | D12 | 低 | **R1 标题「五条路」** vs T1/R6 六手段 | 保留标题；T1 已兜底（D7） |
-| D13 | 低 | **C4** 壳/模板文案扫尾仍开 | 内容债，不挡 S0 |
+| D13 | 低 | **C4** 车厢模板文案扫尾仍开（`03-train` + RF-12） | 内容债，不挡 S0 |
 
 #### E. 工程缺口
 
 | ID | 严重度 | 发现 | 建议 |
 |---|---|---|---|
 | E1 | **部分** | `client/` | S0 + 日结/日历/气候脚本 + `END_DAY`；无 `run_main`/可点闭环 UI |
-| E2 | **部分** | 迁移 GD | `v11_to_v12.gd` + `runtime_save_patch`；全链 S1b |
+| E2 | **部分** | 迁移 GD | `SaveMigrationChain` v2→v12 + `save_migration_climate`（v8）；S1b.5 人工签 / 真实旧档 |
 | E3 | **部分** | `ABANDON_CARRIAGE` | `train_service.gd` + GameSession；缺 UI 确认流 |
 | E4 | **已关** | `abandonCount` | SaveService / RuntimeSavePatch 缺省 0（save 12） |
 

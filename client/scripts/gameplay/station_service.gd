@@ -43,7 +43,7 @@ static func stations_cfg() -> Dictionary:
 ## 公开 API：UI 经 `IntentBus` → `GameSession`，勿在 presentation 改 state。
 ## @return 整数结果（计数/下标/容量）。
 static func guarantee_after() -> int:
-	return int(stations_cfg().get("guaranteeAfter", 4))
+	return int(ConfigDb.require("stations.guaranteeAfter"))
 
 
 ## carriages.templates 单行；缺则 {}。

@@ -63,9 +63,10 @@ static func daily_rate_at_speed_coef(state: RunState, speed_coef: float) -> floa
 	var base := float(ConfigDb.require("balance.fuel.base"))
 	var add := sum_car_fuel_add(state)
 	var surcharge := _segment_fuel_surcharge(state)
+	var cap := float(ConfigDb.require("balance.fuel.climateRegionMultCap"))
 	var mult := minf(
 		speed_coef * state.fuel_climate * state.region_fuel_mult_active() * (1.0 + surcharge),
-		3.0
+		cap
 	)
 	return (base + add) * traction(state) * mult
 

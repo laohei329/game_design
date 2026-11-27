@@ -149,7 +149,7 @@ flowchart LR
 
 **权威明细**：[GODOT_ARCH §9.2 · §10 S1b](GODOT_ARCH.md)
 
-**出口标准（M3 完成）**：S1b.1–S1b.8 过 + [10 §2.1](10-validation.md) 构建号登记。
+**出口标准（M3 完成）**：S1b.1–S1b.9 过 + [10 §2.1](10-validation.md) 构建号登记（与 [GODOT_ARCH §10 S1b](GODOT_ARCH.md) 一致）。
 
 ---
 

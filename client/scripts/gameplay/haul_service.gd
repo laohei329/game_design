@@ -243,6 +243,19 @@ static func _try_enqueue_waiting(state: RunState) -> void:
 				var amt := float(pile[k])
 				if amt > 0.001:
 					enqueue_for_loot(state, pid, str(k), amt)
+	var seen_orphan: Dictionary = {}
+	for row in state.orphan_loot_piles:
+		if typeof(row) != TYPE_DICTIONARY:
+			continue
+		var pid := str(row.get("pointId", ""))
+		if pid == "" or seen_orphan.has(pid):
+			continue
+		seen_orphan[pid] = true
+		var pile := LootPileService._orphan_pile_aggregate(state, pid)
+		for k in pile.keys():
+			var amt := float(pile[k])
+			if amt > 0.001:
+				enqueue_for_loot(state, pid, str(k), amt)
 
 
 ## 手动搬运会取堆中数量最大的 inventoryKey。

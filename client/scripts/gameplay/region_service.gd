@@ -74,9 +74,7 @@ static func region_pick_clues(region_id: String) -> PackedStringArray:
 ## @param state 当前局 `RunState`（就地修改字段）
 static func start_tutorial(state: RunState) -> void:
 	var stations_cfg: Dictionary = ConfigDb.get_table("stations")
-	var region_id := str(
-		stations_cfg.get("tutorialRegion", ConfigDb.require("balance.stations.tutorialRegion"))
-	)
+	var region_id := str(ConfigDb.require("stations.tutorialRegion"))
 	_apply_region_factors(state, region_id)
 
 	var run := RegionRun.new()
@@ -541,13 +539,13 @@ static func _build_tutorial_segment_0(stations_cfg: Dictionary) -> Segment:
 			"nonePool": false,
 			"visited": false,
 			"tutorialHook": true,
-			"forceLivingOffer": bool(stations_cfg.get("tutorialForceLivingOffer", true)),
+			"forceLivingOffer": bool(ConfigDb.require("stations.tutorialForceLivingOffer")),
 			"livingRepairCost": int(ConfigDb.require("stations.tutorialLivingRepairCost")),
 		},
 	]
 
 	seg.points = []
-	var force: Variant = stations_cfg.get("tutorialForcePointTypes", ["supermarket", "water_plant"])
+	var force: Variant = ConfigDb.require("stations.tutorialForcePointTypes")
 	if typeof(force) == TYPE_ARRAY:
 		var idx := 0
 		for pt in force:

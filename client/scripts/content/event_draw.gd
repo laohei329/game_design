@@ -102,19 +102,9 @@ static func _build_ctx(state: RunState, segment: Segment = null) -> Dictionary:
 ##
 ## @return 浮点结果（量/比率/工时）。
 static func scenario_event_rate() -> float:
-	var base := 1.0
-	var ed: Variant = ConfigDb.require("balance.eventDraw")
-	if typeof(ed) == TYPE_DICTIONARY:
-		base = float(ed.get("scenarioEventRate", 1.0))
-	var diff: Dictionary = ConfigDb.get_table("difficulty")
-	var tier_id := str(diff.get("defaultId", "normal"))
-	var tiers: Variant = diff.get("tiers", {})
-	if typeof(tiers) == TYPE_DICTIONARY:
-		var tier: Variant = tiers.get(tier_id, {})
-		if typeof(tier) == TYPE_DICTIONARY:
-			var mult: Variant = tier.get("multipliers", {})
-			if typeof(mult) == TYPE_DICTIONARY:
-				base *= float(mult.get("eventDrawRate", 1.0))
+	var base := float(ConfigDb.require("balance.eventDraw.scenarioEventRate"))
+	var tier_id := str(ConfigDb.require("difficulty.defaultId"))
+	base *= float(ConfigDb.require("difficulty.tiers.%s.multipliers.eventDrawRate" % tier_id))
 	return base
 
 ## 单卡最终权重：基础 × 标签重复惩罚 × 段内 `eventTagWeights` 修正。
@@ -123,7 +113,10 @@ static func scenario_event_rate() -> float:
 ## @param ctx EventDraw 抽卡上下文
 ## @return 浮点结果（量/比率/工时）。
 static func _weight_for_card(card: Dictionary, ctx: Dictionary) -> float:
-	var w := float(card.get("weight", 1.0)) * float(card.get("yieldScale", 1.0)) * float(ctx.get("scenario_event_rate", 1.0))
+	if not card.has("weight") or not card.has("yieldScale"):
+		push_error("EventDraw: card missing weight or yieldScale")
+		return 0.0
+	var w := float(card["weight"]) * float(card["yieldScale"]) * float(ctx.get("scenario_event_rate", 1.0))
 	var tags: Array = []
 	for t in card.get("tags", []):
 		tags.append(str(t))

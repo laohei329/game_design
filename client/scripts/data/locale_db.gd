@@ -3,13 +3,23 @@ extends Node
 ## 文案用 LocaleApi.tr_key 等；本节点提供 reload_locale / set_locale。
 
 
-const EDITOR_UI_TRANSLATIONS: PackedStringArray = [
-	"res://data/localization/ui.en.translation",
-	"res://data/localization/ui.zh.translation",
-	"res://data/localization/ui.de.translation",
-	"res://data/localization/ui.ru.translation",
-	"res://data/localization/ui.es.translation",
+const _EDITOR_LOCALE_STEMS: Array[String] = [
+	"ui",
+	"combat",
+	"abilities",
+	"events_general",
+	"events_season",
+	"events_year",
 ]
+const _EDITOR_LANGS: Array[String] = ["en", "zh", "de", "ru", "es"]
+
+
+static func editor_translation_paths() -> PackedStringArray:
+	var out := PackedStringArray()
+	for stem in _EDITOR_LOCALE_STEMS:
+		for lang in _EDITOR_LANGS:
+			out.append("res://data/localization/%s.%s.translation" % [stem, lang])
+	return out
 
 var _runtime_translations: Array = []
 
@@ -39,7 +49,7 @@ func set_locale(lang: String) -> void:
 
 
 func _load_editor_translation_resources() -> void:
-	for path in EDITOR_UI_TRANSLATIONS:
+	for path in editor_translation_paths():
 		if not ResourceLoader.exists(path):
 			continue
 		var res: Variant = ResourceLoader.load(path)

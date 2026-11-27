@@ -71,9 +71,12 @@ static func stock_cap(state: RunState, key: String) -> float:
 	match k:
 		"food", "water":
 			cap = _base_cap(k) + cargo * float(ConfigDb.require("balance.inventory.cargoPerSize.foodWater"))
-		"parts", "medicine", "chem":
-			var tenth := float(ConfigDb.require("balance.inventory.cargoPerSize.partsMedicineChemTenth"))
-			cap = _base_cap(k) + roundf(cargo * tenth / 3.0)
+		"parts":
+			var parts_tenth := float(ConfigDb.require("balance.inventory.cargoPerSize.partsTenth"))
+			cap = _base_cap(k) + roundf(cargo * parts_tenth / 3.0)
+		"medicine", "chem":
+			var med_tenth := float(ConfigDb.require("balance.inventory.cargoPerSize.medicineChemTenth"))
+			cap = _base_cap(k) + roundf(cargo * med_tenth / 3.0)
 		"scrap":
 			cap = _base_cap("scrap") + cargo * float(ConfigDb.require("balance.inventory.cargoPerSize.scrap"))
 		"seed":

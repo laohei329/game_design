@@ -24,7 +24,7 @@
 | B6 | F3 存档0 / 读档0 | 无报错；关键字段仍在 |
 | B7 | F3 切换 regionFuelMult | 数值 1.0↔1.3 切换 |
 | B8 | F3 **存档0** → 改数（前进一日或改件）→ **读档0** | `dayTotal`/粮水件/precision 回到存档点；无报错 |
-| B8b | 杀进程存读（自动化） | `tools/run_save_kill_smoke.ps1` exit 0 |
+| B8b | 杀进程存读（历史自动化） | 手动：存档0 → 任务管理器结束 Godot → 重开 → 读档0；证据见 `archive/qa-history/DEV-M1-M2-smoke-2026-11-26.md` |
 
 **F3 存读建议顺序（约 2 分钟）**  
 1. 新局后 F3 → 记下 `dayTotal`、粮、`regionRun=urban seg 1/3`、`precision=40`。  

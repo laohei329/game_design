@@ -4,6 +4,27 @@ extends RefCounted
 ##
 ## 与「列车库存」分离：离段/离跨度不删堆（设计 04 §5.4）；存档用 `world.lootPiles[]` 扁平列表
 ## export/apply，读档后 `_ensure_points_loot_on_segments` 会补空字典。
+## 离跨度未匹配点位的物资在 `orphan_loot_piles`，`pointId` 前缀 `orphan:`，杂工可照常搬运。
+
+const ORPHAN_POINT_PREFIX := "orphan:"
+
+
+static func _norm_inv_key(key: String) -> String:
+	var k := str(key).to_lower()
+	if k == "med":
+		return "medicine"
+	return k
+
+
+static func is_orphan_point_id(point_id: String) -> bool:
+	return str(point_id).begins_with(ORPHAN_POINT_PREFIX)
+
+
+static func to_orphan_point_id(original_id: String) -> String:
+	var oid := str(original_id)
+	if is_orphan_point_id(oid):
+		return oid
+	return ORPHAN_POINT_PREFIX + oid
 
 
 static func find_point(state: RunState, point_id: String) -> Dictionary:
@@ -17,7 +38,24 @@ static func find_point(state: RunState, point_id: String) -> Dictionary:
 			var pt: Dictionary = seg.points[i]
 			if str(pt.get("id", "")) == point_id:
 				return {"segment": seg, "pointIndex": i, "point": pt}
+	if is_orphan_point_id(point_id):
+		var pile := _orphan_pile_aggregate(state, point_id)
+		if pile.is_empty():
+			return {}
+		return {"point": {"id": point_id, "lootPile": pile}, "orphan": true}
 	return {}
+
+
+static func _orphan_pile_aggregate(state: RunState, point_id: String) -> Dictionary:
+	var pile: Dictionary = {}
+	for row in state.orphan_loot_piles:
+		if typeof(row) != TYPE_DICTIONARY:
+			continue
+		if str(row.get("pointId", "")) != point_id:
+			continue
+		var key := _norm_inv_key(str(row.get("inventoryKey", row.get("key", "food"))))
+		pile[key] = float(pile.get(key, 0.0)) + float(row.get("amount", 0.0))
+	return pile
 
 
 ## 确保 pt.lootPile 为字典并返回引用（可原地 +=）。
@@ -56,11 +94,25 @@ static func total_amount(pt: Dictionary) -> float:
 static func add(state: RunState, point_id: String, inv_key: String, amount: float) -> float:
 	if amount <= 0.0:
 		return 0.0
+	if is_orphan_point_id(point_id):
+		var key := _norm_inv_key(inv_key)
+		for row in state.orphan_loot_piles:
+			if typeof(row) != TYPE_DICTIONARY:
+				continue
+			if str(row.get("pointId", "")) == point_id and _norm_inv_key(
+					str(row.get("inventoryKey", row.get("key", "food")))
+				) == key:
+				row["amount"] = float(row.get("amount", 0.0)) + amount
+				return amount
+		state.orphan_loot_piles.append(
+			{"pointId": point_id, "inventoryKey": key, "amount": amount}
+		)
+		return amount
 	var hit := find_point(state, point_id)
 	if hit.is_empty():
 		return 0.0
 	var pt: Dictionary = hit.point
-	var key := InventoryService.normalize_key(inv_key)
+	var key := _norm_inv_key(inv_key)
 	var pile := pile_dict(pt)
 	pile[key] = float(pile.get(key, 0.0)) + amount
 	return amount
@@ -75,17 +127,48 @@ static func add(state: RunState, point_id: String, inv_key: String, amount: floa
 ## @param amount 数量（float，可为小数）
 ## @return 浮点结果（量/比率/工时）。
 static func take(state: RunState, point_id: String, inv_key: String, amount: float) -> float:
+	if is_orphan_point_id(point_id):
+		return _take_orphan_row(state, point_id, inv_key, amount)
 	var hit := find_point(state, point_id)
 	if hit.is_empty():
 		return 0.0
 	var pt: Dictionary = hit.point
-	var key := InventoryService.normalize_key(inv_key)
+	var key := _norm_inv_key(inv_key)
 	var pile := pile_dict(pt)
 	var have := float(pile.get(key, 0.0))
 	var moved := minf(have, amount)
 	pile[key] = maxf(0.0, have - moved)
 	if pile[key] <= 0.001:
 		pile.erase(key)
+	return moved
+
+
+static func _take_orphan_row(state: RunState, point_id: String, inv_key: String, amount: float) -> float:
+	var key := _norm_inv_key(inv_key)
+	var moved := 0.0
+	var kept: Array = []
+	for row in state.orphan_loot_piles:
+		if typeof(row) != TYPE_DICTIONARY:
+			continue
+		if str(row.get("pointId", "")) != point_id:
+			kept.append(row)
+			continue
+		var rk := _norm_inv_key(str(row.get("inventoryKey", row.get("key", "food"))))
+		if rk != key:
+			kept.append(row)
+			continue
+		var have := float(row.get("amount", 0.0))
+		var take_amt := minf(have, amount - moved)
+		if take_amt <= 0.001:
+			kept.append(row)
+			continue
+		moved += take_amt
+		var left := have - take_amt
+		if left > 0.001:
+			row = row.duplicate(true)
+			row["amount"] = left
+			kept.append(row)
+	state.orphan_loot_piles = kept
 	return moved
 
 
@@ -116,6 +199,10 @@ static func apply_orphan_piles(state: RunState) -> void:
 		var amt := float(row.get("amount", 0.0))
 		if pid == "" or amt <= 0.001:
 			continue
+		if not is_orphan_point_id(pid) and find_point(state, pid).is_empty():
+			pid = to_orphan_point_id(pid)
+			row = row.duplicate(true)
+			row["pointId"] = pid
 		if find_point(state, pid).is_empty():
 			kept.append(row)
 		else:
@@ -139,7 +226,11 @@ static func export_piles(state: RunState) -> Array:
 			for k in pile.keys():
 				var amt := float(pile[k])
 				if amt > 0.001:
-					out.append({"pointId": pid, "inventoryKey": str(k), "amount": amt})
+					out.append({
+						"pointId": to_orphan_point_id(pid),
+						"inventoryKey": str(k),
+						"amount": amt,
+					})
 	return out
 
 

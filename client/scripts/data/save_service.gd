@@ -1,7 +1,7 @@
 extends Node
 ## 存档读写（Autoload SaveService）：save 12 子集落盘 `user://save_slot_N.json`。
 ##
-## 序列化走 SaveSchema。客户端仅实现 **v11→v12** 迁移；`version.save` < 11 时 warning 后仍尝试补丁。
+## 序列化走 SaveSchema。迁移链见 `SaveMigrationChain`（manifest v2→v12）。
 
 const SAVE_VERSION := 12
 
@@ -24,22 +24,27 @@ func apply_runtime_defaults(save: Dictionary) -> void:
 	if not save.has("telemetry"):
 		save["telemetry"] = {"searchByPointDay": {}}
 
-## 迁移链 + 缺键补丁（不写盘）。
+## 迁移链；不支持版本返回错误码（不写盘）。
 ##
-## Autoload SaveService；SAVE_GAME / LOAD_GAME 唯一落盘入口。
-## @param save 存档根 Dictionary（save 12）
-## @return 结果字典；缺失语义键时可能为空 {}。
-func patch_loaded_save(save: Dictionary) -> Dictionary:
+## @return 空串=成功；否则 `unsupported_save_version_N` 等。
+func migrate_save(save: Dictionary) -> String:
 	apply_runtime_defaults(save)
 	var sv := int(save.get("version", {}).get("save", 0))
-	if sv < 11:
-		push_warning(
-			"SaveService: save version %d < 11; applying v11→v12 patches only (no v2–v10 chain in client)"
-			% sv
-		)
-	if sv < SAVE_VERSION:
-		MigrationV11ToV12.apply(save)
+	if sv <= 0:
+		return "missing_save_version"
+	var chain_err := SaveMigrationChain.migrate_to(save, SAVE_VERSION)
+	if chain_err != "":
+		return chain_err
 	RuntimeSavePatch.ensure_abandon_fields(save)
+	return ""
+
+
+## 迁移链 + 缺键补丁（不写盘）。
+func patch_loaded_save(save: Dictionary) -> Dictionary:
+	var err := migrate_save(save)
+	if err != "":
+		push_error("SaveService.migrate_save: " + err)
+		return {}
 	return save
 
 ## RunState → save dict（SaveSchema）。
@@ -128,9 +133,11 @@ func read_state(slot: int = 0) -> RunState:
 	if typeof(parsed) != TYPE_DICTIONARY:
 		push_error("SaveService: invalid json " + path)
 		return null
-	parsed = patch_loaded_save(parsed)
-	_stash_search_telemetry(parsed)
-	return SaveSchema.from_save_dict(parsed, true)
+	var migrated := patch_loaded_save(parsed)
+	if migrated.is_empty():
+		return null
+	_stash_search_telemetry(migrated)
+	return SaveSchema.from_save_dict(migrated, true)
 
 
 ## 玩法读档：`read_state` + `GameSession.apply_loaded_run`（勿在 Intent 外只调 `read_state` 接 HUD）。

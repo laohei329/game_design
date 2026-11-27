@@ -159,7 +159,7 @@ static func apply_op(
 		return ""
 	var args: Dictionary = op_row.get("args", {}) if typeof(op_row.get("args", {})) == TYPE_DICTIONARY else {}
 	var target_id := str(op_row.get("targetId", ""))
-	var _capture := str(op_row.get("capture", "live"))
+	var capture := str(op_row.get("capture", "live"))
 	match op:
 		"grant_item":
 			var res := InventoryService.normalize_key(str(args.get("res", "")))
@@ -266,14 +266,35 @@ static func apply_op(
 				return "delayed_target_skip"
 			var point_halve := target_id != "" and target_type != "segment"
 			if point_halve:
-				if not _live_point_pile_has_loot(state, target_id):
-					TelemetryService.record(
-						"event_delayed_loot_empty_skip",
-						{"pointId": target_id, "capture": _capture}
-					)
-					return "delayed_target_skip"
-				_halve_point_pile(target_id, seg, ratio)
+				if capture == "snapshot":
+					var snap: Variant = op_row.get("snapshot", {})
+					if typeof(snap) != TYPE_DICTIONARY:
+						return "delayed_target_skip"
+					var snap_pile: Variant = (snap as Dictionary).get("pile", {})
+					if typeof(snap_pile) != TYPE_DICTIONARY or (snap_pile as Dictionary).is_empty():
+						TelemetryService.record(
+							"event_delayed_loot_empty_skip",
+							{"pointId": target_id, "capture": capture}
+						)
+						return "delayed_target_skip"
+					_apply_snapshot_loot_halve(target_id, seg, ratio, snap_pile as Dictionary)
+				else:
+					if not _live_point_pile_has_loot(state, target_id):
+						TelemetryService.record(
+							"event_delayed_loot_empty_skip",
+							{"pointId": target_id, "capture": capture}
+						)
+						return "delayed_target_skip"
+					_halve_point_pile(target_id, seg, ratio)
 			else:
+				if capture == "snapshot":
+					var snap2: Variant = op_row.get("snapshot", {})
+					if typeof(snap2) != TYPE_DICTIONARY:
+						return "delayed_target_skip"
+					var snap_pile2: Variant = (snap2 as Dictionary).get("pile", {})
+					if typeof(snap_pile2) == TYPE_DICTIONARY and not (snap_pile2 as Dictionary).is_empty():
+						_apply_snapshot_loot_halve(target_id, seg, ratio, snap_pile2 as Dictionary)
+						return ""
 				if not _segment_has_loot(seg):
 					TelemetryService.record("event_delayed_loot_empty_skip", {"segment": seg.segment_id})
 					return "delayed_target_skip"
@@ -370,6 +391,30 @@ static func _add_member_mood(member: Dictionary, delta: float) -> void:
 ## @param point_id 搜索点 id（段内 points[].id）
 ## @param seg 当前区段 `Segment`
 ## @param ratio 比例 0~1
+## 按延迟入队时快照的 pile 结算减半（忽略触发前活堆改动）。
+static func _apply_snapshot_loot_halve(
+	point_id: String,
+	seg: Segment,
+	ratio: float,
+	snap_pile: Dictionary
+) -> void:
+	var fac := 1.0 - ratio
+	for pt in seg.points:
+		if typeof(pt) != TYPE_DICTIONARY:
+			continue
+		if str(pt.get("id", "")) != point_id:
+			continue
+		var pile := LootPileService.pile_dict(pt)
+		for k in snap_pile.keys():
+			var base_amt := maxf(0.0, float(snap_pile[k]))
+			var v := base_amt * fac
+			if v < 0.01:
+				pile.erase(k)
+			else:
+				pile[str(k)] = v
+		return
+
+
 static func _halve_point_pile(point_id: String, seg: Segment, ratio: float) -> void:
 	for pt in seg.points:
 		if typeof(pt) != TYPE_DICTIONARY:

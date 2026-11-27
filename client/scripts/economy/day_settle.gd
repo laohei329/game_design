@@ -78,6 +78,18 @@ static func _step_5_water(state: RunState) -> void:
 ##
 ## @param state 当前局 `RunState`（就地修改字段）
 ## @return 整数结果（计数/下标/容量）。
+## 02 §4 / §151：当日工坊非精炼造件则 F04 附加 craftFuelPerDay（与日结 step 6 分支一致）。
+static func _craft_fuel_surcharge_day(state: RunState) -> bool:
+	var cars := _workshop_car_count(state)
+	if cars <= 0 or state.fuel <= 0.0:
+		return false
+	var scrap_batch := float(ConfigDb.require("balance.workshop.scrapPerRefineBatch"))
+	var refining := state.scrap > 0.0 and int(state.scrap / scrap_batch) > 0
+	if refining:
+		return false
+	return true
+
+
 static func _workshop_car_count(state: RunState) -> int:
 	var n := 0
 	for c in state.carriages:
@@ -233,7 +245,8 @@ static func run(state: RunState) -> void:
 	_process_delayed_events(state, next_day)
 
 	# 0 — F04 with yesterday hours; climate = **maintained** fuel_climate (02 §8 / 01 §4.3)
-	var fuel_burn_pct := FuelF04.compute_day_burn_percent(state)
+	var craft_day := _craft_fuel_surcharge_day(state)
+	var fuel_burn_pct := FuelF04.compute_day_burn_percent(state, craft_day)
 	state.drive_hours_today = 0.0
 	state.reverse_hours_today = 0.0
 
