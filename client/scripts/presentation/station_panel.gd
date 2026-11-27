@@ -76,7 +76,7 @@ func _sync() -> void:
 		_hint.text = LocaleApi.tr_key("station.hint.tutorial")
 
 	_btn_accept.text = LocaleApi.trf("station.btn.hook", [cost])
-	_btn_accept.disabled = st.parts < cost
+	_btn_accept.disabled = not bool(offer.get("affordable", false))
 	_btn_defer.text = LocaleApi.tr_key("station.btn.defer")
 
 ## 接受进站要约 → `STATION_ACCEPT`（挂车/扣费逻辑在 StationService）。

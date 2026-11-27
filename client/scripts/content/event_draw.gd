@@ -6,6 +6,15 @@ extends RefCounted
 static func draw_rules() -> Dictionary:
 	return ConfigDb.get_table("event_draw_rules")
 
+
+static func _rule_f(key: String) -> float:
+	return float(ConfigDb.require("event_draw_rules." + key))
+
+
+static func _rule_dict(key: String) -> Dictionary:
+	var raw: Variant = ConfigDb.require("event_draw_rules." + key)
+	return raw if typeof(raw) == TYPE_DICTIONARY else {}
+
 ## 新段掷天气并写入 segment。
 ##
 ## @param state 当前局 `RunState`（就地修改字段）
@@ -56,10 +65,9 @@ static func draw_event_id(state: RunState, segment: Segment = null) -> String:
 ## @param segment 区段 `Segment`
 ## @return 结果字典；缺失语义键时可能为空 {}。
 static func _build_ctx(state: RunState, segment: Segment = null) -> Dictionary:
-	var rules := draw_rules()
 	var onboard := TrainService.onboard_count(state)
-	var fpc := float(rules.get("foodNeedPerCapita", 2.0))
-	var wpc := float(rules.get("waterNeedPerCapita", 1.5))
+	var fpc := _rule_f("foodNeedPerCapita")
+	var wpc := _rule_f("waterNeedPerCapita")
 	var tag_weights := {}
 	var raid_delta := 0.0
 	var seg_ref: Segment = segment
@@ -115,7 +123,6 @@ static func scenario_event_rate() -> float:
 ## @param ctx EventDraw 抽卡上下文
 ## @return 浮点结果（量/比率/工时）。
 static func _weight_for_card(card: Dictionary, ctx: Dictionary) -> float:
-	var rules := draw_rules()
 	var w := float(card.get("weight", 1.0)) * float(card.get("yieldScale", 1.0)) * float(ctx.get("scenario_event_rate", 1.0))
 	var tags: Array = []
 	for t in card.get("tags", []):
@@ -124,19 +131,19 @@ static func _weight_for_card(card: Dictionary, ctx: Dictionary) -> float:
 
 	if tags.has("supply"):
 		if float(ctx.get("food", 0)) < float(ctx.get("food_need", 0)):
-			w += float(rules.get("supplyFoodBoost", 0.4))
+			w += _rule_f("supplyFoodBoost")
 		if float(ctx.get("water", 0)) < float(ctx.get("water_need", 0)):
-			w += float(rules.get("supplyWaterBoost", 0.35))
+			w += _rule_f("supplyWaterBoost")
 
 	if tags.has("recruit"):
 		var beds: int = int(ctx.get("beds", 0))
 		var onboard: int = int(ctx.get("onboard", 0))
 		if onboard >= beds and beds > 0:
-			w *= float(rules.get("recruitBedsFullMult", 0.35))
+			w *= _rule_f("recruitBedsFullMult")
 		else:
-			w *= float(rules.get("recruitHasBedsMult", 1.25))
+			w *= _rule_f("recruitHasBedsMult")
 		if float(ctx.get("food", 0)) < float(ctx.get("food_need", 0)) and onboard < beds:
-			w *= float(rules.get("recruitLowFoodMult", 1.3))
+			w *= _rule_f("recruitLowFoodMult")
 
 	var tag_weights: Dictionary = ctx.get("event_tag_weights", {})
 	for t in tags:
@@ -144,7 +151,7 @@ static func _weight_for_card(card: Dictionary, ctx: Dictionary) -> float:
 			continue
 		w += float(tag_weights.get(str(t), 0.0))
 
-	var raid_tags: Array = rules.get("raidDeltaTags", ["raid"])
+	var raid_tags: Array = ConfigDb.require("event_draw_rules.raidDeltaTags")
 	var raid_hit := false
 	for rt in raid_tags:
 		if tags.has(str(rt)):
@@ -153,47 +160,47 @@ static func _weight_for_card(card: Dictionary, ctx: Dictionary) -> float:
 	if raid_hit:
 		w += float(ctx.get("raid_weight_delta", 0.0))
 		if bool(ctx.get("has_unclaimed_loot", false)):
-			w += float(rules.get("unclaimedLootRaidBoost", 0.25))
+			w += _rule_f("unclaimedLootRaidBoost")
 		if bool(ctx.get("has_guard_on_duty", false)):
-			w *= float(rules.get("guardOnDutyRaidMult", 0.85))
+			w *= _rule_f("guardOnDutyRaidMult")
 
 	if tags.has("mood") and w > 0.0:
-		w *= float(rules.get("moodTagDampenMult", 0.9))
+		w *= _rule_f("moodTagDampenMult")
 
-	var pharma: Dictionary = rules.get("pharmacistOnDutyTagBoost", {})
+	var pharma: Dictionary = _rule_dict("pharmacistOnDutyTagBoost")
 	if (
 		bool(ctx.get("has_pharmacist_on_duty", false))
-		and str(ctx.get("region_id", "")) == str(pharma.get("regionOnly", "plague"))
+		and str(ctx.get("region_id", "")) == str(pharma["regionOnly"])
 	):
 		var boost_tags: Array = pharma.get("tags", [])
 		for bt in boost_tags:
 			if tags.has(str(bt)):
-				w += float(pharma.get("delta", 0.2))
+				w += float(pharma["delta"])
 				break
 
 	if bool(ctx.get("forced_low_content", false)):
-		var flp: Dictionary = rules.get("forcedLowPressure", {})
+		var flp: Dictionary = _rule_dict("forcedLowPressure")
 		var boost_tags_f: Array = flp.get("boostTags", [])
 		if ptag in boost_tags_f:
-			w += float(flp.get("tagBoost", 0.5))
+			w += float(flp["tagBoost"])
 		var suppress: Dictionary = flp.get("suppressTagMult", {})
 		for t in tags:
 			if suppress.has(str(t)):
 				w *= float(suppress[str(t)])
 
-	var low_fuel: Dictionary = rules.get("lowFuelSupplyBoost", {})
+	var low_fuel: Dictionary = _rule_dict("lowFuelSupplyBoost")
 	var fuel_cap: float = float(ctx.get("fuel_cap", 1.0))
 	var fuel_fill := float(ctx.get("fuel", 0.0)) / fuel_cap if fuel_cap > 0.0 else 1.0
-	if fuel_fill < float(low_fuel.get("fuelFillBelow", 0.35)):
-		var lf_tags: Array = low_fuel.get("tags", ["supply"])
+	if fuel_fill < float(low_fuel["fuelFillBelow"]):
+		var lf_tags: Array = low_fuel["tags"]
 		for lt in lf_tags:
 			if tags.has(str(lt)):
-				w += float(low_fuel.get("tagBoost", 0.25))
+				w += float(low_fuel["tagBoost"])
 				break
 
 	var wid := str(card.get("weightEventId", card.get("id", "")))
-	var nr: Dictionary = rules.get("noRepeatWeightEventId", {})
-	var window: int = int(nr.get("windowSegmentsInRun", 2))
+	var nr: Dictionary = _rule_dict("noRepeatWeightEventId")
+	var window: int = int(nr["windowSegmentsInRun"])
 	var recent: Array = ctx.get("recent_weight_event_ids", [])
 	var tail: Array = []
 	if recent.size() > 0:
@@ -201,11 +208,11 @@ static func _weight_for_card(card: Dictionary, ctx: Dictionary) -> float:
 		for i in range(from_i, recent.size()):
 			tail.append(recent[i])
 	if wid in tail:
-		w *= float(nr.get("weightMult", 0.12))
+		w *= float(nr["weightMult"])
 
-	var trp: Dictionary = rules.get("tagRepeatPenalty", {})
+	var trp: Dictionary = _rule_dict("tagRepeatPenalty")
 	if str(ctx.get("last_segment_primary_tag", "")) != "" and ptag == str(ctx.get("last_segment_primary_tag", "")):
-		w *= float(trp.get("lastPrimaryTagMult", 0.35))
+		w *= float(trp["lastPrimaryTagMult"])
 
 	return maxf(0.0, w)
 

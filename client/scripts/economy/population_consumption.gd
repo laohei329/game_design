@@ -7,9 +7,8 @@ extends RefCounted
 const _GameClock := preload("res://scripts/rhythm/game_clock.gd")
 
 
-static func _pop_cfg() -> Dictionary:
-	var p: Variant = ConfigDb.require("balance.population")
-	return p if typeof(p) == TYPE_DICTIONARY else {}
+static func _pop_float(key: String) -> float:
+	return float(ConfigDb.require("balance.population." + key))
 
 
 static var _food_applied_today: float = 0.0
@@ -77,13 +76,13 @@ static func _living_members(state: RunState) -> Array:
 ## 本日全车理论粮需求（对表 sim）。
 static func daily_food_need(state: RunState) -> float:
 	var pop := maxi(1, _living_members(state).size())
-	var food_per := float(_pop_cfg().get("foodPerCapitaDay", 0.9))
+	var food_per := _pop_float("foodPerCapitaDay")
 	return float(pop) * food_per * state.food_climate
 
 
 static func daily_water_need(state: RunState) -> float:
 	var pop := maxi(1, _living_members(state).size())
-	var water_per := float(_pop_cfg().get("waterPerCapitaDay", 0.8))
+	var water_per := _pop_float("waterPerCapitaDay")
 	return float(pop) * water_per * state.water_climate
 
 
@@ -91,17 +90,18 @@ static func tick(state: RunState, day_delta: float) -> void:
 	if day_delta <= 0.0 or state.failed != "":
 		return
 	patch_members(state)
-	var cfg := _pop_cfg()
-	var hunger_rise := float(cfg.get("hungerRisePerDay", 48.0))
-	var thirst_rise := float(cfg.get("thirstRisePerDay", 52.0))
-	var eat_thr := float(cfg.get("eatUrgeThreshold", 18.0))
-	var drink_thr := float(cfg.get("drinkUrgeThreshold", 18.0))
-	var sat_h := float(cfg.get("satisfactionHungerPerFullDayRation", 55.0))
-	var sat_w := float(cfg.get("satisfactionThirstPerFullDayRation", 50.0))
-	var starve_thr := float(cfg.get("starvingHungerThreshold", 90.0))
-	var hp_loss := float(cfg.get("hpLossPerDayAtStarving", 22.0))
-	var food_per := float(cfg.get("foodPerCapitaDay", 0.9)) * state.food_climate
-	var water_per := float(cfg.get("waterPerCapitaDay", 0.8)) * state.water_climate
+	var hunger_rise := _pop_float("hungerRisePerDay")
+	var thirst_rise := _pop_float("thirstRisePerDay")
+	var eat_thr := _pop_float("eatUrgeThreshold")
+	var drink_thr := _pop_float("drinkUrgeThreshold")
+	var sat_h := _pop_float("satisfactionHungerPerFullDayRation")
+	var sat_w := _pop_float("satisfactionThirstPerFullDayRation")
+	var starve_thr := _pop_float("starvingHungerThreshold")
+	var hp_loss := _pop_float("hpLossPerDayAtStarving")
+	var food_per := _pop_float("foodPerCapitaDay") * state.food_climate
+	var water_per := _pop_float("waterPerCapitaDay") * state.water_climate
+	var partial_pen := _pop_float("tickPartialShortfallPenalty")
+	var thirst_hp_frac := _pop_float("thirstStarvingHpLossFraction")
 	var metabolism: float = _GameClock.metabolism_mult(state)
 	var bite_f: float = food_per * day_delta * metabolism
 	var bite_w: float = water_per * day_delta * metabolism
@@ -120,7 +120,7 @@ static func tick(state: RunState, day_delta: float) -> void:
 				var fed := clampf(got / want, 0.0, 1.0)
 				hunger = maxf(0.0, hunger - fed * sat_h * day_delta * 24.0)
 			if got + 0.0001 < want:
-				hunger = minf(100.0, hunger + (want - got) / maxf(food_per, 0.01) * 12.0)
+				hunger = minf(100.0, hunger + (want - got) / maxf(food_per, 0.01) * partial_pen)
 
 		if thirst >= drink_thr or bite_w > 0.0001:
 			var want_w := bite_w
@@ -130,14 +130,14 @@ static func tick(state: RunState, day_delta: float) -> void:
 				var fed_w := clampf(got_w / want_w, 0.0, 1.0)
 				thirst = maxf(0.0, thirst - fed_w * sat_w * day_delta * 24.0)
 			if got_w + 0.0001 < want_w:
-				thirst = minf(100.0, thirst + (want_w - got_w) / maxf(water_per, 0.01) * 12.0)
+				thirst = minf(100.0, thirst + (want_w - got_w) / maxf(water_per, 0.01) * partial_pen)
 
 		if hunger >= starve_thr:
 			var hp := float(m.get("hp", 100.0))
 			m["hp"] = maxf(0.0, hp - hp_loss * day_delta * metabolism)
 		if thirst >= starve_thr:
 			var hp2 := float(m.get("hp", 100.0))
-			m["hp"] = maxf(0.0, hp2 - hp_loss * 0.6 * day_delta * metabolism)
+			m["hp"] = maxf(0.0, hp2 - hp_loss * thirst_hp_frac * day_delta * metabolism)
 
 		m["hunger"] = hunger
 		m["thirst"] = thirst
@@ -156,6 +156,10 @@ static func reconcile_day_end(state: RunState) -> void:
 	var target_w := daily_water_need(state)
 	var rem_f := maxf(0.0, target_f - _food_applied_today)
 	var rem_w := maxf(0.0, target_w - _water_applied_today)
+	var hun_fed := _pop_float("reconcileHungerFedDelta")
+	var hun_short := _pop_float("reconcileHungerShortfallDelta")
+	var thr_fed := _pop_float("reconcileThirstFedDelta")
+	var thr_short := _pop_float("reconcileThirstShortfallDelta")
 
 	if rem_f > 0.0:
 		var per := rem_f / float(alive.size())
@@ -164,9 +168,9 @@ static func reconcile_day_end(state: RunState) -> void:
 			_add_food_applied(got)
 			var hunger := float(m.get("hunger", 0.0))
 			if got + 0.0001 >= per:
-				hunger = maxf(0.0, hunger - 12.0)
+				hunger = maxf(0.0, hunger - hun_fed)
 			else:
-				hunger = minf(100.0, hunger + 18.0)
+				hunger = minf(100.0, hunger + hun_short)
 			m["hunger"] = hunger
 
 	if rem_w > 0.0:
@@ -176,9 +180,9 @@ static func reconcile_day_end(state: RunState) -> void:
 			_add_water_applied(got_w)
 			var thirst := float(m.get("thirst", 0.0))
 			if got_w + 0.0001 >= per_w:
-				thirst = maxf(0.0, thirst - 8.0)
+				thirst = maxf(0.0, thirst - thr_fed)
 			else:
-				thirst = minf(100.0, thirst + 15.0)
+				thirst = minf(100.0, thirst + thr_short)
 			m["thirst"] = thirst
 
 	state.food_went_zero = state.food <= 0.0

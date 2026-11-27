@@ -6,6 +6,15 @@ extends RefCounted
 ## 故使用「上一日结束时刻」的 fuel_climate 与 driveHoursToday。
 
 
+static func _segment_fuel_surcharge(state: RunState) -> float:
+	if state.region_run == null:
+		return 0.0
+	var seg: Variant = state.region_run.active_segment()
+	if seg is Segment:
+		return maxf(0.0, float(seg.segment_fuel_surcharge))
+	return 0.0
+
+
 static func loco_count(state: RunState) -> int:
 	var n := 0
 	for c in state.carriages:
@@ -55,7 +64,11 @@ static func daily_rate_at_speed_coef(state: RunState, speed_coef: float, craft_d
 	var base := float(ConfigDb.require("balance.fuel.base"))
 	var add := sum_car_fuel_add(state)
 	var craft := float(ConfigDb.require("balance.fuel.craftFuelPerDay")) if craft_day else 0.0
-	var mult := minf(speed_coef * state.fuel_climate * state.region_fuel_mult, 3.0)
+	var surcharge := _segment_fuel_surcharge(state)
+	var mult := minf(
+		speed_coef * state.fuel_climate * state.region_fuel_mult_active() * (1.0 + surcharge),
+		3.0
+	)
 	return (base + add) * traction(state) * mult + craft
 
 ## F04：本日小时 → 速度/停靠油耗系数。

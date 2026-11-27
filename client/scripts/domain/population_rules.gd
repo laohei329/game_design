@@ -59,6 +59,22 @@ static func morale_zero_streak_fail() -> int:
 	return int(ConfigDb.require("balance.population.moraleZeroStreakFail"))
 
 
+static func fuel_zero_streak_fail() -> int:
+	return int(ConfigDb.require("balance.population.fuelZeroStreakFail"))
+
+
+static func resource_zero_streak_f39() -> int:
+	return int(ConfigDb.require("balance.population.resourceZeroStreakF39"))
+
+
+static func breakdown_counter_trigger() -> int:
+	return int(ConfigDb.require("balance.population.breakdownCounterTrigger"))
+
+
+static func breakdown_stop_hours() -> float:
+	return float(ConfigDb.require("balance.population.breakdownStopHours"))
+
+
 static func f39_hp_loss() -> float:
 	return float(ConfigDb.require("balance.population.f39HpLoss"))
 

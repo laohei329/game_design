@@ -1,6 +1,7 @@
 class_name SaveSchema
 extends RefCounted
 
+const _BalanceStart := preload("res://scripts/data/balance_start.gd")
 const _GameClock := preload("res://scripts/rhythm/game_clock.gd")
 const _PopulationConsumption := preload("res://scripts/economy/population_consumption.gd")
 ## RunState ↔ JSON 存档（version.save **12** 客户端子集）。
@@ -28,7 +29,7 @@ static func to_save_dict(state: RunState, runtime_extra: Dictionary = {}) -> Dic
 		"cloth": state.cloth,
 	}
 	var save := {
-		"version": {"save": SaveService.SAVE_VERSION, "configVersion": ConfigDb.config_version},
+		"version": {"save": SaveService.SAVE_VERSION, "configVersion": ConfigDb.config_version()},
 		"calendar": {
 			"year": state.year,
 			"season": state.season,
@@ -54,7 +55,7 @@ static func to_save_dict(state: RunState, runtime_extra: Dictionary = {}) -> Dic
 		"world": {
 			"heatingEnabled": state.heating_enabled,
 			"weatherId": state.weather_id,
-			"regionFuelMult": state.region_fuel_mult,
+			"regionFuelMult": state.region_fuel_mult_active(),
 			"regionTempMod": state.region_temp_mod,
 			"guaranteeFailStreak": state.guarantee_fail_streak,
 			"tutorialDone": state.tutorial_done,
@@ -106,7 +107,7 @@ static func _merge_runtime_clock(base: Dictionary, extra: Dictionary) -> Diction
 ##
 ## 读盘重建 RunState；日钟字段须经 `SaveService.write_state` 写入完整 `runtime`。
 ## 直接 `to_save_dict(state)` 无 `runtime_extra` 时，读档日钟归零。
-## `onboard_pop` 由 TrainService 重算。
+## 人口由 `members[]` 派生，不再单独字段。
 ## 磁盘读档经 `SaveService.read_state`（已 patch 一次）；`LootPileService.apply_world_list` + `ClimateService.refresh` 在此内完成。
 ## @param save 存档根 Dictionary（save 12）
 ## @param already_patched `read_state` 已 patch 时传 true，避免双次迁移。
@@ -124,17 +125,15 @@ static func from_save_dict(save: Dictionary, already_patched: bool = false) -> R
 	state.day_total = int(cal.get("dayTotal", 1))
 
 	var inv: Dictionary = save.get("inventory", {})
-	var st: Variant = ConfigDb.require("balance.start")
-	var start: Dictionary = st if typeof(st) == TYPE_DICTIONARY else {}
-	state.parts = float(inv.get("parts", start.get("parts", 6)))
-	state.scrap = float(inv.get("scrap", 0))
-	state.fuel = float(inv.get("fuel", start.get("fuel", 88)))
-	state.food = float(inv.get("food", start.get("food", 20)))
-	state.water = float(inv.get("water", start.get("water", 24)))
-	state.medicine = float(inv.get("medicine", start.get("med", 4)))
-	state.seed = float(inv.get("seed", start.get("seed", 1)))
-	state.chem = float(inv.get("chem", 0))
-	state.cloth = float(inv.get("cloth", 0))
+	state.parts = float(inv.get("parts", _BalanceStart.inventory_default("parts")))
+	state.scrap = float(inv.get("scrap", _BalanceStart.inventory_default("scrap")))
+	state.fuel = float(inv.get("fuel", _BalanceStart.inventory_default("fuel")))
+	state.food = float(inv.get("food", _BalanceStart.inventory_default("food")))
+	state.water = float(inv.get("water", _BalanceStart.inventory_default("water")))
+	state.medicine = float(inv.get("medicine", _BalanceStart.inventory_default("medicine")))
+	state.seed = float(inv.get("seed", _BalanceStart.inventory_default("seed")))
+	state.chem = float(inv.get("chem", _BalanceStart.inventory_default("chem")))
+	state.cloth = float(inv.get("cloth", _BalanceStart.inventory_default("cloth")))
 
 	var train: Dictionary = save.get("train", {})
 	state.carriages = train.get("carriages", []).duplicate(true)
@@ -142,9 +141,7 @@ static func from_save_dict(save: Dictionary, already_patched: bool = false) -> R
 	state.abandon_count = int(train.get("abandonCount", 0))
 	state.drive_intent = str(train.get("driveIntent", "stop"))
 	state.breakdown_counter = int(train.get("breakdownCounter", 0))
-	state.precision = float(
-		train.get("precision", ConfigDb.require("balance.workshop.precisionStart"))
-	)
+	state.precision = float(train.get("precision", _BalanceStart.starting_precision()))
 	state.power_tech = int(train.get("powerTech", 0))
 	state.armor_tech = int(train.get("armorTech", 0))
 	state.radar_tech = int(train.get("radarTech", 0))
@@ -199,7 +196,6 @@ static func from_save_dict(save: Dictionary, already_patched: bool = false) -> R
 	_ensure_points_loot_on_segments(state)
 	_sync_region_fuel_mult_from_run(state)
 
-	state.onboard_pop = TrainService.onboard_count(state)
 	ClimateService.refresh(state)
 	return state
 

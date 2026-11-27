@@ -43,7 +43,6 @@ Service 内每个 `func` / `static func` 上方应有 `##` 说明（Godot 悬停
 | 目录 | 职责 |
 |------|------|
 | `boot.gd` | 可选启动：校验配置后进 `run_main` |
-| `qa/` | 无头冒烟、软锁探针（不进正式包逻辑） |
 | `data/migrations/` | 读档补丁；版本链与 09 文档对齐 |
 
 ## 核心 Service 速查（读代码时对照）

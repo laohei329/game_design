@@ -18,6 +18,8 @@ var weather_draw_count: int = 0
 var event_id: String = ""
 var event_resolved: bool = false
 var event_option_id: String = ""  ## 玩家已选 option.id；入盘防误重开
+## incident 队列（自发路径；legacy 卡路径可为空）。
+var pending_incidents: Array = []
 var segment_fuel_surcharge: float = 0.0
 var raid_weight_delta: float = 0.0
 ## 本段按 `eventTag` 累加的事件抽卡权重（06 §2.3 / 09 `weight_mod`）。
@@ -47,6 +49,8 @@ static func from_dict(d: Dictionary, points: Array) -> Segment:
 	s.event_option_id = str(d.get("eventOptionId", ""))
 	if s.event_option_id != "":
 		s.event_resolved = true
+	var pi: Variant = d.get("pendingIncidents", [])
+	s.pending_incidents = pi.duplicate(true) if typeof(pi) == TYPE_ARRAY else []
 	s.segment_fuel_surcharge = float(d.get("segmentFuelSurcharge", 0))
 	s.raid_weight_delta = float(d.get("raidWeightDelta", 0))
 	var etw: Variant = d.get("eventTagWeights", {})
@@ -73,6 +77,7 @@ func to_dict() -> Dictionary:
 		"eventId": event_id,
 		"eventResolved": event_resolved,
 		"eventOptionId": event_option_id,
+		"pendingIncidents": pending_incidents.duplicate(true),
 		"segmentFuelSurcharge": segment_fuel_surcharge,
 		"raidWeightDelta": raid_weight_delta,
 		"eventTagWeights": event_tag_weights.duplicate(),

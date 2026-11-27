@@ -64,6 +64,8 @@ static func all_event_ids() -> Array:
 ## @param year 游戏内年份
 ## @return 数组结果（列表/选项）。
 static func eligible_ids(season: String, year: int) -> Array:
+	if not _legacy_cards_enabled():
+		return []
 	var out: Array = []
 	for eid in all_event_ids():
 		var card := get_card(str(eid))
@@ -84,6 +86,8 @@ static func eligible_ids(season: String, year: int) -> Array:
 ## @return 结果字典；缺失语义键时可能为空 {}。
 static func get_card(event_id: String) -> Dictionary:
 	if event_id.is_empty():
+		return {}
+	if not _legacy_cards_enabled():
 		return {}
 	if _cards.has(event_id):
 		return _cards[event_id]
@@ -117,3 +121,9 @@ static func primary_tag(card: Dictionary) -> String:
 	if typeof(tags) == TYPE_ARRAY and not tags.is_empty():
 		return str(tags[0])
 	return "mood"
+
+
+static func _legacy_cards_enabled() -> bool:
+	if IncidentDirector.use_legacy_event_cards():
+		return true
+	return bool(ConfigDb.require("balance.featureFlags.loadLegacyEventCatalog"))

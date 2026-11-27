@@ -13,9 +13,10 @@ const _GameClock := preload("res://scripts/rhythm/game_clock.gd")
 
 static func hours_per_task(member: Dictionary) -> float:
 	var base := float(ConfigDb.require("balance.haul.hoursPerTask"))
+	var spec_mult := float(ConfigDb.require("balance.haul.haulSpecialtyMult"))
 	for s in member.get("specialties", []):
 		if str(s) == "haul":
-			return base * 0.85
+			return base * spec_mult
 	return base
 
 
@@ -164,7 +165,7 @@ static func _advance_hours(state: RunState, step: float) -> bool:
 			continue
 		t.hoursDone = float(t.get("hoursDone", 0.0)) + step
 		moved = true
-		if float(t.hoursDone) >= float(t.get("hoursTotal", 0.4)) - 0.001:
+		if float(t.hoursDone) >= float(t.get("hoursTotal", hours_per_task({}))) - 0.001:
 			_complete_task(state, t)
 			_release_member(state, str(t.get("memberId", "")))
 			t.complete = true
@@ -176,7 +177,7 @@ static func _advance_hours(state: RunState, step: float) -> bool:
 ## @param t 任务字典（搜索/搬运）
 ## @return 浮点结果（量/比率/工时）。
 static func task_progress(t: Dictionary) -> float:
-	var total := maxf(0.001, float(t.get("hoursTotal", 0.4)))
+	var total := maxf(0.001, float(t.get("hoursTotal", hours_per_task({}))))
 	return clampf(float(t.get("hoursDone", 0.0)) / total, 0.0, 1.0)
 
 ## 某点未完成 haul 任务列表。

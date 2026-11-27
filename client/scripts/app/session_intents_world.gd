@@ -63,5 +63,16 @@ static func try_handle(session: Node, intent_name: String, payload: Dictionary) 
 			if oerr != "":
 				push_warning("事件: " + oerr)
 			return 1
+		"RESOLVE_INCIDENT":
+			var ierr := IncidentDirector.resolve_action(
+				session.state,
+				str(payload.get("incidentUid", "")),
+				str(payload.get("actionId", ""))
+			)
+			if ierr != "":
+				push_warning("Incident: " + ierr)
+			else:
+				IncidentService.try_open_pending(session.state)
+			return 1
 		_:
 			return -1

@@ -28,7 +28,7 @@ func _refresh() -> void:
 		return
 	_body.text = (
 		"configVersion=%d\n"
-		% ConfigDb.config_version
+		% ConfigDb.config_version()
 		+ "season=%s eff_temp=%.2f cold=%.2f\n"
 		% [st.season, st.effective_temp, st.cold_index]
 		+ "foodClimate=%.2f waterClimate=%.2f fuelClimate=%.2f\n"
@@ -36,7 +36,7 @@ func _refresh() -> void:
 		+ "greenhouseClimate=%.2f speedClimate=%.2f\n"
 		% [st.greenhouse_climate, st.speed_climate]
 		+ "regionFuelMult=%.2f regionTempMod=%.2f weatherId=%s\n"
-		% [st.region_fuel_mult, st.region_temp_mod, st.weather_id]
+		% [st.region_fuel_mult_active(), st.region_temp_mod, st.weather_id]
 		+ _region_run_lines(st)
 		+ "food=%.1f cap=%.0f water=%.1f cap=%.0f\n"
 		% [st.food, InventoryService.stock_cap(st, "food"), st.water, InventoryService.stock_cap(st, "water")]
@@ -91,12 +91,4 @@ func _region_run_lines(st: RunState) -> String:
 
 ## S0.5 验收：1.0 ↔ 1.3 切换 regionFuelMult，验证 fuelClimate 非硬编码。
 func _on_dev_region_mult() -> void:
-	var st := GameSession.state
-	if st == null:
-		return
-	if is_equal_approx(st.region_fuel_mult, 1.3):
-		st.region_fuel_mult = 1.0
-	else:
-		st.region_fuel_mult = 1.3
-	ClimateService.refresh(st)
-	GameSession.state_changed.emit()
+	IntentBus.emit_intent("DEV_TOGGLE_REGION_FUEL", {})

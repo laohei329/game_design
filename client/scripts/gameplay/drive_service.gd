@@ -181,6 +181,6 @@ static func _apply_reverse_km(state: RunState, delta_km: float) -> void:
 			s.progress_km = 0.0
 			idx -= 1
 			if idx >= 0:
-				state.region_run.segment_index = idx
+				RegionService.apply_reverse_segment_index(state, idx)
 			else:
 				break

@@ -1,4 +1,6 @@
 extends Node
+
+const _BalanceStart := preload("res://scripts/data/balance_start.gd")
 ## 当前局状态与意图分发（Autoload GameSession）。
 
 const _GameClock := preload("res://scripts/rhythm/game_clock.gd")
@@ -205,25 +207,7 @@ func _new_run() -> void:
 	# 开局：读 balance.start → 三节车 → 教程 RegionRun → 四人名册 → 清 UI 旗标。
 	RngService.seed_from(int(Time.get_unix_time_from_system()) & 0x7FFFFFFF)
 	state = RunState.new()
-	var start: Dictionary = ConfigDb.require("balance.start")
-	if typeof(start) == TYPE_DICTIONARY:
-		state.food = float(start.get("food", 20))
-		state.water = float(start.get("water", 24))
-		state.fuel = float(start.get("fuel", 88))
-		state.parts = float(start.get("parts", 6))
-		state.medicine = float(start.get("med", 4))
-		state.precision = float(
-			start.get("precision", ConfigDb.require("balance.workshop.precisionStart"))
-		)
-		state.seed = float(start.get("seed", 1))
-	var regions: Dictionary = ConfigDb.require("balance.regions")
-	if typeof(regions) == TYPE_DICTIONARY:
-		state.region_fuel_mult = float(regions.get("defaultFuelMult", 1.0))
-	state.carriages = [
-		{"id": "car_pwr", "templateId": "power", "size": 3},
-		{"id": "car_liv", "templateId": "living", "size": 2},
-		{"id": "car_cgo", "templateId": "cargo", "size": 3},
-	]
+	_BalanceStart.apply_new_run(state)
 	SegmentBuild.begin_tutorial_region_run(state)
 	MemberRoster.seed_starting_crew(state)
 	_PopulationConsumption.patch_members(state)
@@ -256,6 +240,7 @@ func _new_run() -> void:
 	state.pending_combat.clear()
 	state.combat_l1_after_fail = false
 	state.event_modal_open = false
+	state.incident_modal_open = false
 	state.event_weight_history = []
 	state.last_event_primary_tag = ""
 	state.event_flags = {}
@@ -278,7 +263,9 @@ func apply_loaded_run(loaded: RunState) -> void:
 	day_clock_fraction = _GameClock.take_restored_hud_fraction()
 	time_paused = false
 	state.event_modal_open = false
+	state.incident_modal_open = false
 	TrainService.reconcile_outdoor_tasks(state)
 	_sync_pending_threat_after_load(state)
 	EventService.sync_after_load(state)
+	IncidentService.sync_after_load(state)
 	search_telemetry = SaveService.take_pending_search_telemetry()

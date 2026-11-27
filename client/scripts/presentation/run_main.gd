@@ -25,12 +25,14 @@ func _unhandled_input(event: InputEvent) -> void:
 			get_viewport().set_input_as_handled()
 			return
 		match event.keycode:
-			KEY_1:
-				IntentBus.emit_intent("SET_TIME_SPEED", {"speed": 1.0})
-				get_viewport().set_input_as_handled()
-			KEY_2:
-				IntentBus.emit_intent("SET_TIME_SPEED", {"speed": 2.0})
-				get_viewport().set_input_as_handled()
-			KEY_3:
-				IntentBus.emit_intent("SET_TIME_SPEED", {"speed": 4.0})
+			KEY_1, KEY_2, KEY_3:
+				var tier := 1
+				if event.keycode == KEY_2:
+					tier = 2
+				elif event.keycode == KEY_3:
+					tier = 3
+				IntentBus.emit_intent(
+					"SET_TIME_SPEED",
+					{"speed": GameClock.speed_hotkey_tier(tier)}
+				)
 				get_viewport().set_input_as_handled()

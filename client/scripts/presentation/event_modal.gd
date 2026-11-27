@@ -69,5 +69,6 @@ func _another_modal_needs_pause() -> bool:
 		st.region_pick_open
 		or st.combat_panel_open
 		or st.event_modal_open
+		or st.incident_modal_open
 		or st.abandon_panel_open
 	)

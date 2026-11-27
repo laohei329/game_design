@@ -9,10 +9,6 @@ const _PopulationRules := preload("res://scripts/domain/population_rules.gd")
 ## 开局四人权威：`archetypes.startPartyTemplate`（岗位/专长/combatRoster）。
 
 
-## 与 `game_session._new_run` 初始三节车 id 对齐（教程 4 床分配）。
-const START_CAR_IDS: PackedStringArray = ["car_pwr", "car_liv", "car_liv", "car_cgo"]
-
-
 ## 当班：job 匹配、存活、未占用户外任务（对齐 sim `staff_on_duty` 子集）。
 static func staff_on_duty(state: RunState, job: String) -> bool:
 	for m in state.members:
@@ -125,12 +121,10 @@ static func _job_pick_score(member: Dictionary, job: String) -> int:
 ##
 ## @param state 当前局 `RunState`（就地修改字段）
 static func seed_starting_crew(state: RunState) -> void:
-	var tpl: Variant = ConfigDb.require("archetypes.startPartyTemplate")
-	var rows: Variant = tpl.get("members", []) if typeof(tpl) == TYPE_DICTIONARY else []
+	var rows: Variant = ConfigDb.require("archetypes.startPartyTemplate.members")
 	if typeof(rows) != TYPE_ARRAY or rows.is_empty():
-		push_error("MemberRoster: archetypes.startPartyTemplate.members missing")
+		push_error("MemberRoster: archetypes.startPartyTemplate.members missing or empty")
 		state.members = []
-		state.onboard_pop = 0
 		return
 	state.members = []
 	var lang := str(ProjectSettings.get_setting("game/locale", "zh"))
@@ -146,12 +140,30 @@ static func seed_starting_crew(state: RunState) -> void:
 		if typeof(spec_v) == TYPE_ARRAY:
 			for s in spec_v:
 				specs.append(str(s))
-		var car_id := START_CAR_IDS[i] if i < START_CAR_IDS.size() else "car_liv"
+		var car_id := _start_bed_car_id(state, i)
 		var mid := "mem_start_%d" % i
 		var display := _start_display_name(lang, name_i)
 		name_i += 1
 		state.members.append(_make(mid, display, job, car_id, combat, specs))
-	state.onboard_pop = TrainService.onboard_count(state)
+
+
+## 开局床位：优先 `living` 车厢 id，按 index 轮询 `state.carriages`。
+static func _start_bed_car_id(state: RunState, index: int) -> String:
+	var living: PackedStringArray = []
+	var any: PackedStringArray = []
+	for c in state.carriages:
+		if typeof(c) != TYPE_DICTIONARY:
+			continue
+		var cid := str(c.get("id", ""))
+		if cid.is_empty():
+			continue
+		any.append(cid)
+		if str(c.get("templateId", "")) == "living":
+			living.append(cid)
+	var pool := living if living.size() > 0 else any
+	if pool.is_empty():
+		return ""
+	return pool[index % pool.size()]
 
 
 ## 玩家指派岗位；`jobIds` 权威见 `archetypes.json`。
@@ -239,8 +251,8 @@ static func try_recruit_one(state: RunState) -> bool:
 		return false
 	var n := state.members.size()
 	var mid := "mem_evt_%d" % n
-	state.members.append(_make(mid, "路人 %d" % (n + 1), "none", "car_liv", false, ["scavenge"]))
-	state.onboard_pop = TrainService.onboard_count(state)
+	var bed := _start_bed_car_id(state, n)
+	state.members.append(_make(mid, "路人 %d" % (n + 1), "none", bed, false, ["scavenge"]))
 	assign_daily_jobs(state)
 	state.last_recruit_success_day = state.day_total
 	return true

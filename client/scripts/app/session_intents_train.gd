@@ -19,6 +19,11 @@ static func try_handle(session: Node, intent_name: String, payload: Dictionary) 
 				session.state.abandon_selected_car_id = ""
 				return 1
 			return 0
+		"SELECT_ABANDON_CARRIAGE":
+			var pick := str(payload.get("carId", ""))
+			if pick != "":
+				session.state.abandon_selected_car_id = pick
+			return 1
 		"OPEN_ABANDON":
 			session.state.abandon_panel_open = true
 			if session.state.abandon_selected_car_id == "":

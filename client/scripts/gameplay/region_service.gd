@@ -83,7 +83,7 @@ static func start_tutorial(state: RunState) -> void:
 	run.region_id = region_id
 	run.segment_count = 3
 	run.segment_index = 0
-	run.region_fuel_mult = state.region_fuel_mult
+	run.region_fuel_mult = _region_fuel_mult_for(region_id)
 	run.point_type_weight_mods = _region_point_mods(region_id)
 	var seg := _build_tutorial_segment_0(stations_cfg)
 	seg.built = true
@@ -153,7 +153,7 @@ static func begin_region_run(state: RunState, region_id: String) -> void:
 	run.region_id = region_id
 	run.segment_count = seg_n
 	run.segment_index = 0
-	run.region_fuel_mult = state.region_fuel_mult
+	run.region_fuel_mult = _region_fuel_mult_for(region_id)
 	run.point_type_weight_mods = _region_point_mods(region_id)
 	run.segments = []
 	state.region_run = run
@@ -177,6 +177,22 @@ static func after_travel_day(state: RunState) -> void:
 	if seg.progress_km < seg.length_km - 0.05:
 		return
 	_on_reach_segment_end(state)
+
+
+## 返程跨段：过期段内影响、切换 segment_index 并懒建目标段（与前进段末对称）。
+##
+## 模块内部实现；`DriveService._apply_reverse_km` 在 index 变化时调用。
+## @param state 当前局 `RunState`（就地修改字段）
+## @param new_index 目标段下标
+static func apply_reverse_segment_index(state: RunState, new_index: int) -> void:
+	var rr: RegionRun = state.region_run
+	if rr == null or new_index < 0 or new_index >= rr.segment_count:
+		return
+	if rr.segment_index == new_index:
+		return
+	EventOps.expire_segment_influences(state)
+	rr.segment_index = new_index
+	_ensure_segment_built(state, new_index)
 
 
 ## 段末分支：末段 open_region_pick，否则 segment_index++ 并重置 progress_km。
@@ -219,7 +235,7 @@ static func build_segment(state: RunState, segment: Segment) -> void:
 	_push_pressure_history(state, segment.pressure_class)
 	_roll_points_for_segment(state, segment)
 	WeatherDraw.on_segment_build(state, segment)
-	EventDraw.on_segment_build(state, segment)
+	IncidentDirector.on_segment_build(state, segment)
 
 
 ## 步骤 8：只读刷新；不重抽事件（06 §8）
@@ -252,18 +268,40 @@ static func _clear_station_offers(state: RunState) -> void:
 	state.guarantee_fail_streak = 0
 
 
-## 写 regionFuelMult、climateInfluences（regions.json + 预设）。
+## `regions.json` 行 → 区域燃油倍率（`RegionRun` 权威）。
+static func _region_fuel_mult_for(region_id: String) -> float:
+	var row := region_def(region_id)
+	var default_mult := float(ConfigDb.require("balance.regions.defaultFuelMult"))
+	var fuel_mult := float(row.get("regionFuelMult", default_mult))
+	if fuel_mult <= 0.0:
+		fuel_mult = default_mult
+	return fuel_mult
+
+
+## 调试用：1.0 ↔ 1.3 切换当前跨度燃油倍率（仅 debug 构建）。
+static func dev_toggle_region_fuel_mult(state: RunState) -> void:
+	if not OS.is_debug_build():
+		return
+	if state.region_run == null:
+		return
+	var m := state.region_run.region_fuel_mult
+	state.region_run.region_fuel_mult = 1.0 if m > 1.15 else 1.3
+	state.region_fuel_mult = state.region_run.region_fuel_mult
+	ClimateService.refresh(state)
+
+
+## 写 climateInfluences（regions.json + 预设）；燃油倍率在创建 RegionRun 时写入。
 ##
 ## 模块内部实现；调用方限于本文件或同层 Service。
 ## @param state 当前局 `RunState`（就地修改字段）
 ## @param region_id `regions.json` 的 regionId
 static func _apply_region_factors(state: RunState, region_id: String) -> void:
 	var row := region_def(region_id)
-	var fuel_mult := float(row.get("regionFuelMult", 1.0))
-	var default_mult := float(ConfigDb.require("balance.regions.defaultFuelMult"))
-	if fuel_mult <= 0.0:
-		fuel_mult = default_mult
-	state.region_fuel_mult = fuel_mult
+	var fuel_mult := _region_fuel_mult_for(region_id)
+	if state.region_run != null:
+		state.region_run.region_fuel_mult = fuel_mult
+	else:
+		state.region_fuel_mult = fuel_mult
 	WeatherDraw.sync_region_influence(state, region_id, row)
 
 
@@ -283,7 +321,9 @@ static func _region_point_mods(region_id: String) -> Dictionary:
 ## 模块内部实现；调用方限于本文件或同层 Service。
 ## @return 整数结果（计数/下标/容量）。
 static func _roll_segment_count() -> int:
-	return RngService.randi_range(3, 5)
+	var lo := int(ConfigDb.require("stations.regionRunSegmentCountMin"))
+	var hi := int(ConfigDb.require("stations.regionRunSegmentCountMax"))
+	return RngService.randi_range(lo, hi)
 
 
 ## 懒创建 segments[index]：缺则程序化骨架 + build_segment。
@@ -318,8 +358,8 @@ static func _build_procedural_segment(state: RunState, index: int) -> Segment:
 	var stations_cfg: Dictionary = ConfigDb.get_table("stations")
 	var seg := Segment.new()
 	seg.segment_id = "%s_seg_%d" % [state.region_run.region_id, index]
-	var len_min := float(stations_cfg.get("segmentLengthMin", 40))
-	var len_max := float(stations_cfg.get("segmentLengthMax", 60))
+	var len_min := float(ConfigDb.require("stations.segmentLengthMin"))
+	var len_max := float(ConfigDb.require("stations.segmentLengthMax"))
 	seg.length_km = len_min + RngService.randf() * (len_max - len_min)
 	seg.progress_km = 0.0
 	seg.built = false
@@ -335,19 +375,21 @@ static func _build_procedural_segment(state: RunState, index: int) -> Segment:
 ## @param stations_cfg（Dictionary）
 ## @return 数组结果（列表/选项）。
 static func _roll_stations_for_segment(length_km: float, stations_cfg: Dictionary) -> Array:
-	var weights: Dictionary = stations_cfg.get("stationCountWeights", {"0": 0.35, "1": 0.45, "2": 0.2})
+	var weights: Dictionary = ConfigDb.require("stations.stationCountWeights")
 	var station_n := int(_weighted_key(weights, "1"))
+	var frac_min := float(ConfigDb.require("stations.stationProgressKmFractionMin"))
+	var frac_span := float(ConfigDb.require("stations.stationProgressKmFractionSpan"))
 	var out: Array = []
 	for i in station_n:
-		var km := length_km * (0.25 + 0.5 * RngService.randf())
-		var size_weights: Dictionary = stations_cfg.get("sizeWeights", {})
+		var km := length_km * (frac_min + frac_span * RngService.randf())
+		var size_weights: Dictionary = ConfigDb.require("stations.sizeWeights")
 		out.append(
 			{
 				"id": "st_%d_%d" % [Time.get_ticks_usec() % 100000, i],
 				"progressKm": km,
 				"size": _weighted_key(size_weights, "small"),
 				"hasPool": true,
-				"nonePool": RngService.randf() < float(stations_cfg.get("nonePoolChance", 0.08)),
+				"nonePool": RngService.randf() < float(ConfigDb.require("stations.nonePoolChance")),
 				"visited": false,
 			}
 		)
@@ -360,7 +402,9 @@ static func _roll_stations_for_segment(length_km: float, stations_cfg: Dictionar
 ## @param state 当前局 `RunState`（就地修改字段）
 ## @param seg 当前区段 `Segment`
 static func _roll_points_for_segment(state: RunState, seg: Segment) -> void:
-	var n_pts := RngService.randi_range(3, 4)
+	var pt_lo := int(ConfigDb.require("stations.segmentPointsMin"))
+	var pt_hi := int(ConfigDb.require("stations.segmentPointsMax"))
+	var n_pts := RngService.randi_range(pt_lo, pt_hi)
 	var mods: Dictionary = {}
 	if state.region_run:
 		mods = state.region_run.point_type_weight_mods
@@ -376,7 +420,7 @@ static func _roll_points_for_segment(state: RunState, seg: Segment) -> void:
 			continue
 		if not bool(row.get("inPool", true)):
 			continue
-		var w := float(row.get("baseWeight", 1.0)) * float(mods.get(tid, 1.0))
+		var w := float(ConfigDb.require("point_types.types." + str(tid) + ".baseWeight")) * float(mods.get(tid, 1.0))
 		if w > 0.0:
 			weights[str(tid)] = w
 			total += w
@@ -443,9 +487,11 @@ static func _weighted_key(weights: Dictionary, fallback: String = "0") -> String
 ## @return 空串=成功；非空=机器错误码。
 static func _roll_pressure_class() -> String:
 	var roll := RngService.randf()
-	if roll < 0.25:
+	var low_max := float(ConfigDb.require("event_draw_rules.pressureClassRoll.lowMax"))
+	var med_max := float(ConfigDb.require("event_draw_rules.pressureClassRoll.mediumMax"))
+	if roll < low_max:
 		return "low"
-	if roll < 0.7:
+	if roll < med_max:
 		return "medium"
 	return "high"
 
@@ -477,8 +523,8 @@ static func _push_pressure_history(state: RunState, cls: String) -> void:
 static func _build_tutorial_segment_0(stations_cfg: Dictionary) -> Segment:
 	var seg := Segment.new()
 	seg.segment_id = "tutorial_seg_0"
-	var len_min := float(stations_cfg.get("segmentLengthMin", 40))
-	var len_max := float(stations_cfg.get("segmentLengthMax", 60))
+	var len_min := float(ConfigDb.require("stations.segmentLengthMin"))
+	var len_max := float(ConfigDb.require("stations.segmentLengthMax"))
 	seg.length_km = (len_min + len_max) * 0.5
 	seg.progress_km = 0.0
 
@@ -493,7 +539,7 @@ static func _build_tutorial_segment_0(stations_cfg: Dictionary) -> Segment:
 			"visited": false,
 			"tutorialHook": true,
 			"forceLivingOffer": bool(stations_cfg.get("tutorialForceLivingOffer", true)),
-			"livingRepairCost": int(stations_cfg.get("tutorialLivingRepairCost", 1)),
+			"livingRepairCost": int(ConfigDb.require("stations.tutorialLivingRepairCost")),
 		},
 	]
 

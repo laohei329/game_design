@@ -17,11 +17,9 @@ static func try_on_search_assign(state: RunState, point_id: String, store: Dicti
 		return ""
 	var pt: Dictionary = hit.point
 	var ptype := str(pt.get("type", ""))
-	if ptype == "horde":
-		return CombatL1.open_from_template(state, "shambler", {"source": "point", "pointId": point_id})
-	var cfg: Dictionary = ConfigDb.get_table("combat").get("searchEncounter", {})
-	if typeof(cfg) != TYPE_DICTIONARY:
-		cfg = {}
+	var enc: Variant = ConfigDb.require("combat.searchEncounter")
+	if typeof(enc) != TYPE_DICTIONARY:
+		return ""
 	var day := str(state.day_total)
 	if not store.has(day):
 		store[day] = {}
@@ -30,12 +28,20 @@ static func try_on_search_assign(state: RunState, point_id: String, store: Dicti
 	if bool(day_map.get(enc_key, false)):
 		return ""
 	day_map[enc_key] = true
-	var by_type: Variant = cfg.get("chanceByPointType", {})
-	var chance := float(by_type.get(ptype, by_type.get("default", 0.18)))
+	var chance_path := (
+		"combat.searchEncounter.chanceByPointType." + ptype
+		if ConfigDb.has("combat.searchEncounter.chanceByPointType." + ptype)
+		else "combat.searchEncounter.chanceByPointType.default"
+	)
+	var chance := float(ConfigDb.require(chance_path))
 	if not force and RngService.randf() >= chance:
 		return ""
-	var templates: Variant = cfg.get("templateByPointType", {})
-	var tpl := str(templates.get(ptype, templates.get("default", "shambler")))
+	var tpl_path := (
+		"combat.searchEncounter.templateByPointType." + ptype
+		if ConfigDb.has("combat.searchEncounter.templateByPointType." + ptype)
+		else "combat.searchEncounter.templateByPointType.default"
+	)
+	var tpl := str(ConfigDb.require(tpl_path))
 	var err := CombatL1.open_from_template(state, tpl, {"source": "point", "pointId": point_id})
 	if err != "":
 		day_map.erase(enc_key)

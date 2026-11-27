@@ -45,20 +45,16 @@ func _rebuild_list(st: RunState) -> void:
 		b.pressed.connect(func() -> void: _select(cid))
 		_list.add_child(b)
 
-## 选中车厢 id → `abandon_selected_car_id` 并刷新详情。
+## 选中车厢 → `SELECT_ABANDON_CARRIAGE`。
 func _select(car_id: String) -> void:
-	var st := GameSession.state
-	if st == null:
-		return
-	st.abandon_selected_car_id = car_id
-	GameSession.state_changed.emit()
+	IntentBus.emit_intent("SELECT_ABANDON_CARRIAGE", {"carId": car_id})
 
 ## 展示选中节模板、乘员与 `TrainService.can_abandon` 原因码。
 func _refresh_detail(st: RunState) -> void:
 	var cid := st.abandon_selected_car_id
 	if cid == "":
 		cid = TrainService.default_abandon_car_id(st)
-		st.abandon_selected_car_id = cid
+		IntentBus.emit_intent("SELECT_ABANDON_CARRIAGE", {"carId": cid})
 	var prev := TrainService.abandon_preview(st, cid)
 	if prev.is_empty():
 		_detail.text = LocaleApi.tr_key("abandon.title")
@@ -70,9 +66,12 @@ func _refresh_detail(st: RunState) -> void:
 	var parts_cost := float(prev.get("partsCost", 0.0))
 	var scrap_gain := int(prev.get("scrapGain", 0))
 	var fuel_spent := float(prev.get("fuelSpent", 0.0))
+	var day_frac := float(prev.get("dayFraction", -1.0))
+	if day_frac < 0.0:
+		day_frac = 0.0
 	_detail.text = LocaleApi.trf(
 		"abandon.detail",
-		[cid, tpl, parts_cost, scrap_gain, fuel_spent, TrainService.ABANDON_DAY_FRACTION]
+		[cid, tpl, parts_cost, scrap_gain, fuel_spent, day_frac]
 	)
 	if reason != "":
 		_detail.text += LocaleApi.trf("abandon.blocked_suffix", [TrainService.reason_text(reason)])

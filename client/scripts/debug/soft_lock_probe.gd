@@ -1,6 +1,6 @@
 class_name SoftLockProbe
 extends RefCounted
-## 软锁审计：DebugOverlay F3 与无头末尾调用 `audit(state)`。
+## 软锁审计：DebugOverlay F3 调用 `audit(state)`。
 ##
 ## 检查：库存非负、failed 闸、末节动力不可遗弃、search cap 配置可读等；返回 { ok, lines }。
 
@@ -41,6 +41,7 @@ static func audit(state: RunState) -> Dictionary:
 	lines.append("车外任务=%d" % state.search_tasks.size())
 
 	return {"ok": ok, "lines": lines}
+
 
 ## 若编组仅一节 `templateId==power`，返回其 `id`；否则空串（软锁规则输入）。
 static func _sole_power_id(state: RunState) -> String:

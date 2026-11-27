@@ -93,7 +93,7 @@ static func assign_search(state: RunState, point_id: String, member_ids: Array, 
 		if pick_err != "":
 			return pick_err
 	elif ids.is_empty():
-		ids = _auto_pick_searchers(state, mini(2, maxi(1, state.onboard_pop)))
+		ids = _auto_pick_searchers(state, mini(2, maxi(1, TrainService.onboard_count(state))))
 	var members := ids.size()
 	if members <= 0:
 		return "no_members"
@@ -185,7 +185,7 @@ static func _advance_hours(state: RunState, step: float) -> bool:
 			continue
 		t.hoursDone = float(t.get("hoursDone", 0.0)) + step
 		moved = true
-		if float(t.hoursDone) >= float(t.get("hoursTotal", 1.0)) - 0.001:
+		if float(t.hoursDone) >= float(t.get("hoursTotal", SearchRules.hours_per_task())) - 0.001:
 			_complete_task(state, t)
 			_release_task_members(state, t)
 			t.complete = true
@@ -200,7 +200,7 @@ static func _advance_hours(state: RunState, step: float) -> bool:
 static func task_progress(t: Dictionary) -> float:
 	if t.is_empty():
 		return 0.0
-	var total := maxf(0.001, float(t.get("hoursTotal", 1.0)))
+	var total := maxf(0.001, float(t.get("hoursTotal", SearchRules.hours_per_task())))
 	return clampf(float(t.get("hoursDone", 0.0)) / total, 0.0, 1.0)
 
 
@@ -234,12 +234,16 @@ static func _complete_task(state: RunState, task: Dictionary) -> void:
 		return
 	var pt: Dictionary = hit.point
 	var type_id := str(pt.get("type", ""))
+	var median := _median_for_type(type_id)
 	var type_row := _point_type_row(type_id)
-	var median := float(type_row.get("median", 1.0))
 	var remaining := float(pt.get("remainingYield", 0.0))
 	var members := int(task.get("memberCount", 1))
-	var team_eff := 0.9 + 0.02 * float(members)
-	var jitter := 0.55 + RngService.randf() * 0.5
+	var team_base := float(ConfigDb.require("balance.search.teamEffBase"))
+	var team_per := float(ConfigDb.require("balance.search.teamEffPerMember"))
+	var team_eff := team_base + team_per * float(members)
+	var jmin := float(ConfigDb.require("balance.search.yieldJitterMin"))
+	var jspan := float(ConfigDb.require("balance.search.yieldJitterSpan"))
+	var jitter := jmin + RngService.randf() * jspan
 	var take := minf(remaining, median * jitter * team_eff)
 	pt.remainingYield = maxf(0.0, remaining - take)
 	if pt.remainingYield <= 0.001:
@@ -281,11 +285,16 @@ static func _point_type_row(type_id: String) -> Dictionary:
 ## 公开 API：UI 经 `IntentBus` → `GameSession`，勿在 presentation 改 state。
 ## @param type_id 搜索点类型 id
 ## @return 浮点结果（量/比率/工时）。
+static func _median_for_type(type_id: String) -> float:
+	var path := "point_types.types." + type_id + ".median"
+	if ConfigDb.has(path):
+		return float(ConfigDb.require(path))
+	return float(ConfigDb.require("point_types.fallbackMedian"))
+
+
 static func initial_remaining_yield(type_id: String) -> float:
-	var row := _point_type_row(type_id)
-	var median := float(row.get("median", 1.0))
-	var root: Dictionary = ConfigDb.get_table("point_types")
-	var mult := float(root.get("poolMultiplier", 2.5))
+	var median := _median_for_type(type_id)
+	var mult := float(ConfigDb.require("point_types.poolMultiplier"))
 	return median * mult
 
 

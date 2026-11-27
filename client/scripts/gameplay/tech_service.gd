@@ -192,7 +192,7 @@ static func effective_vision(state: RunState) -> int:
 ## @param state 当前局 `RunState`（就地修改字段）
 ## @return 整数结果（计数/下标/容量）。
 static func living_bed_bonus(state: RunState) -> int:
-	return state.living_tech * 2
+	return TrainService.living_tech_bed_bonus(state)
 
 
 const BLUEPRINT_LINES: PackedStringArray = ["power", "armor", "radar", "living"]

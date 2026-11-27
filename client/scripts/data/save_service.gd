@@ -16,7 +16,7 @@ var _pending_search_telemetry: Dictionary = {}
 ## @param save 存档根 Dictionary（save 12）
 func apply_runtime_defaults(save: Dictionary) -> void:
 	if not save.has("version"):
-		save["version"] = {"save": SAVE_VERSION, "configVersion": ConfigDb.config_version}
+		save["version"] = {"save": SAVE_VERSION, "configVersion": ConfigDb.config_version()}
 	var train: Dictionary = save.get("train", {})
 	if not train.has("abandonCount"):
 		train["abandonCount"] = 0
@@ -50,7 +50,7 @@ func patch_loaded_save(save: Dictionary) -> Dictionary:
 func snapshot_for_save(session_state: Dictionary) -> Dictionary:
 	var save: Dictionary = session_state.duplicate(true)
 	apply_runtime_defaults(save)
-	save["version"] = {"save": SAVE_VERSION, "configVersion": ConfigDb.config_version}
+	save["version"] = {"save": SAVE_VERSION, "configVersion": ConfigDb.config_version()}
 	return save
 
 ## 槽位 JSON 绝对路径。
@@ -85,11 +85,31 @@ func write_state(state: RunState, slot: int = 0) -> bool:
 	save["telemetry"] = tel
 	var text := JSON.stringify(save, "\t")
 	var path := slot_path(slot)
-	var f := FileAccess.open(path, FileAccess.WRITE)
+	var tmp_path := path + ".tmp"
+	var bak_path := path + ".bak"
+	var f := FileAccess.open(tmp_path, FileAccess.WRITE)
 	if f == null:
-		push_error("SaveService: cannot write " + path)
+		push_error("SaveService: cannot write " + tmp_path)
 		return false
 	f.store_string(text)
+	f.flush()
+	f = null
+	var probe := JSON.new()
+	if probe.parse(text) != OK:
+		push_error("SaveService: save JSON invalid, aborting write")
+		if FileAccess.file_exists(tmp_path):
+			DirAccess.remove_absolute(tmp_path)
+		return false
+	if FileAccess.file_exists(path):
+		if FileAccess.file_exists(bak_path):
+			DirAccess.remove_absolute(bak_path)
+		var rb := DirAccess.rename_absolute(path, bak_path)
+		if rb != OK:
+			push_warning("SaveService: backup rename failed (%d)" % rb)
+	var mv := DirAccess.rename_absolute(tmp_path, path)
+	if mv != OK:
+		push_error("SaveService: atomic save failed (%d)" % mv)
+		return false
 	return true
 
 

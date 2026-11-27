@@ -7,21 +7,13 @@ extends RefCounted
 ## `add` 返回**实际入库量**（可能因 cap 小于请求量）；HaulService 据此处理溢出回堆。
 
 
-static func _inventory_cfg() -> Dictionary:
-	var root: Variant = ConfigDb.require("balance.inventory")
-	return root if typeof(root) == TYPE_DICTIONARY else {}
-
-## 单资源基础上限（不含货舱）。
+## 单资源基础上限（不含货舱）；`balance.inventory.base.*`。
 ##
 ## 模块内部实现；调用方限于本文件或同层 Service。
 ## @param key 库存或配置键（常经 normalize_key）
 ## @return 浮点结果（量/比率/工时）。
 static func _base_cap(key: String) -> float:
-	var inv := _inventory_cfg()
-	var base: Variant = inv.get("base", {})
-	if typeof(base) == TYPE_DICTIONARY:
-		return float(base.get(key, 0.0))
-	return 0.0
+	return float(ConfigDb.require("balance.inventory.base." + key))
 
 
 ## med → medicine；堆/表键统一小写。
@@ -75,24 +67,21 @@ static func stock_cap(state: RunState, key: String) -> float:
 		return state.fuel_cap()
 	var cargo := float(cargo_size_sum(state))
 	var mult := life_mult(state)
-	var inv := _inventory_cfg()
-	var cps: Variant = inv.get("cargoPerSize", {})
-	var cargo_per: Dictionary = cps if typeof(cps) == TYPE_DICTIONARY else {}
 	var cap := 0.0
 	match k:
 		"food", "water":
-			cap = _base_cap(k) + cargo * float(cargo_per.get("foodWater", 10.0))
+			cap = _base_cap(k) + cargo * float(ConfigDb.require("balance.inventory.cargoPerSize.foodWater"))
 		"parts", "medicine", "chem":
-			var tenth := float(cargo_per.get("partsMedicineChemTenth", 10.0))
+			var tenth := float(ConfigDb.require("balance.inventory.cargoPerSize.partsMedicineChemTenth"))
 			cap = _base_cap(k) + roundf(cargo * tenth / 3.0)
 		"scrap":
-			cap = _base_cap("scrap") + cargo * float(cargo_per.get("scrap", 8.0))
+			cap = _base_cap("scrap") + cargo * float(ConfigDb.require("balance.inventory.cargoPerSize.scrap"))
 		"seed":
-			cap = _base_cap("seed") + cargo * float(cargo_per.get("seed", 4.0))
+			cap = _base_cap("seed") + cargo * float(ConfigDb.require("balance.inventory.cargoPerSize.seed"))
 		"cloth":
-			cap = _base_cap("cloth") + cargo * float(cargo_per.get("cloth", 5.0))
+			cap = _base_cap("cloth") + cargo * float(ConfigDb.require("balance.inventory.cargoPerSize.cloth"))
 		_:
-			cap = float(inv.get("unknownResourceCap", 9999.0))
+			cap = float(ConfigDb.require("balance.inventory.unknownResourceCap"))
 	return cap * mult
 
 

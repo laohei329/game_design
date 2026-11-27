@@ -12,14 +12,14 @@ var season: String = "spring"
 var day_in_season: int = 1
 var day_total: int = 1
 
-# --- 六元库存（fuel 上限见 fuel_cap）---
-var parts: float = 6.0
+# --- 六元库存（fuel 上限见 fuel_cap）；开局值只经 BalanceStart ---
+var parts: float = 0.0
 var scrap: float = 0.0
-var fuel: float = 88.0
-var food: float = 20.0
-var water: float = 24.0
-var medicine: float = 4.0
-var seed: float = 1.0
+var fuel: float = 0.0
+var food: float = 0.0
+var water: float = 0.0
+var medicine: float = 0.0
+var seed: float = 0.0
 var chem: float = 0.0
 var cloth: float = 0.0
 
@@ -40,7 +40,7 @@ var blueprints: Dictionary = {
 	"radar": false,
 	"living": false,
 }
-var precision: float = 40.0
+var precision: float = 0.0
 var morale_offset: float = 0.0
 var pressure_history: Array = ["", ""]
 var pressure_display: String = ""
@@ -49,7 +49,6 @@ var prefer_expansion: bool = true
 # --- 当日行驶累计（日结 F04 后清零）---
 var drive_hours_today: float = 0.0
 var reverse_hours_today: float = 0.0
-var onboard_pop: int = 4
 var members: Array = []
 var haul_tasks: Array = []  # 杂工搬运单（S1a 薄）
 
@@ -66,11 +65,13 @@ var breakdown_stop_hours_remaining: float = 0.0
 
 # --- 气候输入与派生（ClimateService.refresh 唯一写入乘子）---
 var weather_id: String = "clear"
+## 无 `region_run` 时的暂存；有跨度时读 `region_run.region_fuel_mult`。
 var region_fuel_mult: float = 1.0
 var region_temp_mod: float = 0.0
 var climate_influences: Array = []
 var delayed_events: Array = []
 var event_modal_open: bool = false
+var incident_modal_open: bool = false
 var event_weight_history: Array = []
 var last_event_primary_tag: String = ""
 var event_flags: Dictionary = {}
@@ -116,6 +117,13 @@ var combat_l1_after_fail: bool = false  ## L1 检定失败后 UI 切「撤退/�
 ##
 ## RunState 实例方法；不触发日结或 Intent。
 ## @return 浮点结果（量/比率/工时）。
+## 区域燃油倍率：权威在 `region_run`，否则用开局暂存。
+func region_fuel_mult_active() -> float:
+	if region_run != null:
+		return region_run.region_fuel_mult
+	return region_fuel_mult
+
+
 func fuel_cap() -> float:
 	var cap: float = _PopulationRules.fuel_tank_base()
 	var per_cargo: float = _PopulationRules.fuel_tank_per_cargo()

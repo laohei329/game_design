@@ -6,10 +6,7 @@ extends RefCounted
 
 ## 1 游戏日对应的真实秒数（`balance.time.secondsPerDay`，默认 180）。
 static func seconds_per_day() -> float:
-	var t: Variant = ConfigDb.require("balance.time")
-	if typeof(t) != TYPE_DICTIONARY:
-		return 180.0
-	return maxf(1.0, float(t.get("secondsPerDay", 180.0)))
+	return maxf(1.0, float(ConfigDb.require("balance.time.secondsPerDay")))
 
 
 ## 真实秒 × 倍速 → 游戏日份额。
@@ -21,19 +18,17 @@ static func day_delta_from_real_seconds(real_seconds: float, speed_mult: float =
 
 ## 饥渴上升 / 咬粮咬水 tick 倍率：`stop` 车上活动多，`forward` 行进略缓。
 static func metabolism_mult(state: RunState) -> float:
-	var t: Dictionary = ConfigDb.require("balance.time") if typeof(ConfigDb.require("balance.time")) == TYPE_DICTIONARY else {}
-	var table: Variant = t.get("metabolismMultByIntent", {})
-	if typeof(table) != TYPE_DICTIONARY:
-		table = {"stop": 1.35, "forward": 0.55, "reverse": 0.75}
+	var table: Dictionary = ConfigDb.require("balance.time.metabolismMultByIntent")
 	var intent := str(state.drive_intent)
-	var v: Variant = table.get(intent, 1.0)
-	return maxf(0.05, float(v))
+	if not table.has(intent):
+		push_error("GameClock: missing metabolismMultByIntent." + intent)
+		return 1.0
+	return maxf(0.05, float(table[intent]))
 
 
 ## 车外搜索/搬运工时是否随日钟推进（默认仅 `stop`）。
 static func outdoor_work_active(state: RunState) -> bool:
-	var t: Dictionary = ConfigDb.require("balance.time") if typeof(ConfigDb.require("balance.time")) == TYPE_DICTIONARY else {}
-	var need := str(t.get("outdoorWorkRequiresIntent", "stop"))
+	var need := str(ConfigDb.require("balance.time.outdoorWorkRequiresIntent"))
 	return str(state.drive_intent) == need
 
 
@@ -136,3 +131,19 @@ static func take_restored_hud_fraction() -> float:
 ## 合法倍速档（0=冻结 UI 用手动暂停）。
 static func speed_choices() -> Array:
 	return [1.0, 2.0, 4.0]
+
+
+## 热键 1/2/3 对应第 n 档（1 起算）；越界取首档。
+static func speed_hotkey_tier(tier_1_based: int) -> float:
+	var ch: Array = speed_choices()
+	var idx := clampi(tier_1_based - 1, 0, ch.size() - 1)
+	return float(ch[idx])
+
+
+## 当前倍速在档位中循环下一档（1→2→4→1）。
+static func next_speed_after(current: float) -> float:
+	var ch: Array = speed_choices()
+	for spd in ch:
+		if current < float(spd) - 0.01:
+			return float(spd)
+	return float(ch[0])

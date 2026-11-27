@@ -42,7 +42,9 @@ static func label_for(m: Dictionary) -> String:
 	var name := str(m.get("name", m.get("id", "?")))
 	var job := LocaleApi.tr_code("job", str(m.get("job", "")), str(m.get("job", "")))
 	var mark := LocaleApi.tr_key("spec.scavenge.badge") if _has_scavenge(m) else ""
-	if float(m.get("hunger", 0.0)) >= 55.0 or float(m.get("thirst", 0.0)) >= 55.0:
+	var hun_warn := float(ConfigDb.require("balance.population.satisfactionHungerPerFullDayRation"))
+	var thr_warn := float(ConfigDb.require("balance.population.satisfactionThirstPerFullDayRation"))
+	if float(m.get("hunger", 0.0)) >= hun_warn or float(m.get("thirst", 0.0)) >= thr_warn:
 		mark = (mark + " ") if mark != "" else ""
 		mark += "☆"
 	var hun := int(round(float(m.get("hunger", 0.0))))

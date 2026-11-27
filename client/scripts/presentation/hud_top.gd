@@ -110,8 +110,7 @@ func _on_time_pause() -> void:
 
 ## 倍速 1→2→4 循环。
 func _on_time_speed_cycle() -> void:
-	var cur := GameSession.time_speed
-	var next := 4.0 if cur >= 4.0 - 0.01 else (2.0 if cur >= 2.0 - 0.01 else 1.0)
+	var next := GameClock.next_speed_after(GameSession.time_speed)
 	IntentBus.emit_intent("SET_TIME_SPEED", {"speed": next})
 
 

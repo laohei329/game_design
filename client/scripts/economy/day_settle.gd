@@ -98,7 +98,13 @@ static func _step_6_workshop(state: RunState) -> void:
 	var decay := float(ConfigDb.require("balance.workshop.precisionIdleDecay"))
 	var refining := state.scrap > 0.0 and state.fuel > 0.0
 	if refining:
-		pass
+		var scrap_batch := float(ConfigDb.require("balance.workshop.scrapPerRefineBatch"))
+		var parts_batch := float(ConfigDb.require("balance.workshop.partsPerRefineBatch"))
+		var batches := mini(cars, int(state.scrap / scrap_batch))
+		if batches > 0:
+			var spend := scrap_batch * float(batches)
+			InventoryService.remove(state, "scrap", spend)
+			InventoryService.add(state, "parts", parts_batch * float(batches))
 	elif state.fuel > 0.0:
 		state.precision += craft_bonus
 		var parts_per := float(ConfigDb.require("balance.workshop.partsPerPrecision"))
@@ -114,9 +120,9 @@ static func _step_6_workshop(state: RunState) -> void:
 ## 日结子步骤：仅 `DaySettle.run` 顺序调用；不直接响应 Intent。
 ## @param state 当前局 `RunState`（就地修改字段）
 static func _step_7_zero_consequences(state: RunState) -> void:
-	if state.fuel_zero_streak >= 3:
+	if state.fuel_zero_streak >= _PopulationRules.fuel_zero_streak_fail():
 		state.failed = "fuel"
-	var f39 := maxi(state.food_zero_streak, state.water_zero_streak) >= 3
+	var f39 := maxi(state.food_zero_streak, state.water_zero_streak) >= _PopulationRules.resource_zero_streak_f39()
 	if not f39:
 		return
 	var hp_loss := _PopulationRules.f39_hp_loss()
@@ -190,7 +196,10 @@ static func _collective_morale(state: RunState) -> float:
 static func _step_7c_day_end_recruit(state: RunState) -> void:
 	if state.failed != "":
 		return
-	MemberRoster.try_day_end_recruit(state)
+	if IncidentDirector.use_legacy_event_cards():
+		MemberRoster.try_day_end_recruit(state)
+	else:
+		IncidentDirector.on_day_end(state)
 
 
 ## 列车体 HP 低时累加 breakdown_counter；满 3 清零当日行驶小时（强制停薄模拟）。
@@ -201,11 +210,11 @@ static func _step_8b_breakdown(state: RunState) -> void:
 	if state.body_hp >= _PopulationRules.body_hp_breakdown_threshold():
 		state.breakdown_counter = 0
 		return
-	if state.breakdown_counter >= 3:
+	if state.breakdown_counter >= _PopulationRules.breakdown_counter_trigger():
 		state.breakdown_counter = 0
 		state.drive_hours_today = 0.0
 		state.reverse_hours_today = 0.0
-		state.breakdown_stop_hours_remaining = 2.0
+		state.breakdown_stop_hours_remaining = _PopulationRules.breakdown_stop_hours()
 		DriveService.set_intent(state, "stop")
 	else:
 		state.breakdown_counter += 1
@@ -243,11 +252,12 @@ static func run(state: RunState) -> void:
 		if state.fuel >= heat_cost:
 			InventoryService.remove(state, "fuel", heat_cost)
 			state.heating_applied_today = true
-			state.greenhouse_climate = float(ConfigDb.require("balance.greenhouse.heatingMult"))
 		else:
-			state.greenhouse_climate = float(ConfigDb.require("balance.greenhouse.noHeatWinterMult"))
+			state.heating_applied_today = false
 	elif state.cold_index >= 1.0 and green_cars > 0:
-		state.greenhouse_climate = float(ConfigDb.require("balance.greenhouse.noHeatWinterMult"))
+		state.heating_applied_today = false
+
+	ClimateService.refresh(state, next_day)
 
 	InventoryService.clamp_resource(state, "fuel")
 

@@ -1,5 +1,7 @@
 class_name CombatL1
 extends RefCounted
+
+const _PopulationRules := preload("res://scripts/domain/population_rules.gd")
 ## L1 小股战斗检定 + 非战斗路径（S1b 薄切片，L2/L3 未实现）。
 ##
 ## 状态（RunState）：
@@ -33,6 +35,14 @@ static func combat_cfg() -> Dictionary:
 	return ConfigDb.get_table("combat")
 
 
+static func _c_f(path: String) -> float:
+	return float(ConfigDb.require("combat." + path))
+
+
+static func _c_i(path: String) -> int:
+	return int(ConfigDb.require("combat." + path))
+
+
 ## NEW_RUN / 旧档缺 formations 时：把 combatRoster 成员填入单编队 fmt_default。
 ##
 ## 公开 API：UI 经 `IntentBus` → `GameSession`，勿在 presentation 改 state。
@@ -48,7 +58,7 @@ static func seed_default_formation(state: RunState) -> void:
 		if mid.is_empty():
 			continue
 		slots.append({"memberId": mid, "slotId": "front_%d" % (slots.size() + 1)})
-		if slots.size() >= 8:
+		if slots.size() >= _c_i("formationMaxSlots"):
 			break
 	state.formations = [
 		{
@@ -114,7 +124,7 @@ static func open_encounter(state: RunState, enemy_count: int) -> String:
 		return "must_stop"
 	if TrainService.has_outdoor_tasks(state):
 		return "outdoor_busy"
-	var max_l1 := int(combat_cfg().get("layerRouting", {}).get("stopMaxCountL1", 5))
+	var max_l1 := _c_i("layerRouting.stopMaxCountL1")
 	enemy_count = clampi(enemy_count, 1, max_l1)
 	state.pending_combat = {
 		"layer": "L1",
@@ -138,15 +148,12 @@ static func open_from_template(state: RunState, template_id: String, extra: Dict
 	var tpl := _resolve_threat_template(template_id)
 	if tpl.is_empty():
 		return "unknown_threat"
-	var layer := str(tpl.get("layerDefault", "L1"))
-	var count_min := int(tpl.get("countMin", 2))
-	var count_max := int(tpl.get("countMax", count_min))
+	var layer := str(tpl["layerDefault"])
+	var count_min := int(tpl["countMin"])
+	var count_max := int(tpl["countMax"])
 	var count := RngService.randi_range(count_min, count_max)
-	if layer == "L1":
-		var max_l1 := int(combat_cfg().get("layerRouting", {}).get("stopMaxCountL1", 5))
-		count = clampi(count, 1, max_l1)
-	else:
-		count = clampi(count, 1, int(combat_cfg().get("layerRouting", {}).get("stopMaxCountL1", 5)))
+	var max_l1 := _c_i("layerRouting.stopMaxCountL1")
+	count = clampi(count, 1, max_l1)
 	if state.drive_intent != "stop":
 		return "must_stop"
 	if TrainService.has_outdoor_tasks(state):
@@ -267,7 +274,7 @@ static func can_non_combat_path(state: RunState, path: String) -> String:
 		"negotiate", "bypass":
 			return ""
 		"horn":
-			var need := float(combat_cfg().get("nonCombat", {}).get("hornFuelCostPct", 2.0))
+			var need := _c_f("nonCombat.hornFuelCostPct")
 			var cost := state.fuel_cap() * need / 100.0
 			if state.fuel < cost:
 				return "fuel"
@@ -287,8 +294,8 @@ static func can_non_combat_path(state: RunState, path: String) -> String:
 ## @return 浮点结果（量/比率/工时）。
 static func power_p(state: RunState) -> float:
 	var cfg := combat_cfg()
-	var guard_base := float(cfg.get("guardBase", 10.0))
-	var drill_mult := float(cfg.get("combatDrill", {}).get("guardMult", 1.05))
+	var guard_base := _c_f("guardBase")
+	var drill_mult := _c_f("combatDrill.guardMult")
 	var b := 0.0
 	var ids := field_member_ids(state)
 	for mid in ids:
@@ -296,14 +303,12 @@ static func power_p(state: RunState) -> float:
 		var m := _member(state, mid)
 		if m.is_empty():
 			continue
-		if str(m.get("job", "")) == "guard":
-			pass
 		var specs: Variant = m.get("specialties", [])
 		if typeof(specs) == TYPE_ARRAY and "combat_drill" in specs:
 			g *= drill_mult
 		b += g
-	b += float(_armor_car_count(state)) * 12.0
-	b += float(state.armor_tech) * 4.0
+	b += float(_armor_car_count(state)) * float(ConfigDb.require("combat.l1ArmorCarPower"))
+	b += float(state.armor_tech) * float(ConfigDb.require("combat.l1ArmorTechPerLevel"))
 	return maxf(b, 0.0)
 
 
@@ -313,7 +318,7 @@ static func power_p(state: RunState) -> float:
 ## @param enemy_count 遭遇敌人数（L1 层）
 ## @return 浮点结果（量/比率/工时）。
 static func power_e(enemy_count: int) -> float:
-	var unit := float(combat_cfg().get("l1Unit", 8.0))
+	var unit := _c_f("l1Unit")
 	return float(enemy_count) * unit
 
 
@@ -338,14 +343,14 @@ static func ratio_d(state: RunState, enemy_count: int) -> float:
 ## @param enemy_count 遭遇敌人数（L1 层）
 ## @return 浮点结果（量/比率/工时）。
 static func l1_success_chance(state: RunState, enemy_count: int) -> float:
-	var cfg: Dictionary = {}
-	var raw_succ: Variant = combat_cfg().get("l1Success", {})
-	if typeof(raw_succ) == TYPE_DICTIONARY:
-		cfg = raw_succ
-	var base := float(cfg.get("base", 0.35))
-	var scale := float(cfg.get("scaleD", 0.45))
+	var base := _c_f("l1Success.base")
+	var scale := _c_f("l1Success.scaleD")
 	var d := ratio_d(state, enemy_count)
-	return clampf(base + scale * d, float(cfg.get("min", 0.15)), float(cfg.get("max", 0.9)))
+	return clampf(
+		base + scale * d,
+		_c_f("l1Success.min"),
+		_c_f("l1Success.max")
+	)
 
 
 ## 非战路径成功率；无编队时 D=0；谈判有 guard 时 threatModNegotiateWithGuard。
@@ -355,19 +360,18 @@ static func l1_success_chance(state: RunState, enemy_count: int) -> float:
 ## @param path 非战斗路径 id（negotiate/bypass/horn/evacuate）
 ## @return 浮点结果（量/比率/工时）。
 static func non_combat_chance(state: RunState, path: String) -> float:
-	var nc: Dictionary = combat_cfg().get("nonCombat", {})
-	var base := float(nc.get("pathChanceBase", 0.25))
-	var scale := float(nc.get("pathChanceScaleD", 0.5))
+	var base := _c_f("nonCombat.pathChanceBase")
+	var scale := _c_f("nonCombat.pathChanceScaleD")
 	var d := ratio_d(state, int(state.pending_combat.get("enemyCount", 1)))
 	if not has_combat_field(state):
 		d = 0.0
 	var threat := 0.0
 	if path == "negotiate" and _has_guard_on_roster(state):
-		threat = float(nc.get("threatModNegotiateWithGuard", -0.05))
+		threat = _c_f("nonCombat.threatModNegotiateWithGuard")
 	return clampf(
 		base + scale * d - threat,
-		float(nc.get("pathChanceMin", 0.1)),
-		float(nc.get("pathChanceMax", 0.85))
+		_c_f("nonCombat.pathChanceMin"),
+		_c_f("nonCombat.pathChanceMax")
 	)
 
 
@@ -502,11 +506,14 @@ static func _close_combat(state: RunState) -> void:
 ## 模块内部实现；调用方限于本文件或同层 Service。
 ## @param state 当前局 `RunState`（就地修改字段）
 static func _apply_l1_success(state: RunState) -> void:
-	var bonus := float(combat_cfg().get("moodCombatWinL1", 2.0))
+	var bonus := _c_f("moodCombatWinL1")
 	for mid in field_member_ids(state):
 		var m := _member(state, mid)
 		if not m.is_empty():
-			m["mood"] = minf(100.0, float(m.get("mood", 70.0)) + bonus)
+			m["mood"] = minf(
+				100.0,
+				float(m.get("mood", _PopulationRules.mood_default())) + bonus
+			)
 
 
 ## l1Fail：50% 随机 1 人 -12 HP，否则全队上场 -allHpLoss（默认 8）。
@@ -514,19 +521,16 @@ static func _apply_l1_success(state: RunState) -> void:
 ## 模块内部实现；调用方限于本文件或同层 Service。
 ## @param state 当前局 `RunState`（就地修改字段）
 static func _apply_l1_fail(state: RunState) -> void:
-	var cfg: Dictionary = {}
-	var raw_fail: Variant = combat_cfg().get("l1Fail", {})
-	if typeof(raw_fail) == TYPE_DICTIONARY:
-		cfg = raw_fail
-	if RngService.randf() < float(cfg.get("injuryBranchChance", 0.5)):
+	if RngService.randf() < _c_f("l1Fail.injuryBranchChance"):
 		var ids := field_member_ids(state)
 		if not ids.is_empty():
 			var pick := str(ids[RngService.randi() % ids.size()])
 			var m := _member(state, pick)
 			if not m.is_empty():
-				m["hp"] = maxf(1.0, float(m.get("hp", 100.0)) - 12.0)
+				var inj := _c_f("l1Fail.injuryHpLoss")
+				m["hp"] = maxf(1.0, float(m.get("hp", 100.0)) - inj)
 	else:
-		var loss := float(cfg.get("allHpLoss", 8.0))
+		var loss := _c_f("l1Fail.allHpLoss")
 		for mid in field_member_ids(state):
 			var m := _member(state, mid)
 			if not m.is_empty():
@@ -539,18 +543,21 @@ static func _apply_l1_fail(state: RunState) -> void:
 ## @param state 当前局 `RunState`（就地修改字段）
 ## @param path 非战斗路径 id（negotiate/bypass/horn/evacuate）
 static func _apply_non_combat_success(state: RunState, path: String) -> void:
-	var nc: Dictionary = combat_cfg().get("nonCombat", {})
+	var mood_bonus := _c_f("nonCombat.negotiateMoodBonus")
 	match path:
 		"negotiate":
 			for m in state.members:
 				if typeof(m) == TYPE_DICTIONARY:
-					m["mood"] = minf(100.0, float(m.get("mood", 70.0)) + 1.0)
+					m["mood"] = minf(
+						100.0,
+						float(m.get("mood", _PopulationRules.mood_default())) + mood_bonus
+					)
 		"bypass":
 			var seg := state.region_run.active_segment() if state.region_run else null
 			if seg is Segment:
-				seg.segment_fuel_surcharge = float(nc.get("bypassFuelSurcharge", 0.05))
+				seg.segment_fuel_surcharge = _c_f("nonCombat.bypassFuelSurcharge")
 		"horn":
-			var pct := float(nc.get("hornFuelCostPct", 2.0))
+			var pct := _c_f("nonCombat.hornFuelCostPct")
 			InventoryService.remove(state, "fuel", state.fuel_cap() * pct / 100.0)
 		"evacuate":
 			state.drive_hours_today = DriveService.hours_cap()
@@ -572,8 +579,7 @@ static func _apply_non_combat_fail(state: RunState, path: String) -> void:
 ## 模块内部实现；调用方限于本文件或同层 Service。
 ## @param state 当前局 `RunState`（就地修改字段）
 static func _apply_bypass_fail(state: RunState) -> void:
-	var nc: Dictionary = combat_cfg().get("nonCombat", {})
-	var loss := float(nc.get("bypassFailHpLoss", 15.0))
+	var loss := _c_f("nonCombat.bypassFailHpLoss")
 	for m in state.members:
 		if typeof(m) != TYPE_DICTIONARY:
 			continue

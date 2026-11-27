@@ -5,7 +5,7 @@ extends Node
 
 var tables: Dictionary = {}
 var load_errors: PackedStringArray = []
-var config_version: int = 0
+var _config_version: int = 0
 
 const MANIFEST := "res://data/manifest.json"
 ## _ready
@@ -30,7 +30,7 @@ func load_all() -> bool:
 	if typeof(manifest) != TYPE_DICTIONARY:
 		load_errors.append("manifest not object")
 		return false
-	config_version = int(manifest.get("configVersion", 0))
+	_config_version = int(manifest.get("configVersion", 0))
 	var files: Dictionary = manifest.get("files", {})
 	for table_name in files.keys():
 		var rel := str(files[table_name]).replace("\\", "/")
@@ -48,6 +48,31 @@ func load_all() -> bool:
 			continue
 		tables[table_name] = payload
 	return load_errors.is_empty()
+
+
+func reload_all() -> bool:
+	return load_all()
+
+
+func has(path: String) -> bool:
+	var parts := path.split(".")
+	if parts.is_empty():
+		return false
+	var node: Variant = tables.get(parts[0], null)
+	if node == null:
+		return false
+	for i in range(1, parts.size()):
+		if typeof(node) != TYPE_DICTIONARY:
+			return false
+		if not node.has(parts[i]):
+			return false
+		node = node[parts[i]]
+	return true
+
+
+func config_version() -> int:
+	return _config_version
+
 
 ## 已加载根表；无则 `{}`。
 ##

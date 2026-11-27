@@ -9,7 +9,6 @@ extends RefCounted
 ##
 ## 成功遗弃：扣零件/油、加废料、占用 0.5 行驶日、Telemetry `carriage_abandon`。
 
-const ABANDON_DAY_FRACTION := 0.5
 
 ## 车厢模板展示名（`carriage.*`）。
 ##
@@ -20,18 +19,40 @@ static func template_label(template_id: String) -> String:
 	return LocaleApi.tr_code("carriage", template_id, template_id)
 
 
+## 运行态车厢 `size`；缺字段时读模板表。
+##
+## 公开 API：UI 经 `IntentBus` → `GameSession`，勿在 presentation 改 state。
+## @param car 车厢字典 `carriages[]` 元素
+## @return 整数结果（计数/下标/容量）。
+static func carriage_size(car: Dictionary) -> int:
+	var tid := str(car.get("templateId", ""))
+	if car.has("size"):
+		return int(car["size"])
+	return int(ConfigDb.require("carriages.templates." + tid + ".size"))
+
+
+## living 节床位 = size × `carriages.livingBedsPerSize`（03 §3.2 预满密度）。
+static func living_beds_for_car(car: Dictionary) -> int:
+	var per := int(ConfigDb.require("carriages.livingBedsPerSize"))
+	return carriage_size(car) * per
+
+
+## 生活科技线附加床位 = level × `carriages.techBedsPerLivingLevel`。
+static func living_tech_bed_bonus(state: RunState) -> int:
+	var per := int(ConfigDb.require("carriages.techBedsPerLivingLevel"))
+	return state.living_tech * per
+
+
 ## 挂车/遗弃废料折算用零件成本（carriages.repairParts）。
 ##
 ## 公开 API：UI 经 `IntentBus` → `GameSession`，勿在 presentation 改 state。
 ## @param template_id 车厢/威胁模板 id
 ## @return 整数结果（计数/下标/容量）。
 static func repair_cost(template_id: String) -> int:
-	var root: Dictionary = ConfigDb.get_table("carriages")
-	var rp: Variant = root.get("repairParts", {})
-	if typeof(rp) == TYPE_DICTIONARY:
-		var v: Variant = rp.get(template_id, rp.get("default", 5))
-		return int(v)
-	return 5
+	var key := "carriages.repairParts." + template_id
+	if ConfigDb.has(key):
+		return int(ConfigDb.require(key))
+	return int(ConfigDb.require("carriages.repairParts.default"))
 
 
 ## 按 carriages[].id 查下标；-1 不存在。
@@ -47,7 +68,7 @@ static func find_carriage_index(carriages: Array, car_id: String) -> int:
 	return -1
 
 
-## living.size×2 求和 + living_tech×2（生活科技床位）。
+## living 节床位求和 + 生活科技线床位加成（`carriages.*Beds*`）。
 ##
 ## 公开 API：UI 经 `IntentBus` → `GameSession`，勿在 presentation 改 state。
 ## @param state 当前局 `RunState`（就地修改字段）
@@ -56,12 +77,12 @@ static func bed_count(state: RunState) -> int:
 	var beds := 0
 	for c in state.carriages:
 		if str(c.get("templateId", "")) == "living":
-			beds += int(c.get("size", 2)) * 2
-	beds += state.living_tech * 2
+			beds += living_beds_for_car(c)
+	beds += living_tech_bed_bonus(state)
 	return beds
 
 
-## 有 members[] 时数 hp>0；否则回退 onboard_pop（至少 1）。日结粮水用此值。
+## 存活成员数（hp>0）；无成员列表时回退 1。日结粮水用此值。
 ##
 ## 公开 API：UI 经 `IntentBus` → `GameSession`，勿在 presentation 改 state。
 ## @param state 当前局 `RunState`（就地修改字段）
@@ -75,7 +96,7 @@ static func onboard_count(state: RunState) -> int:
 			if float(m.get("hp", 100.0)) > 0.0:
 				n += 1
 		return maxi(1, n)
-	return maxi(1, state.onboard_pop)
+	return 1
 
 
 ## 未完结搜索/搬运或队员 searching/hauling/in_combat；遗弃与开战前须为 false。
@@ -138,7 +159,8 @@ static func can_abandon(state: RunState, car_id: String) -> String:
 		return "must_stop"
 	if has_outdoor_tasks(state):
 		return "outdoor_tasks"
-	if state.drive_hours_today + ABANDON_DAY_FRACTION > DriveService.hours_cap() + 0.001:
+	var abandon_day := float(ConfigDb.require("balance.train.abandonDayFraction"))
+	if state.drive_hours_today + abandon_day > DriveService.hours_cap() + 0.001:
 		return "drive_hours"
 	var idx := find_carriage_index(state.carriages, car_id)
 	if idx < 0:
@@ -151,7 +173,7 @@ static func can_abandon(state: RunState, car_id: String) -> String:
 		return "no_other_car"
 	var beds_after := bed_count(state)
 	if str(car.get("templateId", "")) == "living":
-		beds_after -= int(car.get("size", 2)) * 2
+		beds_after -= living_beds_for_car(car)
 	if beds_after < onboard_count(state):
 		return "beds"
 	var cost: float = float(ConfigDb.require("balance.train.abandonPartsCost"))
@@ -183,17 +205,23 @@ static func abandon_preview(state: RunState, car_id: String) -> Dictionary:
 	var tid := str(car.get("templateId", ""))
 	var parts_cost := float(ConfigDb.require("balance.train.abandonPartsCost"))
 	var scrap_ratio := float(ConfigDb.require("balance.train.abandonScrapRatio"))
-	var fuel_pct := float(ConfigDb.require("balance.train.abandonFuelCostPct"))
 	var scrap_gain := int(float(repair_cost(tid)) * scrap_ratio)
-	var fuel_spent := state.fuel_cap() * fuel_pct
+	var fuel_spent := _abandon_fuel_cost(state)
 	return {
 		"carId": car_id,
 		"templateId": tid,
 		"partsCost": parts_cost,
 		"scrapGain": scrap_gain,
 		"fuelSpent": fuel_spent,
+		"dayFraction": float(ConfigDb.require("balance.train.abandonDayFraction")),
 		"blockReason": can_abandon(state, car_id),
 	}
+
+
+## 遗弃切割油耗：`fuel_cap × abandonFuelCostPct`（配置为小数，0.01=1%）。
+static func _abandon_fuel_cost(state: RunState) -> float:
+	var pct := float(ConfigDb.require("balance.train.abandonFuelCostPct"))
+	return state.fuel_cap() * pct
 
 
 ## Intent `ABANDON_CARRIAGE` 唯一写入口；失败仅 warning，不改 state。
@@ -212,14 +240,15 @@ static func abandon_carriage(state: RunState, car_id: String) -> bool:
 	var tid: String = str(car.get("templateId", ""))
 	var parts_cost: float = float(ConfigDb.require("balance.train.abandonPartsCost"))
 	var scrap_ratio: float = float(ConfigDb.require("balance.train.abandonScrapRatio"))
-	var fuel_pct: float = float(ConfigDb.require("balance.train.abandonFuelCostPct"))
+	var fuel_spent := _abandon_fuel_cost(state)
 	InventoryService.remove(state, "parts", parts_cost)
-	state.scrap += float(int(float(repair_cost(tid)) * scrap_ratio))
-	InventoryService.remove(state, "fuel", state.fuel_cap() * fuel_pct / 100.0)
+	var scrap_grant := float(int(float(repair_cost(tid)) * scrap_ratio))
+	InventoryService.add(state, "scrap", scrap_grant)
+	InventoryService.remove(state, "fuel", fuel_spent)
 	_relocate_members_off_car(state, car_id)
 	state.carriages.remove_at(idx)
 	state.abandon_count += 1
-	state.drive_hours_today += ABANDON_DAY_FRACTION
+	state.drive_hours_today += float(ConfigDb.require("balance.train.abandonDayFraction"))
 	ClimateService.refresh(state)
 	TelemetryService.record(
 		"carriage_abandon",
@@ -231,7 +260,7 @@ static func abandon_carriage(state: RunState, car_id: String) -> bool:
 			"fuelFill": snappedf(state.fuel_fill(), 0.01),
 			"partsSpent": parts_cost,
 			"scrapGranted": int(float(repair_cost(tid)) * scrap_ratio),
-			"fuelSpent": state.fuel_cap() * fuel_pct,
+			"fuelSpent": fuel_spent,
 			"driveIntent": state.drive_intent,
 			"stationContext": true,
 		}

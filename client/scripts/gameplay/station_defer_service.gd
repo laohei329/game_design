@@ -27,15 +27,16 @@ static func offer_defer_reason(state: RunState, offer: Dictionary, prefer_expans
 	var hints := _hints()
 	var fuel_cfg: Dictionary = hints.get("fuelFill", {})
 	var car_cfg: Dictionary = hints.get("carCount", {})
-	var throttle: float = float(fuel_cfg.get("expansionThrottle", 0.55))
-	var high_burn: float = float(fuel_cfg.get("highBurnOfferBlock", 0.28))
-	var length_banner: int = int(car_cfg.get("lengthBurdenBanner", 12))
+	var throttle: float = float(ConfigDb.require("hud_hints.fuelFill.expansionThrottle"))
+	var high_burn: float = float(ConfigDb.require("hud_hints.fuelFill.highBurnOfferBlock"))
+	var high_burn_fuel_min: float = float(ConfigDb.require("hud_hints.fuelFill.highBurnFuelPerDayMin"))
+	var length_banner: int = int(ConfigDb.require("hud_hints.carCount.lengthBurdenBanner"))
 	var ff := fuel_fill(state)
 	var tid: String = str(offer.get("templateId", ""))
 	var fuel_add: float = float(offer.get("fuelPerDay", offer.get("fuelAdd", 1.0)))
 	if ff < throttle and tid == "armor":
 		return "FUEL_TIGHT_ARMOR"
-	if ff < high_burn and fuel_add >= 2.0:
+	if ff < high_burn and fuel_add >= high_burn_fuel_min:
 		return "FUEL_TIGHT_HIGH_BURN"
 	if prefer_expansion and ff < throttle and state.car_count() >= length_banner:
 		var allow: Array = hints.get("whitelistWhenLongTrainTight", [])

@@ -69,7 +69,7 @@ static func carriage_template(template_id: String) -> Dictionary:
 ## @param template_id 车厢/威胁模板 id
 ## @return 浮点结果（量/比率/工时）。
 static func fuel_per_day_add(template_id: String) -> float:
-	return float(carriage_template(template_id).get("fuelPerDayAdd", 1.0))
+	return float(ConfigDb.require("carriages.templates." + template_id + ".fuelPerDayAdd"))
 
 
 ## 列车逻辑位置 `progress_km` 是否已到达该站（±0.05 km 容差）。
@@ -164,7 +164,9 @@ static func generate_offer(state: RunState, _seg: Segment, station: Dictionary) 
 	var skip_streak := bool(station.get("tutorialHook", false))
 
 	if bool(station.get("forceLivingOffer", false)):
-		var cost := int(station.get("livingRepairCost", stations_cfg().get("tutorialLivingRepairCost", 1)))
+		var cost := int(
+			station.get("livingRepairCost", ConfigDb.require("stations.tutorialLivingRepairCost"))
+		)
 		station.offer = _make_offer("living", "damaged", cost, false, state.parts >= cost, true)
 		return station.offer
 
@@ -176,8 +178,8 @@ static func generate_offer(state: RunState, _seg: Segment, station: Dictionary) 
 	var force := state.guarantee_fail_streak >= guarantee_after()
 	var found := force
 	if not found:
-		found = RngService.randf() < float(cfg.get("poolOfferChance", 0.9))
-	if not found and RngService.randf() < float(cfg.get("emptyChance", 0.1)):
+		found = RngService.randf() < float(ConfigDb.require("stations.poolOfferChance"))
+	if not found and RngService.randf() < float(ConfigDb.require("stations.emptyChance")):
 		_record_miss(state, station, skip_streak, "empty_roll")
 		return {}
 	if not found:
@@ -227,18 +229,19 @@ static func resolve_offer(state: RunState, accept: bool) -> String:
 	if accept:
 		if typeof(offer) != TYPE_DICTIONARY or offer.is_empty():
 			return "no_offer"
-		var cost := int(offer.get("repairCost", 99))
+		if not offer.has("repairCost"):
+			return "no_offer"
+		var cost := int(offer["repairCost"])
 		if state.parts < cost:
 			return "parts"
 		var tid := str(offer.get("templateId", ""))
 		InventoryService.remove(state, "parts", float(cost))
-		var tmpl := carriage_template(tid)
 		var car_id := "car_%s_%d" % [tid, state.carriages.size()]
 		state.carriages.append(
 			{
 				"id": car_id,
 				"templateId": tid,
-				"size": int(tmpl.get("size", 2)),
+				"size": int(ConfigDb.require("carriages.templates." + tid + ".size")),
 			}
 		)
 		station.carriage_received = true
@@ -395,7 +398,7 @@ static func _pick_from_pool(size: String, _force: bool) -> String:
 ## 模块内部实现；调用方限于本文件或同层 Service。
 ## @return 空串=成功；非空=机器错误码。
 static func _pick_condition() -> String:
-	var weights: Variant = stations_cfg().get("conditionWeights", {"intact": 0.15, "damaged": 0.6, "wreck": 0.25})
+	var weights: Variant = ConfigDb.require("stations.conditionWeights")
 	if typeof(weights) != TYPE_DICTIONARY:
 		return "damaged"
 	var keys: Array = []

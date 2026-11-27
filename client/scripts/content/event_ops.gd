@@ -2,7 +2,7 @@ class_name EventOps
 extends RefCounted
 
 const _PopulationRules := preload("res://scripts/domain/population_rules.gd")
-## 事件选项 `op` / `immediate` 结算（对齐 sim/run_time_event_sweep）；延迟入 `state.delayed_events`。
+## 事件选项 `op` / `immediate` 结算（权威客户端；Python 对照 `sim/event_ops_sim.py`）；延迟入 `state.delayed_events`。
 ## 写 `RunState` 的权威：`choose_option` / `fire_delayed` / `apply_op` / `process_due_delayed_events`。
 
 
@@ -244,7 +244,11 @@ static func apply_op(
 				state.event_flags[key] = args.get("value", true)
 			return ""
 		"recruit_roll":
-			var prob := float(args.get("p", 0.7))
+			var prob := (
+				float(args["p"])
+				if args.has("p")
+				else float(ConfigDb.require("balance.eventOps.defaultRecruitRollP"))
+			)
 			if TrainService.onboard_count(state) < TrainService.bed_count(state) and RngService.randf() < prob:
 				MemberRoster.try_recruit_one(state)
 				TelemetryService.record("event_recruit_success", {"eventId": source_event})
@@ -252,10 +256,16 @@ static func apply_op(
 				TelemetryService.record("event_recruit_fail", {"eventId": source_event})
 			return ""
 		"loot_halve":
-			var ratio := clampf(float(args.get("ratio", 0.5)), 0.0, 1.0)
+			var raw_ratio := (
+				float(args["ratio"])
+				if args.has("ratio")
+				else float(ConfigDb.require("balance.eventOps.defaultLootHalveRatio"))
+			)
+			var ratio := clampf(raw_ratio, 0.0, 1.0)
 			if seg == null:
 				return "delayed_target_skip"
-			if target_id != "":
+			var point_halve := target_id != "" and target_type != "segment"
+			if point_halve:
 				if not _live_point_pile_has_loot(state, target_id):
 					TelemetryService.record(
 						"event_delayed_loot_empty_skip",

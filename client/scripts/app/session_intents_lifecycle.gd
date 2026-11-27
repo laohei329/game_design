@@ -38,5 +38,10 @@ static func try_handle(session: Node, intent_name: String, payload: Dictionary) 
 			if SaveService.load_into_game_session(int(payload.get("slot", 0))):
 				return 1
 			return 0
+		"DEV_TOGGLE_REGION_FUEL":
+			if session.state:
+				RegionService.dev_toggle_region_fuel_mult(session.state)
+				return 1
+			return 0
 		_:
 			return -1

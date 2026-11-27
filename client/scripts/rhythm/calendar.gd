@@ -12,10 +12,9 @@ const SEASONS := ["spring", "summer", "autumn", "winter"]
 ## @return 整数结果（计数/下标/容量）。
 static func season_index_for_day(day_total: int) -> int:
 	var days_per := int(ConfigDb.require("balance.time.daysPerSeason"))
-	if days_per <= 0:
-		days_per = 30
+	var seasons_per := int(ConfigDb.require("balance.time.seasonsPerYear"))
 	var zero := maxi(0, day_total - 1)
-	return (zero / days_per) % 4
+	return (zero / days_per) % seasons_per
 
 ## day_total → spring|summer|autumn|winter。
 ##
@@ -33,10 +32,6 @@ static func season_name_for_day(day_total: int) -> String:
 static func year_for_day(day_total: int) -> int:
 	var days_per := int(ConfigDb.require("balance.time.daysPerSeason"))
 	var per_year := int(ConfigDb.require("balance.time.seasonsPerYear"))
-	if days_per <= 0:
-		days_per = 30
-	if per_year <= 0:
-		per_year = 4
 	var zero := maxi(0, day_total - 1)
 	return zero / (days_per * per_year) + 1
 
@@ -47,8 +42,6 @@ static func year_for_day(day_total: int) -> int:
 ## @return 整数结果（计数/下标/容量）。
 static func day_in_season_for_day(day_total: int) -> int:
 	var days_per := int(ConfigDb.require("balance.time.daysPerSeason"))
-	if days_per <= 0:
-		days_per = 30
 	var zero := maxi(0, day_total - 1)
 	return (zero % days_per) + 1
 
